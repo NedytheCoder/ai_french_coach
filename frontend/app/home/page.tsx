@@ -1,10 +1,16 @@
 "use client"
 import { useState } from "react"
 
+interface Message {
+    role: "user" | "assistant"
+    content: string
+}
+
 export default function Home() {
     const [message, setMessage] = useState("")
     const [prompt, setPrompt] = useState("")
-    const [reply, setReply] = useState("")
+    const[mode, setMode] = useState<"chat" | "introduction" | "traveling" | "daily_conversations">("chat")
+    const [messages, setMessages] = useState<Message[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
     async function getData() {
@@ -17,29 +23,47 @@ export default function Home() {
         if (!prompt.trim()) return
         
         setIsLoading(true)
-        setReply("")
+        
+        // Create user message and updated history
+        const userMessage: Message = { role: "user", content: prompt }
+        const updatedHistory = [...messages, userMessage]
+        
+        // Update local state
+        setMessages(updatedHistory)
         
         try {
-            const res = await fetch("http://127.0.0.1:8000/respond", {
+            let url = "http://127.0.0.1:8000/respond"
+            if (mode === "introduction") {
+                url = "http://127.0.0.1:8000/introduction"
+            } else if (mode === "traveling") {
+                url = "http://127.0.0.1:8000/traveling"
+            } else if (mode === "daily_conversations") {
+                url = "http://127.0.0.1:8000/daily_conversations"
+            }
+            const res = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    message: prompt,
+                    message: updatedHistory,
                 }),
             })
             const data = await res.json()
 
             if (!res.ok) {
-                setReply(`Error: ${data.detail || "Something went wrong"}`)
+                const errorMessage: Message = { role: "assistant", content: `Error: ${data.detail || "Something went wrong"}` }
+                setMessages(prev => [...prev, errorMessage])
             } else {
-                setReply(data.reply)
+                const assistantMessage: Message = { role: "assistant", content: data.reply }
+                setMessages(prev => [...prev, assistantMessage])
             }
         } catch (error) {
-            setReply(`Error: Failed to connect to server`)
+            const errorMessage: Message = { role: "assistant", content: "Error: Failed to connect to server" }
+            setMessages(prev => [...prev, errorMessage])
         } finally {
             setIsLoading(false)
+            setPrompt("")
         }
     }
 
@@ -48,6 +72,24 @@ export default function Home() {
             <div className="max-w-2xl mx-auto">
                 <h1 className="text-3xl font-bold text-gray-900 mb-8">French Coach</h1>
                 
+                <div className="mb-6">
+                    <label htmlFor="mode" className="block text-sm font-medium text-gray-700 mb-2">
+                        Conversation Mode:
+                    </label>
+                    <select
+                        id="mode"
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value as typeof mode)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        disabled={isLoading}
+                    >
+                        <option value="chat">Chat</option>
+                        <option value="introduction">Introduction</option>
+                        <option value="traveling">Traveling</option>
+                        <option value="daily_conversations">Daily Conversations</option>
+                    </select>
+                </div>
+
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <div className="mb-4">
                         <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 mb-2">
@@ -73,10 +115,27 @@ export default function Home() {
                     </button>
                 </div>
 
-                {reply && (
-                    <div className="mt-6 bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-3">Reply:</h2>
-                        <div className="text-gray-700 whitespace-pre-wrap">{reply}</div>
+                {messages.length > 0 && (
+                    <div className="mt-6 space-y-4">
+                        {messages.map((msg, index) => (
+                            <div
+                                key={index}
+                                className={`p-4 rounded-lg ${
+                                    msg.role === "user"
+                                        ? "bg-blue-50 border border-blue-200 ml-8"
+                                        : "bg-white border border-gray-200 mr-8"
+                                }`}
+                            >
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className={`text-sm font-semibold ${
+                                        msg.role === "user" ? "text-blue-700" : "text-gray-700"
+                                    }`}>
+                                        {msg.role === "user" ? "You" : "Assistant"}
+                                    </span>
+                                </div>
+                                <div className="text-gray-800 whitespace-pre-wrap">{msg.content}</div>
+                            </div>
+                        ))}
                     </div>
                 )}
 
