@@ -1,7 +1,5 @@
 "use client"
 import { useState, useRef } from "react"
-import { UisMicrophone } from '@iconscout/react-unicons-solid'
-import { UisMessage } from '@iconscout/react-unicons-solid'
 
 interface Message {
     role: "user" | "assistant"
@@ -12,19 +10,19 @@ export default function Home() {
 
     // State for the test connection message
     const [message, setMessage] = useState("")
-
+    
     // State for the prompt input
     const [prompt, setPrompt] = useState("")
-
+    
     // State for the mode (chat, introduction, traveling, daily_conversations)
     const [mode, setMode] = useState<"chat" | "introduction" | "traveling" | "daily_conversations">("chat")
-
+    
     // State for the series of messages sent to the backend
     const [messages, setMessages] = useState<Message[]>([])
-
+    
     // State for loading
     const [isLoading, setIsLoading] = useState(false)
-
+    
     // State for recording
     const [isRecording, setIsRecording] = useState(false)
 
@@ -130,7 +128,7 @@ export default function Home() {
             formData.append("file", audioBlob, "recording.webm")
 
             setIsLoading(true)
-
+            
             try {
                 const res = await fetch("http://127.0.0.1:8000/transcribe", {
                     method: "POST",
@@ -146,7 +144,7 @@ export default function Home() {
                     const userMessage: Message = { role: "user", content: data.transcription }
                     const updatedHistory = [...messages, userMessage]
                     setMessages(updatedHistory)
-
+                    
                     // Now get AI response using the same mode endpoint
                     let url = "http://127.0.0.1:8000/respond"
                     if (mode === "introduction") {
@@ -156,7 +154,7 @@ export default function Home() {
                     } else if (mode === "daily_conversations") {
                         url = "http://127.0.0.1:8000/daily_conversations"
                     }
-
+                    
                     const aiRes = await fetch(url, {
                         method: "POST",
                         headers: {
@@ -224,8 +222,8 @@ export default function Home() {
                             <div
                                 key={index}
                                 className={`p-4 rounded-lg ${msg.role === "user"
-                                    ? "bg-blue-50 border border-blue-200 ml-8"
-                                    : "bg-white border border-gray-200 mr-8"
+                                        ? "bg-blue-50 border border-blue-200 ml-8"
+                                        : "bg-white border border-gray-200 mr-8"
                                     }`}
                             >
                                 <div className="flex items-center gap-2 mb-2">
@@ -240,31 +238,23 @@ export default function Home() {
                     </div>
                 )}
 
-                 //Textarea for messages
+                {/* Textarea for messages */}
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <div className="mb-4">
-                        <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 mb-2">
-                            Enter your message:
-                        </label>
                         <textarea
                             id="prompt"
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             rows={4}
-                            placeholder="Type your message in French or English..."
+                            placeholder="Type your message preferably in French or English..."
                             disabled={isLoading}
                         />
+                        {prompt.trim() ? <></> : <></>}
                     </div>
 
                     <div>
-                        <button
-                            onClick={sendMessage}
-                            disabled={isLoading || !prompt.trim() || isRecording}
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                        >
-                            {isLoading ? "Sending..." : "Send Message"}
-                        </button>
+                        
 
                         <button
                             onPointerDown={recordAudio}

@@ -9,5 +9,6 @@ dependencies = [
     "openai>=2.30.0",
     "openapi>=2.0.0",
     "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.22",
     "uvicorn>=0.42.0",
 ]
