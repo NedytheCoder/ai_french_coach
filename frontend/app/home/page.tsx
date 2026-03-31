@@ -161,27 +161,33 @@ export default function Home() {
                     const errorMessage: Message = { role: "assistant", content: "Error: " + data.detail || "Transcription failed" }
                     setMessages(prev => [...prev, errorMessage])
                 } else {
-                    // Add transcribed text as user message 
-                    const userMessage: Message = { role: "user", content: data.transcription }
-                    const updatedHistory = [...messages, userMessage]
-                    setMessages(updatedHistory)
-                    // Now get AI response using the same mode endpoint 
-                    let url = "http://127.0.0.1:8000/respond"
-                    if (mode === "introduction") {
-                        url = "http://127.0.0.1:8000/introduction"
-                    } else if (mode === "traveling") {
-                        url = "http://127.0.0.1:8000/traveling"
-                    } else if (mode === "daily_conversations") {
-                        url = "http://127.0.0.1:8000/daily_conversations"
-                    }
-                    const aiRes = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", }, body: JSON.stringify({ message: updatedHistory, }) })
-                    const aiData = await aiRes.json()
-                    if (!aiRes.ok) {
-                        const errorMessage: Message = { role: "assistant", content: "Error: " + aiData.detail || "Something went wrong" }
-                        setMessages(prev => [...prev, errorMessage])
+                    // Check if transcription is empty
+                    if (!data.transcription || data.transcription.trim() === "") {
+                        const noSpeechMessage: Message = { role: "assistant", content: "You didn't say anything" }
+                        setMessages(prev => [...prev, noSpeechMessage])
                     } else {
-                        const assistantMessage: Message = { role: "assistant", content: aiData.reply }
-                        setMessages(prev => [...prev, assistantMessage])
+                        // Add transcribed text as user message 
+                        const userMessage: Message = { role: "user", content: data.transcription }
+                        const updatedHistory = [...messages, userMessage]
+                        setMessages(updatedHistory)
+                        // Now get AI response using the same mode endpoint 
+                        let url = "http://127.0.0.1:8000/respond"
+                        if (mode === "introduction") {
+                            url = "http://127.0.0.1:8000/introduction"
+                        } else if (mode === "traveling") {
+                            url = "http://127.0.0.1:8000/traveling"
+                        } else if (mode === "daily_conversations") {
+                            url = "http://127.0.0.1:8000/daily_conversations"
+                        }
+                        const aiRes = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", }, body: JSON.stringify({ message: updatedHistory, }) })
+                        const aiData = await aiRes.json()
+                        if (!aiRes.ok) {
+                            const errorMessage: Message = { role: "assistant", content: "Error: " + aiData.detail || "Something went wrong" }
+                            setMessages(prev => [...prev, errorMessage])
+                        } else {
+                            const assistantMessage: Message = { role: "assistant", content: aiData.reply }
+                            setMessages(prev => [...prev, assistantMessage])
+                        }
                     }
                 }
             } catch (error) {
