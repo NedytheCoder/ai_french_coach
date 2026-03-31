@@ -270,10 +270,12 @@ export default function Home() {
                             <div className="text-gray-800 whitespace-pre-wrap text-sm">{msg.content}</div>
                         </div>
                     ))}
+            <div className="">{isLoading && <Loader />}</div>
+
                 </div>
-            </div>
             {/* Dummy element to scroll to */ }
             <div ref={messagesEndRef} />
+            </div>
 
         {/* Fixed Input Area */ }
         <div className="border-t border-gray-200 bg-white px-4 py-3 shrink-0">
