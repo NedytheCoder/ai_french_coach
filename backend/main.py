@@ -1,9 +1,11 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import tempfile
+import math
+from pydub import AudioSegment
 
 load_dotenv()
 
@@ -144,19 +146,60 @@ def daily_conversations(data: dict):
 # Function to transcribe audio
 @app.post("/transcribe")
 def transcribe(file: UploadFile = File(...)):
+    # Read file content for validation
+    file_content = file.file.read()
+    file_size = len(file_content)
+    
+    # Check 1: File size too small (less than 1KB)
+    MIN_FILE_SIZE = 1024  # 1KB
+    if file_size < MIN_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="Audio file size too small. Please speak louder or longer.")
+    
     # Save uploaded file to a temporary location
     with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
-        tmp.write(file.file.read())
+        tmp.write(file_content)
         tmp_path = tmp.name
 
     try:
+        # Load audio for analysis
+        audio = AudioSegment.from_file(tmp_path, format="webm")
+        
+        # Check 2: Duration too short (less than 0.5 seconds)
+        duration_ms = len(audio)
+        MIN_DURATION_MS = 500  # 0.5 seconds
+        if duration_ms < MIN_DURATION_MS:
+            raise HTTPException(status_code=400, detail="Audio duration too short. Please speak longer.")
+        
+        # Check 3: RMS / dB level too low (silence or near-silence)
+        rms = audio.rms
+        MIN_RMS = 100  # Adjust threshold based on testing
+        if rms < MIN_RMS:
+            raise HTTPException(status_code=400, detail="Audio level too low. Please speak louder or closer to the microphone.")
+        
+        # Calculate dB level
+        db = 20 * math.log10(rms) if rms > 0 else -float('inf')
+        MIN_DB = -40  # -40 dB threshold
+        if db < MIN_DB:
+            raise HTTPException(status_code=400, detail="Audio volume too low. Please speak louder.")
+        
         # Open the temporary file and transcribe
         with open(tmp_path, "rb") as audio_file:
             transcription = client.audio.transcriptions.create(
                 model="gpt-4o-transcribe", file=audio_file
             )
+        
+        transcript_text = transcription.text.strip()
+        
+        # Check 4: Transcript too short or suspicious
+        MIN_TRANSCRIPT_LENGTH = 2  # At least 2 characters
+        if len(transcript_text) < MIN_TRANSCRIPT_LENGTH:
+            raise HTTPException(status_code=400, detail="Transcription too short. Please speak clearly.")
+        
+        # Check for suspicious patterns (repeated single characters, mostly numbers/punctuation)
+        if len(set(transcript_text.lower())) <= 2:  # Only 2 or fewer unique characters
+            raise HTTPException(status_code=400, detail="Audio not clear. Please speak more clearly.")
 
-        return {"transcription": transcription.text}
+        return {"transcription": transcript_text}
     finally:
         # Clean up temporary file
         os.unlink(tmp_path)
