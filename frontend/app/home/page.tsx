@@ -4,6 +4,7 @@ import Loader from "@/app/components/Loader"
 import Button from "@/app/components/Button"
 import { UilMessage } from '@iconscout/react-unicons'
 import { UilMicrophone } from '@iconscout/react-unicons'
+import Toggle from "../components/Toggle"
 
 interface Message {
     role: "user" | "assistant"
@@ -33,6 +34,9 @@ export default function Home() {
     // State for TTS 
     const [isSpeaking, setIsSpeaking] = useState(false)
 
+    // State for auto-reply
+    const [autoReply, setAutoReply] = useState(false)
+
     const [speakingMessageId, setSpeakingMessageId] = useState<number | null>(null)
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -42,10 +46,18 @@ export default function Home() {
     // Ref for scrolling to bottom of messages 
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
+    // Ref for input focus
+    const inputRef = useRef<HTMLInputElement>(null)
+
     // Auto-scroll to bottom when messages change 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [messages])
+
+    // Keep input focused
+    useEffect(() => {
+        inputRef.current?.focus()
+    }, [isLoading])
 
     // Cleanup TTS on unmount 
     useEffect(() => {
@@ -280,7 +292,11 @@ export default function Home() {
         {/* Fixed Input Area */ }
         <div className="border-t border-gray-200 bg-white px-4 py-3 shrink-0">
             <div className="max-w-2xl mx-auto flex items-center gap-3">
-                <input id="prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage())} className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Type your message..." disabled={isLoading} />
+                <div className="flex items-center gap-1 flex-col">
+                    <Toggle checked={autoReply} onCheckedChange={setAutoReply} className="scale-[0.7]"/>
+                    <span className="text-xs">{autoReply ? "Auto-reply: ON" : "Auto-reply: OFF"}</span>
+                </div>
+                <input ref={inputRef} id="prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage())} className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Type your message..." disabled={isLoading} />
                 <Button className="cursor-pointer shrink-0" children={<UilMessage />} onClick={sendMessage} disabled={isLoading || !prompt.trim() || isRecording} />
                 <Button className="cursor-pointer shrink-0" children={<UilMicrophone />} onPointerDown={recordAudio} onPointerUp={sendAudio} onPointerCancel={cancelAudio} disabled={isLoading || isRecording} />
             </div>
