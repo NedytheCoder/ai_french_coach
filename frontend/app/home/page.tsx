@@ -5,6 +5,7 @@ import Button from "@/app/components/Button"
 import { UilMessage } from '@iconscout/react-unicons'
 import { UilMicrophone } from '@iconscout/react-unicons'
 import Toggle from "../components/Toggle"
+import { time } from "console"
 
 interface Message {
     role: "user" | "assistant"
@@ -158,12 +159,13 @@ export default function Home() {
                 const res = await fetch("http://127.0.0.1:8000/transcribe", { method: "POST", body: formData, })
                 const data = await res.json()
                 if (!res.ok) {
-                    const errorMessage: Message = { role: "assistant", content: "Error: " + data.detail || "Transcription failed" }
+                    const errorMessage: Message = { role: "assistant", 
+                        content: "Error: " + data.detail}
                     setMessages(prev => [...prev, errorMessage])
                 } else {
                     // Check if transcription is empty
                     if (!data.transcription || data.transcription.trim() === "") {
-                        const noSpeechMessage: Message = { role: "assistant", content: "You didn't say anything" }
+                        const noSpeechMessage: Message = { role: "assistant", content: data.detail }
                         setMessages(prev => [...prev, noSpeechMessage])
                     } else {
                         // Add transcribed text as user message 
@@ -191,7 +193,7 @@ export default function Home() {
                     }
                 }
             } catch (error) {
-                const errorMessage: Message = { role: "assistant", content: "Error: Failed to transcribe audio" }
+                const errorMessage: Message = { role: "assistant", content: "Front End error message: " + error }
                 setMessages(prev => [...prev, errorMessage])
             } finally {
                 setIsLoading(false)

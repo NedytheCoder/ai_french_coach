@@ -6,6 +6,10 @@ import os
 import tempfile
 import math
 from pydub import AudioSegment
+from pydub.silence import detect_nonsilent
+import sys
+import time
+from langdetect import detect
 
 load_dotenv()
 
@@ -146,60 +150,82 @@ def daily_conversations(data: dict):
 # Function to transcribe audio
 @app.post("/transcribe")
 def transcribe(file: UploadFile = File(...)):
-    # Read file content for validation
-    file_content = file.file.read()
-    file_size = len(file_content)
-    
-    # Check 1: File size too small (less than 1KB)
-    MIN_FILE_SIZE = 1024  # 1KB
-    if file_size < MIN_FILE_SIZE:
-        raise HTTPException(status_code=400, detail="Audio file size too small. Please speak louder or longer.")
-    
-    # Save uploaded file to a temporary location
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
-        tmp.write(file_content)
-        tmp_path = tmp.name
+    tmp_path = None
 
     try:
-        # Load audio for analysis
+        file_content = file.file.read()
+        file_size = len(file_content)
+
+        if file_size < 1024:
+            return {"detail": "Audio file size too small."}
+            raise HTTPException(status_code=400, detail="Audio file size too small.")
+
+        
+        fd, tmp_path = tempfile.mkstemp(suffix=".webm")
+        os.close(fd)  # important on Windows
+
+        
+        with open(tmp_path, "wb") as tmp_file:
+            tmp_file.write(file_content)
+
         audio = AudioSegment.from_file(tmp_path, format="webm")
+
         
-        # Check 2: Duration too short (less than 0.5 seconds)
         duration_ms = len(audio)
-        MIN_DURATION_MS = 500  # 0.5 seconds
-        if duration_ms < MIN_DURATION_MS:
-            raise HTTPException(status_code=400, detail="Audio duration too short. Please speak longer.")
+        if duration_ms < 500:
+            return {"detail": "Audio duration too short."}
         
-        # Check 3: RMS / dB level too low (silence or near-silence)
-        rms = audio.rms
-        MIN_RMS = 100  # Adjust threshold based on testing
-        if rms < MIN_RMS:
-            raise HTTPException(status_code=400, detail="Audio level too low. Please speak louder or closer to the microphone.")
+        dbfs = audio.dBFS
+        if dbfs == float("-inf") or dbfs < -40:
+            return {"detail": "Audio volume too low."}
         
-        # Calculate dB level
-        db = 20 * math.log10(rms) if rms > 0 else -float('inf')
-        MIN_DB = -40  # -40 dB threshold
-        if db < MIN_DB:
-            raise HTTPException(status_code=400, detail="Audio volume too low. Please speak louder.")
-        
-        # Open the temporary file and transcribe
+        nonsilent_ranges = detect_nonsilent(
+            audio,
+            min_silence_len=300,
+            silence_thresh=max(audio.dBFS - 16, -45),
+        )
+
+        if not nonsilent_ranges:
+            return {"detail": "No clear speech detected."}
+
+
+        voiced_ms = sum(end - start for start, end in nonsilent_ranges)
+        if voiced_ms < 400:
+            return {"detail": "Not enough speech detected."}
+            raise HTTPException(status_code=400, detail="Not enough speech detected.")
+
+        # return {"detail": "We in the try block"}
+
         with open(tmp_path, "rb") as audio_file:
             transcription = client.audio.transcriptions.create(
-                model="gpt-4o-transcribe", file=audio_file
+                model="gpt-4o-transcribe",
+                file=audio_file,
+                prompt="User is learning French. Input may be in French or English."
             )
-        
+
         transcript_text = transcription.text.strip()
-        
-        # Check 4: Transcript too short or suspicious
-        MIN_TRANSCRIPT_LENGTH = 2  # At least 2 characters
-        if len(transcript_text) < MIN_TRANSCRIPT_LENGTH:
-            raise HTTPException(status_code=400, detail="Transcription too short. Please speak clearly.")
-        
-        # Check for suspicious patterns (repeated single characters, mostly numbers/punctuation)
-        if len(set(transcript_text.lower())) <= 2:  # Only 2 or fewer unique characters
-            raise HTTPException(status_code=400, detail="Audio not clear. Please speak more clearly.")
+
+        if not transcript_text:
+            return {"detail": "No transcription detected."}
+            raise HTTPException(status_code=400, detail="No transcription detected.")
+
+        lang = detect(transcript_text)
+
+        if lang not in ["fr", "en"]:
+            return {"detail": "Only French or English allowed."}
 
         return {"transcription": transcript_text}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error during transcription: {e}")
+        raise HTTPException(status_code=500, detail="Transcription failed")
     finally:
-        # Clean up temporary file
-        os.unlink(tmp_path)
+        if tmp_path and os.path.exists(tmp_path):
+            for _ in range(5):
+                try:
+                    os.unlink(tmp_path)
+                    break
+                except PermissionError:
+                    time.sleep(0.1)
