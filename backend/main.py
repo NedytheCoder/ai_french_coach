@@ -158,7 +158,6 @@ def transcribe(file: UploadFile = File(...)):
 
         if file_size < 1024:
             return {"detail": "Audio file size too small."}
-            raise HTTPException(status_code=400, detail="Audio file size too small.")
 
         
         fd, tmp_path = tempfile.mkstemp(suffix=".webm")
@@ -192,7 +191,6 @@ def transcribe(file: UploadFile = File(...)):
         voiced_ms = sum(end - start for start, end in nonsilent_ranges)
         if voiced_ms < 400:
             return {"detail": "Not enough speech detected."}
-            raise HTTPException(status_code=400, detail="Not enough speech detected.")
 
         # return {"detail": "We in the try block"}
 
@@ -207,7 +205,6 @@ def transcribe(file: UploadFile = File(...)):
 
         if not transcript_text:
             return {"detail": "No transcription detected."}
-            raise HTTPException(status_code=400, detail="No transcription detected.")
 
         lang = detect(transcript_text)
 

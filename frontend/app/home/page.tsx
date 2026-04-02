@@ -5,7 +5,6 @@ import Button from "@/app/components/Button"
 import { UilMessage } from '@iconscout/react-unicons'
 import { UilMicrophone } from '@iconscout/react-unicons'
 import Toggle from "../components/Toggle"
-import { time } from "console"
 
 interface Message {
     role: "user" | "assistant"
@@ -189,6 +188,12 @@ export default function Home() {
                         } else {
                             const assistantMessage: Message = { role: "assistant", content: aiData.reply }
                             setMessages(prev => [...prev, assistantMessage])
+                            // Auto-play if autoReply is enabled
+                            if (autoReply) {
+                                // Calculate the index of the new assistant message
+                                const newMessageIndex = messages.length + 1
+                                speak(aiData.reply, newMessageIndex)
+                            }
                         }
                     }
                 }
