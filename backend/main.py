@@ -53,12 +53,6 @@ Adaptation:
 Tone:
 - Be encouraging, positive, and supportive at all times
 
-Response format (ALWAYS follow this exactly):
-
-Corrected: <corrected sentence>
-Natural: <more natural version>
-Explanation: <short simple explanation>
-Next question: <one simple follow-up question>
 """
     }
 ]
@@ -222,8 +216,8 @@ def transcribe(file: UploadFile = File(...)):
 
         lang = detect(transcript_text)
 
-        if lang not in ["fr", "en"]:
-            return {"detail": "Only French or English allowed."}
+        # if lang not in ["fr", "en"]:
+        #     return {"detail": "Only French or English allowed."}
 
         return {"transcription": transcript_text}
 
