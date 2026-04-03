@@ -2,8 +2,8 @@
 import { useState, useRef, useEffect } from "react"
 import Loader from "@/app/components/Loader"
 import Button from "@/app/components/Button"
-// import { UilMessage } from '@iconscout/react-unicons'
-// import { UilMicrophone } from '@iconscout/react-unicons'
+import { UilMessage } from '@iconscout/react-unicons'
+import { UilMicrophone } from '@iconscout/react-unicons'
 import Toggle from "../components/Toggle"
 
 interface Message {
