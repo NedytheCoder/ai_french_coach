@@ -18,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "https://ai-french-coach.vercel.app"],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,

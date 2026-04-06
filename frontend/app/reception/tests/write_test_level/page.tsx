@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
+import { write_questions } from "../../Questions"
 
 /**
  * Question interface for writing test
@@ -27,85 +28,6 @@ interface Question {
   expectedKeywords?: string[]
   validation?: string
 }
-
-/**
- * Questions database - 8 progressive French writing tasks
- * Organized by CEFR levels from A0 (beginner) to B2 (upper-intermediate)
- */
-const questions: Question[] = [
-  {
-    id: 1,
-    level: "A0",
-    type: "copy",
-    prompt: "Copiez la phrase suivante :",
-    text: "Bonjour",
-    placeholder: "Tapez ici...",
-    expectedAnswer: "Bonjour"
-  },
-  {
-    id: 2,
-    level: "A0",
-    type: "fill",
-    prompt: "Complétez :",
-    text: "Je m'_____ Marie.",
-    placeholder: "Tapez le mot manquant...",
-    expectedKeywords: ["appelle"]
-  },
-  {
-    id: 3,
-    level: "A1",
-    type: "short",
-    prompt: "Complétez la phrase avec votre information :",
-    text: "J'habite à ______.",
-    placeholder: "Exemple : Paris",
-    validation: "non-empty"
-  },
-  {
-    id: 4,
-    level: "A1",
-    type: "short",
-    prompt: "Écrivez une phrase avec :",
-    text: "J'aime",
-    placeholder: "Exemple : J'aime le café.",
-    expectedKeywords: ["j'aime", "j'aime"]
-  },
-  {
-    id: 5,
-    level: "A2",
-    type: "medium",
-    prompt: "Écrivez 1–2 phrases sur votre travail ou vos études.",
-    text: "",
-    placeholder: "Exemple : Je suis étudiant. J'étudie l'informatique.",
-    validation: "min-words-3"
-  },
-  {
-    id: 6,
-    level: "A2",
-    type: "medium",
-    prompt: "Décrivez votre journée en 2–3 phrases.",
-    text: "",
-    placeholder: "Exemple : Je me lève à 8h. Je travaille. Je regarde la télévision le soir.",
-    validation: "min-words-5"
-  },
-  {
-    id: 7,
-    level: "B1",
-    type: "long",
-    prompt: "Préférez-vous vivre en ville ou à la campagne ? Pourquoi ?",
-    text: "Écrivez 3–4 phrases.",
-    placeholder: "Donnez votre opinion et expliquez pourquoi.",
-    validation: "min-words-12"
-  },
-  {
-    id: 8,
-    level: "B2",
-    type: "long",
-    prompt: "Les réseaux sociaux sont-ils une bonne chose ?",
-    text: "Donnez votre opinion avec des avantages et des inconvénients (4–6 phrases).",
-    placeholder: "Présentez un point de vue équilibré avec des avantages et des inconvénients.",
-    validation: "min-words-20"
-  }
-]
 
 /**
  * Determines user's French level based on writing test score
@@ -283,14 +205,14 @@ const countWords = (text: string): number => {
 export default function WritingTestLevel() {
   // Quiz state management
   const [currentIndex, setCurrentIndex] = useState(0)           // Current task index (0-7)
-  const [answers, setAnswers] = useState<string[]>(Array(questions.length).fill(""))  // User's answers
-  const [hasSubmitted, setHasSubmitted] = useState<boolean[]>(Array(questions.length).fill(false))  // Submission state
-  const [isCorrect, setIsCorrect] = useState<boolean[]>(Array(questions.length).fill(false))  // Correctness state
+  const [answers, setAnswers] = useState<string[]>(Array(write_questions.length).fill(""))  // User's answers
+  const [hasSubmitted, setHasSubmitted] = useState<boolean[]>(Array(write_questions.length).fill(false))  // Submission state
+  const [isCorrect, setIsCorrect] = useState<boolean[]>(Array(write_questions.length).fill(false))  // Correctness state
   const [showResult, setShowResult] = useState(false)           // Show results screen
   const [score, setScore] = useState(0)                       // Number of correct answers
 
-  const currentQuestion = questions[currentIndex]
-  const progress = ((currentIndex + 1) / questions.length) * 100
+  const currentQuestion = write_questions[currentIndex]
+  const progress = ((currentIndex + 1) / write_questions.length) * 100
   const currentAnswer = answers[currentIndex]
   const currentSubmitted = hasSubmitted[currentIndex]
   const currentIsCorrect = isCorrect[currentIndex]
@@ -331,7 +253,7 @@ export default function WritingTestLevel() {
    * Advances to next task or shows results
    */
   const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
+    if (currentIndex < write_questions.length - 1) {
       setCurrentIndex(currentIndex + 1)
     } else {
       setShowResult(true)
@@ -343,9 +265,9 @@ export default function WritingTestLevel() {
    */
   const handleRestart = () => {
     setCurrentIndex(0)
-    setAnswers(Array(questions.length).fill(""))
-    setHasSubmitted(Array(questions.length).fill(false))
-    setIsCorrect(Array(questions.length).fill(false))
+    setAnswers(Array(write_questions.length).fill(""))
+    setHasSubmitted(Array(write_questions.length).fill(false))
+    setIsCorrect(Array(write_questions.length).fill(false))
     setShowResult(false)
     setScore(0)
   }
@@ -379,7 +301,7 @@ export default function WritingTestLevel() {
           {/* Score */}
           <div className="mb-6">
             <div className="text-5xl font-bold text-slate-800 mb-1">
-              {score}/{questions.length}
+              {score}/{write_questions.length}
             </div>
             <p className="text-slate-500">tasks completed correctly</p>
           </div>
@@ -388,7 +310,7 @@ export default function WritingTestLevel() {
           <div className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${(score / questions.length) * 100}%` }}
+              animate={{ width: `${(score / write_questions.length) * 100}%` }}
               transition={{ delay: 0.5, duration: 0.8 }}
               className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
             />
@@ -430,7 +352,7 @@ export default function WritingTestLevel() {
               ← Back to Home
             </Link>
             <span className="text-sm font-medium text-slate-600">
-              Task {currentIndex + 1} of {questions.length}
+              Task {currentIndex + 1} of {write_questions.length}
             </span>
           </div>
           
@@ -570,7 +492,7 @@ export default function WritingTestLevel() {
                     onClick={handleNext}
                     className="w-full py-4 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all"
                   >
-                    {currentIndex < questions.length - 1 ? "Next Task →" : "See Results →"}
+                    {currentIndex < write_questions.length - 1 ? "Next Task →" : "See Results →"}
                   </motion.button>
                 </motion.div>
               )}
