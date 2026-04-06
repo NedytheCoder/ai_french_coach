@@ -2,8 +2,8 @@
 import { useState, useRef, useEffect } from "react"
 import Loader from "@/app/components/Loader"
 import Button from "@/app/components/Button"
-import { UilMessage } from '@iconscout/react-unicons'
-import { UilMicrophone } from '@iconscout/react-unicons'
+import { FiMessageCircle } from 'react-icons/fi'
+import { FaMicrophone } from 'react-icons/fa'
 import Toggle from "../components/Toggle"
 
 interface Message {
@@ -310,8 +310,8 @@ export default function Home() {
                     <span className="text-xs">{autoReply ? "Auto-reply: ON" : "Auto-reply: OFF"}</span>
                 </div>
                 <input ref={inputRef} id="prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage())} className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Type your message..." disabled={isLoading} />
-                <Button className="cursor-pointer shrink-0" children={<UilMessage />} onClick={sendMessage} disabled={isLoading || !prompt.trim() || isRecording} />
-                <Button className="cursor-pointer shrink-0" children={<UilMicrophone />} onPointerDown={recordAudio} onPointerUp={sendAudio} onPointerCancel={cancelAudio} disabled={isLoading || isRecording} />
+                <Button className="cursor-pointer shrink-0" children={<FiMessageCircle />} onClick={sendMessage} disabled={isLoading || !prompt.trim() || isRecording} />
+                <Button className="cursor-pointer shrink-0" children={<FaMicrophone />} onPointerDown={recordAudio} onPointerUp={sendAudio} onPointerCancel={cancelAudio} disabled={isLoading || isRecording} />
             </div>
             {isRecording && (<div className="text-center text-red-500 text-xs mt-2"> Recording... Release to send </div>)}
         </div>        
