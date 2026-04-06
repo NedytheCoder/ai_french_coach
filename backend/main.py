@@ -75,7 +75,7 @@ def respond(data: dict):
                 "role": "system",
                 "content": "You are a beginner French tutor who loves to chat with students and in french for them to practice and improve their French skills.",
             },
-            # *backendMessages,
+            *backendMessages,
             *messages,
         ],
     )
