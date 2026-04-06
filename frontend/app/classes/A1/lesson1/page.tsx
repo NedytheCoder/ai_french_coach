@@ -115,7 +115,7 @@ export default function A1LessonPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Back to home link */}
         <div className="mb-6">
           <Link

@@ -4,10 +4,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 import tempfile
-import math
 from pydub import AudioSegment
 from pydub.silence import detect_nonsilent
-import sys
 import time
 from langdetect import detect
 
