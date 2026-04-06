@@ -167,25 +167,22 @@ def transcribe(file: UploadFile = File(...)):
         if file_size < 1024:
             return {"detail": "Audio file size too small."}
 
-        
         fd, tmp_path = tempfile.mkstemp(suffix=".webm")
         os.close(fd)  # important on Windows
 
-        
         with open(tmp_path, "wb") as tmp_file:
             tmp_file.write(file_content)
 
         audio = AudioSegment.from_file(tmp_path, format="webm")
 
-        
         duration_ms = len(audio)
         if duration_ms < 500:
             return {"detail": "Audio duration too short."}
-        
+
         dbfs = audio.dBFS
         if dbfs == float("-inf") or dbfs < -40:
             return {"detail": "Audio volume too low."}
-        
+
         nonsilent_ranges = detect_nonsilent(
             audio,
             min_silence_len=300,
@@ -194,7 +191,6 @@ def transcribe(file: UploadFile = File(...)):
 
         if not nonsilent_ranges:
             return {"detail": "No clear speech detected."}
-
 
         voiced_ms = sum(end - start for start, end in nonsilent_ranges)
         if voiced_ms < 400:

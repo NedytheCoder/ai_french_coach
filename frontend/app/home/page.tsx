@@ -5,7 +5,6 @@ import Link from "next/link"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { 
-  UilMessage, 
   UilMicrophone, 
   UilHeadphones, 
   UilBookOpen, 
@@ -14,7 +13,6 @@ import {
   UilArrowRight,
   UilPlayCircle,
   UilStar,
-  UilUserCircle,
   UilInstagram,
   UilTwitter,
   UilLinkedin,
