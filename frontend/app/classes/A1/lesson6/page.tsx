@@ -13,20 +13,19 @@ import {
   FaTimes,
   FaRedo,
   FaChevronDown,
-  FaChevronUp
+  FaChevronUp,
+  FaVolumeUp
 } from 'react-icons/fa'
 import Link from 'next/link'
 import {
-  sentencePartsExamples,
-  affirmativeExamples,
-  adjectivePlacementExamples,
-  negativeExamples,
-  questionExamples,
-  commonMistakes,
-  sentencePatterns,
+  firstGroupVerbs,
+  secondGroupVerbs,
+  thirdGroupVerbs,
+  verbSummary,
   practiceQuestions,
   sectionIds,
-  SectionId
+  SectionId,
+  conjugationExamples
 } from './data'
 
 interface LessonProgress {
@@ -46,7 +45,7 @@ function getRandomFeedback(isCorrect: boolean) {
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
-export default function A1Lesson5Page() {
+export default function A1Lesson6Page() {
   const [reviewedSections, setReviewedSections] = useState<SectionId[]>([])
   const [practiceAnswers, setPracticeAnswers] = useState<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>([])
   const [practiceCompleted, setPracticeCompleted] = useState(false)
@@ -55,7 +54,7 @@ export default function A1Lesson5Page() {
 
   useEffect(() => {
     setIsClient(true)
-    const saved = localStorage.getItem('a1Lesson5Progress')
+    const saved = localStorage.getItem('a1Lesson6Progress')
     if (saved) {
       const parsed: LessonProgress = JSON.parse(saved)
       setReviewedSections(parsed.reviewedSections || [])
@@ -67,7 +66,7 @@ export default function A1Lesson5Page() {
 
   useEffect(() => {
     if (isClient) {
-      localStorage.setItem('a1Lesson5Progress', JSON.stringify({
+      localStorage.setItem('a1Lesson6Progress', JSON.stringify({
         reviewedSections,
         practiceAnswers,
         practiceCompleted,
@@ -113,49 +112,39 @@ export default function A1Lesson5Page() {
 
         {/* Sections */}
         <div className="space-y-6">
-          <WhatIsSentenceSection
-            isReviewed={reviewedSections.includes('what-is-sentence')}
-            onMarkReviewed={() => markSectionReviewed('what-is-sentence')}
+          <VerbGroupsIntroSection
+            isReviewed={reviewedSections.includes('verb-groups-intro')}
+            onMarkReviewed={() => markSectionReviewed('verb-groups-intro')}
           />
 
-          <BasicOrderSection
-            isReviewed={reviewedSections.includes('basic-order')}
-            onMarkReviewed={() => markSectionReviewed('basic-order')}
+          <FirstGroupSection
+            isReviewed={reviewedSections.includes('first-group')}
+            onMarkReviewed={() => markSectionReviewed('first-group')}
           />
 
-          <SentencePartsSection
-            isReviewed={reviewedSections.includes('sentence-parts')}
-            onMarkReviewed={() => markSectionReviewed('sentence-parts')}
+          <SecondGroupSection
+            isReviewed={reviewedSections.includes('second-group')}
+            onMarkReviewed={() => markSectionReviewed('second-group')}
           />
 
-          <AffirmativeSection
-            isReviewed={reviewedSections.includes('affirmative')}
-            onMarkReviewed={() => markSectionReviewed('affirmative')}
+          <ThirdGroupSection
+            isReviewed={reviewedSections.includes('third-group')}
+            onMarkReviewed={() => markSectionReviewed('third-group')}
           />
 
-          <AdjectivesSection
-            isReviewed={reviewedSections.includes('adjectives')}
-            onMarkReviewed={() => markSectionReviewed('adjectives')}
+          <RegularVsIrregularSection
+            isReviewed={reviewedSections.includes('regular-vs-irregular')}
+            onMarkReviewed={() => markSectionReviewed('regular-vs-irregular')}
           />
 
-          <NegativesSection
-            isReviewed={reviewedSections.includes('negatives')}
-            onMarkReviewed={() => markSectionReviewed('negatives')}
+          <ConjugationExamplesSection
+            isReviewed={reviewedSections.includes('conjugation-examples')}
+            onMarkReviewed={() => markSectionReviewed('conjugation-examples')}
           />
 
-          <QuestionsSection
-            isReviewed={reviewedSections.includes('questions')}
-            onMarkReviewed={() => markSectionReviewed('questions')}
-          />
-
-          <MistakesSection
-            isReviewed={reviewedSections.includes('mistakes')}
-            onMarkReviewed={() => markSectionReviewed('mistakes')}
-          />
-
-          <PatternsSection
-            isReviewed={reviewedSections.includes('patterns')}
-            onMarkReviewed={() => markSectionReviewed('patterns')}
+          <PatternSummarySection
+            isReviewed={reviewedSections.includes('pattern-summary')}
+            onMarkReviewed={() => markSectionReviewed('pattern-summary')}
           />
 
           <PracticeSection
@@ -190,11 +179,11 @@ function LessonHeader() {
       <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 text-white">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-4">
           <FaGraduationCap size={14} />
-          <span>A1 Lesson 5</span>
+          <span>A1 Lesson 6</span>
         </div>
-        <h1 className="text-3xl font-bold mb-2">French Sentence Structure</h1>
+        <h1 className="text-3xl font-bold mb-2">Verbs II — Verb Groups and Patterns</h1>
         <p className="text-indigo-100 text-lg">
-          Learn how French sentences are built and how to make simple statements, negatives, and questions.
+          Learn how French verbs are grouped and how regular and irregular verbs behave.
         </p>
       </div>
 
@@ -204,7 +193,7 @@ function LessonHeader() {
             <FaLightbulb className="text-indigo-700" size={14} />
           </div>
           <p className="text-indigo-800 text-sm">
-            Read the examples, review the patterns, and complete the practice before moving on.
+            Read the explanations, explore examples, and complete the practice to understand verb patterns.
           </p>
         </div>
       </div>
@@ -214,7 +203,7 @@ function LessonHeader() {
 
 function ProgressBar({ reviewedSections, practiceCompleted }: { reviewedSections: SectionId[]; practiceCompleted: boolean }) {
   const totalSections = sectionIds.length
-  const completedSections = reviewedSections.length + (practiceCompleted ? 0 : 0)
+  const completedSections = reviewedSections.length
   const progress = Math.round((completedSections / totalSections) * 100)
 
   return (
@@ -315,100 +304,62 @@ function SectionCard({
   )
 }
 
-function WhatIsSentenceSection({ isReviewed, onMarkReviewed }: SectionProps) {
+function VerbGroupsIntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
-      id="what-is-sentence"
-      title="What is a Sentence?"
+      id="verb-groups-intro"
+      title="What Are Verb Groups?"
       icon={FaBookOpen}
       isReviewed={isReviewed}
       onMarkReviewed={onMarkReviewed}
     >
       <div className="space-y-4">
         <p className="text-slate-700 leading-relaxed">
-          A sentence is a group of words that expresses a complete idea. In French, as in English, 
-          a sentence often begins with a subject and a verb.
+          French verbs are divided into 3 groups. These groups help us understand how verbs are conjugated:
         </p>
 
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 text-center">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <span className="text-blue-700 font-bold">1st</span>
+            </div>
+            <p className="font-medium text-slate-800">-er verbs</p>
+            <p className="text-sm text-slate-500">Most common</p>
+          </div>
+          <div className="bg-green-50 rounded-xl p-4 border border-green-200 text-center">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <span className="text-green-700 font-bold">2nd</span>
+            </div>
+            <p className="font-medium text-slate-800">-ir verbs</p>
+            <p className="text-sm text-slate-500">Regular pattern</p>
+          </div>
+          <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 text-center">
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <span className="text-purple-700 font-bold">3rd</span>
+            </div>
+            <p className="font-medium text-slate-800">Irregular</p>
+            <p className="text-sm text-slate-500">Unique forms</p>
+          </div>
+        </div>
+
         <div className="bg-indigo-50 rounded-xl p-5 border border-indigo-100">
-          <h3 className="font-medium text-indigo-900 mb-3">Why sentence structure matters:</h3>
+          <h3 className="font-medium text-indigo-900 mb-2">Why this matters:</h3>
           <ul className="space-y-2 text-indigo-800">
             <li className="flex items-start gap-2">
               <span className="text-indigo-500 mt-1">•</span>
-              <span>Good sentence structure helps learners speak and write clearly.</span>
+              <span>Some verbs follow clear patterns (regular)</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-indigo-500 mt-1">•</span>
-              <span>When learners understand sentence patterns, they can build many new sentences more easily.</span>
+              <span>Others change in unique ways (irregular)</span>
             </li>
           </ul>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {['Je parle.', 'Elle est ici.', "Nous allons à l'école."].map((sentence, idx) => (
-            <div key={idx} className="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
-              <p className="text-lg font-medium text-slate-800 mb-1">{sentence}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </SectionCard>
-  )
-}
-
-function BasicOrderSection({ isReviewed, onMarkReviewed }: SectionProps) {
-  return (
-    <SectionCard
-      id="basic-order"
-      title="Basic French Sentence Order"
-      icon={FaLightbulb}
-      isReviewed={isReviewed}
-      onMarkReviewed={onMarkReviewed}
-    >
-      <div className="space-y-6">
-        <p className="text-slate-700 leading-relaxed">
-          The most common beginner French sentence pattern is:
-        </p>
-
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white text-center">
-          <p className="text-xl font-semibold mb-4">Subject + Verb + Complement</p>
-          <div className="grid grid-cols-3 gap-4 text-sm">
-            <div className="bg-white/20 rounded-lg p-3">
-              <p className="font-medium mb-1">Subject</p>
-              <p className="text-indigo-100">who does the action</p>
-            </div>
-            <div className="bg-white/20 rounded-lg p-3">
-              <p className="font-medium mb-1">Verb</p>
-              <p className="text-indigo-100">the action or state</p>
-            </div>
-            <div className="bg-white/20 rounded-lg p-3">
-              <p className="font-medium mb-1">Complement</p>
-              <p className="text-indigo-100">extra information</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {[
-            { french: "Je mange une pomme.", english: "I eat an apple." },
-            { french: "Tu habites à Paris.", english: "You live in Paris." },
-            { french: "Nous parlons français.", english: "We speak French." },
-            { french: "Il aime le café.", english: "He likes coffee." }
-          ].map((example, idx) => (
-            <div key={idx} className="flex items-center gap-4 bg-slate-50 rounded-xl p-4 border border-slate-200">
-              <span className="text-slate-400 font-medium">{idx + 1}.</span>
-              <div>
-                <p className="font-medium text-slate-800">{example.french}</p>
-                <p className="text-sm text-slate-500">{example.english}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
         <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
           <p className="text-amber-800 text-sm">
-            <span className="font-medium">Remember:</span> French word order is often similar to English in simple sentences. 
-            At A1 level, learning this core pattern is the most important step.
+            <span className="font-medium">Remember:</span> Understanding verb groups helps you learn faster. 
+            You don't need to memorize everything — just recognize patterns.
           </p>
         </div>
       </div>
@@ -416,76 +367,43 @@ function BasicOrderSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-function SentencePartsSection({ isReviewed, onMarkReviewed }: SectionProps) {
+function FirstGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
-      id="sentence-parts"
-      title="Sentence Parts: Subject, Verb, Complement"
+      id="first-group"
+      title="1st Group Verbs (-er verbs)"
       icon={FaBookOpen}
       isReviewed={isReviewed}
       onMarkReviewed={onMarkReviewed}
     >
       <div className="space-y-4">
         <p className="text-slate-700 leading-relaxed">
-          Let's break down some sentences to see how the parts fit together:
-        </p>
-
-        <div className="space-y-4">
-          {sentencePartsExamples.map((example) => (
-            <div key={example.id} className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-              <p className="text-lg font-medium text-slate-800 mb-3">{example.sentence}</p>
-              <p className="text-sm text-slate-500 mb-4">{example.english}</p>
-
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-blue-100 rounded-lg p-3 text-center">
-                  <p className="text-xs text-blue-600 font-medium uppercase tracking-wide mb-1">Subject</p>
-                  <p className="text-blue-800 font-medium">{example.subject}</p>
-                </div>
-                <div className="bg-purple-100 rounded-lg p-3 text-center">
-                  <p className="text-xs text-purple-600 font-medium uppercase tracking-wide mb-1">Verb</p>
-                  <p className="text-purple-800 font-medium">{example.verb}</p>
-                </div>
-                <div className="bg-pink-100 rounded-lg p-3 text-center">
-                  <p className="text-xs text-pink-600 font-medium uppercase tracking-wide mb-1">Complement</p>
-                  <p className="text-pink-800 font-medium">{example.complement}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </SectionCard>
-  )
-}
-
-function AffirmativeSection({ isReviewed, onMarkReviewed }: SectionProps) {
-  return (
-    <SectionCard
-      id="affirmative"
-      title="Affirmative Sentence Examples"
-      icon={FaCheck}
-      isReviewed={isReviewed}
-      onMarkReviewed={onMarkReviewed}
-    >
-      <div className="space-y-4">
-        <p className="text-slate-700 leading-relaxed">
-          Affirmative sentences say what is true, what someone does, or what someone is. 
-          At beginner level, many useful sentences follow this simple structure.
+          The 1st group is the most common. These verbs end in <span className="font-medium text-indigo-600">-er</span> (except <em>aller</em>) and are usually regular.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {affirmativeExamples.map((example) => (
-            <div key={example.id} className="bg-green-50 rounded-xl p-4 border border-green-200">
-              <p className="font-medium text-slate-800 mb-1">{example.french}</p>
-              <p className="text-sm text-slate-500">{example.english}</p>
+          {firstGroupVerbs.map((verb, idx) => (
+            <div key={idx} className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-slate-800 text-lg">{verb.verb}</p>
+                  <p className="text-sm text-slate-500">{verb.english}</p>
+                </div>
+                <button 
+                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+                  aria-label={`Play pronunciation of ${verb.verb}`}
+                >
+                  <FaVolumeUp className="text-blue-600" size={14} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
 
         <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
           <p className="text-indigo-800 text-sm">
-            <span className="font-medium">Tip:</span> These are all positive statements that follow the 
-            Subject + Verb + Complement pattern.
+            <span className="font-medium">Note:</span> These verbs follow predictable patterns in the present tense. 
+            Once you know the pattern, you can conjugate many verbs easily.
           </p>
         </div>
       </div>
@@ -493,36 +411,146 @@ function AffirmativeSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-function AdjectivesSection({ isReviewed, onMarkReviewed }: SectionProps) {
+function SecondGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
-      id="adjectives"
-      title="Adjective Placement in Simple A1 Sentences"
+      id="second-group"
+      title="2nd Group Verbs (-ir regular)"
+      icon={FaBookOpen}
+      isReviewed={isReviewed}
+      onMarkReviewed={onMarkReviewed}
+    >
+      <div className="space-y-4">
+        <p className="text-slate-700 leading-relaxed">
+          The 2nd group verbs end in <span className="font-medium text-indigo-600">-ir</span> and follow a regular pattern — though different from -er verbs. They are less common than 1st group verbs.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {secondGroupVerbs.map((verb, idx) => (
+            <div key={idx} className="bg-green-50 rounded-xl p-4 border border-green-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-slate-800 text-lg">{verb.verb}</p>
+                  <p className="text-sm text-slate-500">{verb.english}</p>
+                </div>
+                <button 
+                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+                  aria-label={`Play pronunciation of ${verb.verb}`}
+                >
+                  <FaVolumeUp className="text-green-600" size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+          <p className="text-green-800 text-sm">
+            <span className="font-medium">Pattern note:</span> These verbs often have <span className="font-medium">-issons</span> in the <em>nous</em> form. 
+            For example: "nous finissons" (we finish).
+          </p>
+        </div>
+      </div>
+    </SectionCard>
+  )
+}
+
+function ThirdGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
+  return (
+    <SectionCard
+      id="third-group"
+      title="3rd Group Verbs (Irregular Group)"
+      icon={FaBookOpen}
+      isReviewed={isReviewed}
+      onMarkReviewed={onMarkReviewed}
+    >
+      <div className="space-y-4">
+        <p className="text-slate-700 leading-relaxed">
+          The 3rd group is the "irregular" group. These verbs do not follow a single pattern and must often be learned individually.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {thirdGroupVerbs.map((verb, idx) => (
+            <div key={idx} className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-slate-800 text-lg">{verb.verb}</p>
+                  <p className="text-sm text-slate-500">{verb.english}</p>
+                </div>
+                <button 
+                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+                  aria-label={`Play pronunciation of ${verb.verb}`}
+                >
+                  <FaVolumeUp className="text-purple-600" size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+          <p className="text-purple-800 text-sm">
+            <span className="font-medium">Important:</span> Many of the most important verbs are in this group — 
+            <em>être</em> (to be), <em>avoir</em> (to have), <em>aller</em> (to go). These are used constantly in everyday French.
+          </p>
+        </div>
+      </div>
+    </SectionCard>
+  )
+}
+
+function RegularVsIrregularSection({ isReviewed, onMarkReviewed }: SectionProps) {
+  return (
+    <SectionCard
+      id="regular-vs-irregular"
+      title="Regular vs Irregular Verbs"
       icon={FaLightbulb}
       isReviewed={isReviewed}
       onMarkReviewed={onMarkReviewed}
     >
       <div className="space-y-4">
-        <p className="text-slate-700 leading-relaxed">
-          In French, adjectives often come after the noun. But some common adjectives 
-          can come before the noun. At A1 level, the most important thing is to notice 
-          the pattern, not memorize every exception yet.
-        </p>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {adjectivePlacementExamples.map((example) => (
-            <div key={example.id} className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-              <p className="font-medium text-slate-800 mb-1">{example.french}</p>
-              <p className="text-sm text-slate-500 mb-2">{example.english}</p>
-              <p className="text-xs text-indigo-600 bg-indigo-50 rounded-lg px-2 py-1">{example.note}</p>
+          <div className="bg-green-50 rounded-xl p-5 border border-green-200">
+            <h3 className="font-semibold text-green-800 mb-3">Regular Verbs</h3>
+            <ul className="space-y-2 text-green-700 text-sm">
+              <li className="flex items-start gap-2">
+                <span>•</span>
+                <span>Follow predictable patterns</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span>•</span>
+                <span>Easier to learn once pattern is known</span>
+              </li>
+            </ul>
+            <div className="mt-4 pt-4 border-t border-green-200">
+              <p className="text-sm text-slate-600">Examples:</p>
+              <p className="font-medium text-slate-800">parler (1st), finir (2nd)</p>
             </div>
-          ))}
+          </div>
+
+          <div className="bg-amber-50 rounded-xl p-5 border border-amber-200">
+            <h3 className="font-semibold text-amber-800 mb-3">Irregular Verbs</h3>
+            <ul className="space-y-2 text-amber-700 text-sm">
+              <li className="flex items-start gap-2">
+                <span>•</span>
+                <span>Do not follow standard patterns</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span>•</span>
+                <span>Must be memorized individually</span>
+              </li>
+            </ul>
+            <div className="mt-4 pt-4 border-t border-amber-200">
+              <p className="text-sm text-slate-600">Examples:</p>
+              <p className="font-medium text-slate-800">être, avoir, aller</p>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-          <p className="text-amber-800 text-sm">
-            <span className="font-medium">For now:</span> Focus on reading and noticing the pattern. 
-            You will learn adjective placement in more detail later.
+        <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+          <p className="text-indigo-800 text-sm">
+            <span className="font-medium">Remember:</span> Even advanced learners continue to use irregular verbs every day. 
+            Don't worry about perfect mastery — focus on recognizing the patterns first.
           </p>
         </div>
       </div>
@@ -530,52 +558,98 @@ function AdjectivesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-function NegativesSection({ isReviewed, onMarkReviewed }: SectionProps) {
+function ConjugationExamplesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
-      id="negatives"
-      title="Negative Sentence Structure"
-      icon={FaTimes}
+      id="conjugation-examples"
+      title="Conjugation Examples"
+      icon={FaBookOpen}
       isReviewed={isReviewed}
       onMarkReviewed={onMarkReviewed}
     >
-      <div className="space-y-4">
+      <div className="space-y-6">
         <p className="text-slate-700 leading-relaxed">
-          In simple French, negation often uses <span className="font-medium text-indigo-600">ne + verb + pas</span>. 
-          The negative wraps around the conjugated verb.
+          Here's how one verb from each group is conjugated in the present tense. Notice the patterns (or lack thereof):
         </p>
 
-        <div className="bg-gradient-to-r from-red-500 to-pink-500 rounded-xl p-4 text-white text-center mb-4">
-          <p className="text-lg font-semibold">Subject + ne/n' + Verb + pas + Complement</p>
-        </div>
-
-        <div className="space-y-3">
-          {negativeExamples.map((example) => (
-            <div key={example.id} className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-green-600 font-medium">{example.affirmative}</span>
-                <FaArrowRight className="text-slate-400" size={14} />
-                <span className="text-red-600 font-medium">{example.negative}</span>
+        {conjugationExamples.map((example, idx) => (
+          <div key={idx} className={`rounded-xl border-2 overflow-hidden ${
+            idx === 0 ? 'border-blue-200' :
+            idx === 1 ? 'border-green-200' :
+            'border-purple-200'
+          }`}>
+            {/* Header */}
+            <div className={`px-5 py-3 ${
+              idx === 0 ? 'bg-blue-50' :
+              idx === 1 ? 'bg-green-50' :
+              'bg-purple-50'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium mb-1 ${
+                    idx === 0 ? 'bg-blue-200 text-blue-800' :
+                    idx === 1 ? 'bg-green-200 text-green-800' :
+                    'bg-purple-200 text-purple-800'
+                  }`}>
+                    {example.group}
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-800">
+                    {example.verb} <span className="text-slate-500 font-normal">({example.english})</span>
+                  </h3>
+                </div>
+                <button 
+                  className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-shadow"
+                  aria-label={`Play pronunciation of ${example.verb}`}
+                >
+                  <FaVolumeUp className={`${
+                    idx === 0 ? 'text-blue-600' :
+                    idx === 1 ? 'text-green-600' :
+                    'text-purple-600'
+                  }`} size={14} />
+                </button>
               </div>
-              <p className="text-sm text-slate-500">{example.english}</p>
             </div>
-          ))}
-        </div>
 
-        <div className="space-y-2">
-          <p className="font-medium text-slate-800">Important teaching points:</p>
-          <ul className="space-y-1 text-slate-600 text-sm">
+            {/* Conjugation Table */}
+            <div className="bg-white p-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {example.forms.map((form, formIdx) => (
+                  <div key={formIdx} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50">
+                    <span className="text-slate-500 text-sm">{form.pronoun}</span>
+                    <span className="font-semibold text-slate-800">{form.form}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pattern Note */}
+              <div className={`mt-4 pt-3 border-t ${
+                idx === 0 ? 'border-blue-100' :
+                idx === 1 ? 'border-green-100' :
+                'border-purple-100'
+              }`}>
+                <p className={`text-sm ${
+                  idx === 0 ? 'text-blue-700' :
+                  idx === 1 ? 'text-green-700' :
+                  'text-purple-700'
+                }`}>
+                  <span className="font-medium">Pattern:</span> {example.note}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Compare and Notice */}
+        <div className="bg-indigo-50 rounded-xl p-5 border border-indigo-100">
+          <h3 className="font-semibold text-indigo-900 mb-3">What to notice:</h3>
+          <ul className="space-y-2 text-indigo-800 text-sm">
             <li className="flex items-start gap-2">
-              <span className="text-indigo-500">•</span>
-              <span><span className="font-medium">ne</span> becomes <span className="font-medium">n'</span> before a vowel or silent h</span>
+              <span className="text-indigo-500 mt-0.5">→</span>
+              <span><strong>1st & 2nd groups:</strong> You can see the pattern — the verb stem stays consistent, and only the endings change.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-indigo-500">•</span>
-              <span><span className="font-medium">pas</span> usually comes after the conjugated verb</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-indigo-500">•</span>
-              <span>In beginner French, this pattern is one of the most important sentence changes to learn</span>
+              <span className="text-indigo-500 mt-0.5">→</span>
+              <span><strong>3rd group:</strong> The stem changes completely (suis, es, est, sommes...). This is why irregular verbs need more attention.</span>
             </li>
           </ul>
         </div>
@@ -584,129 +658,64 @@ function NegativesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-function QuestionsSection({ isReviewed, onMarkReviewed }: SectionProps) {
+function PatternSummarySection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
-      id="questions"
-      title="Simple Question Structures"
-      icon={FaLightbulb}
-      isReviewed={isReviewed}
-      onMarkReviewed={onMarkReviewed}
-    >
-      <div className="space-y-4">
-        <p className="text-slate-700 leading-relaxed">
-          At A1 level, learners should focus on these two simple yes/no question patterns:
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-purple-50 rounded-xl p-5 border border-purple-200">
-            <h3 className="font-semibold text-purple-800 mb-3">1. Intonation</h3>
-            <p className="text-sm text-purple-600 mb-3">Rise your voice at the end of a statement.</p>
-            <div className="space-y-2">
-              <p className="font-medium text-slate-800">Tu parles français ?</p>
-              <p className="font-medium text-slate-800">Elle est ici ?</p>
-            </div>
-          </div>
-
-          <div className="bg-indigo-50 rounded-xl p-5 border border-indigo-200">
-            <h3 className="font-semibold text-indigo-800 mb-3">2. Est-ce que</h3>
-            <p className="text-sm text-indigo-600 mb-3">Add "Est-ce que" at the beginning.</p>
-            <div className="space-y-2">
-              <p className="font-medium text-slate-800">Est-ce que tu parles français ?</p>
-              <p className="font-medium text-slate-800">Est-ce qu'il habite à Paris ?</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {questionExamples.map((example) => (
-            <div key={example.id} className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-              <div className="flex items-center gap-2 mb-1">
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  example.type === 'intonation' ? 'bg-purple-100 text-purple-700' : 'bg-indigo-100 text-indigo-700'
-                }`}>
-                  {example.type === 'intonation' ? 'Intonation' : "Est-ce que"}
-                </span>
-              </div>
-              <p className="font-medium text-slate-800">{example.french}</p>
-              <p className="text-sm text-slate-500">{example.english}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-          <p className="text-amber-800 text-sm">
-            <span className="font-medium">Remember:</span> Both patterns are useful. At beginner level, 
-            est-ce que is a very clear and safe question structure. You do not need to learn 
-            inversion in detail yet.
-          </p>
-        </div>
-      </div>
-    </SectionCard>
-  )
-}
-
-function MistakesSection({ isReviewed, onMarkReviewed }: SectionProps) {
-  return (
-    <SectionCard
-      id="mistakes"
-      title="Common Beginner Mistakes"
-      icon={FaTimes}
-      isReviewed={isReviewed}
-      onMarkReviewed={onMarkReviewed}
-    >
-      <div className="space-y-4">
-        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-          <p className="text-amber-800 text-sm">
-            These mistakes are normal. You are learning a new pattern. Noticing mistakes is part of learning.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {commonMistakes.map((mistake) => (
-            <div key={mistake.id} className="bg-red-50 rounded-xl p-5 border border-red-200">
-              <div className="flex items-center gap-2 mb-2">
-                <FaTimes className="text-red-500" />
-                <span className="text-red-600 font-medium line-through">{mistake.wrong}</span>
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <FaCheck className="text-green-500" />
-                <span className="text-green-700 font-medium">{mistake.correct}</span>
-              </div>
-              <p className="text-sm text-slate-600 mt-2">{mistake.explanation}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </SectionCard>
-  )
-}
-
-function PatternsSection({ isReviewed, onMarkReviewed }: SectionProps) {
-  return (
-    <SectionCard
-      id="patterns"
-      title="Sentence Pattern Summary"
+      id="pattern-summary"
+      title="Pattern Summary"
       icon={FaBookOpen}
       isReviewed={isReviewed}
       onMarkReviewed={onMarkReviewed}
     >
       <div className="space-y-4">
         <p className="text-slate-700 leading-relaxed">
-          Here's a quick-reference guide to the most important beginner patterns:
+          Here's a quick-reference guide to the three verb groups:
         </p>
 
-        <div className="grid grid-cols-1 gap-3">
-          {sentencePatterns.map((pattern) => (
-            <div key={pattern.id} className="bg-gradient-to-r from-slate-50 to-indigo-50 rounded-xl p-4 border border-slate-200">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold text-slate-800">{pattern.label}</h3>
-                <span className="text-xs text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full">Pattern {pattern.id}</span>
-              </div>
-              <p className="text-sm font-medium text-indigo-700 mb-2">{pattern.pattern}</p>
-              <p className="text-sm text-slate-600">Example: <span className="font-medium text-slate-800">{pattern.example}</span></p>
-            </div>
-          ))}
+        <div className="overflow-hidden rounded-xl border border-slate-200">
+          <table className="w-full">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">Group</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">Pattern</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">Type</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">Example</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {verbSummary.map((item, idx) => (
+                <tr key={idx} className="bg-white">
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                      idx === 0 ? 'bg-blue-100 text-blue-700' :
+                      idx === 1 ? 'bg-green-100 text-green-700' :
+                      'bg-purple-100 text-purple-700'
+                    }`}>
+                      {item.group}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-slate-800 font-medium">{item.pattern}</td>
+                  <td className="px-4 py-3 text-slate-600">{item.type}</td>
+                  <td className="px-4 py-3 text-slate-800 font-medium">{item.example}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-200">
+            <p className="text-2xl font-bold text-blue-700">-er</p>
+            <p className="text-xs text-blue-600">1st group</p>
+          </div>
+          <div className="bg-green-50 rounded-lg p-3 text-center border border-green-200">
+            <p className="text-2xl font-bold text-green-700">-ir</p>
+            <p className="text-xs text-green-600">2nd group</p>
+          </div>
+          <div className="bg-purple-50 rounded-lg p-3 text-center border border-purple-200">
+            <p className="text-2xl font-bold text-purple-700">...</p>
+            <p className="text-xs text-purple-600">3rd group</p>
+          </div>
         </div>
       </div>
     </SectionCard>
@@ -739,31 +748,24 @@ function PracticeSection({
   const getPerformanceMessage = () => {
     if (percentage >= 80) {
       return {
-        title: "Great work! 🎉",
-        message: "You've shown a strong understanding of French sentence structure. You're ready to move forward with confidence!",
-        tone: "high",
-        color: "green"
+        title: "Great job! 🎉",
+        message: "You understand verb groups and patterns well. You're ready to move forward!",
+        tone: "high" as const,
+        color: "green" as const
       }
-    } else if (percentage >= 60) {
+    } else if (percentage >= 50) {
       return {
-        title: "Good progress! 👍",
-        message: "You're getting the hang of it. A little more practice will help these patterns feel natural.",
-        tone: "medium",
-        color: "blue"
-      }
-    } else if (percentage >= 40) {
-      return {
-        title: "Keep going! 💪",
-        message: "Learning sentence structure takes time. You can retake this practice or continue to review the lesson material.",
-        tone: "low",
-        color: "amber"
+        title: "Nice progress! 👍",
+        message: "You're getting the hang of verb groups. A bit more practice will help solidify these patterns.",
+        tone: "medium" as const,
+        color: "blue" as const
       }
     } else {
       return {
-        title: "You're learning! 🌱",
-        message: "Don't worry — French sentence structure is new, and every attempt helps. Feel free to retake this practice or review the lesson sections again.",
-        tone: "very-low",
-        color: "indigo"
+        title: "Good effort! 💪",
+        message: "Verb groups take time to learn. You can retake this practice or review the lesson sections again.",
+        tone: "low" as const,
+        color: "amber" as const
       }
     }
   }
@@ -845,14 +847,12 @@ function PracticeSection({
           <div className={`rounded-xl p-6 border-2 ${
             performance.color === 'green' ? 'bg-green-50 border-green-200' :
             performance.color === 'blue' ? 'bg-blue-50 border-blue-200' :
-            performance.color === 'amber' ? 'bg-amber-50 border-amber-200' :
-            'bg-indigo-50 border-indigo-200'
+            'bg-amber-50 border-amber-200'
           }`}>
             <h3 className={`text-xl font-bold mb-3 ${
               performance.color === 'green' ? 'text-green-700' :
               performance.color === 'blue' ? 'text-blue-700' :
-              performance.color === 'amber' ? 'text-amber-700' :
-              'text-indigo-700'
+              'text-amber-700'
             }`}>
               {performance.title}
             </h3>
@@ -861,7 +861,7 @@ function PracticeSection({
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            {performance.tone === 'high' || performance.tone === 'medium' ? (
+            {performance.tone === 'high' ? (
               <button
                 onClick={handleContinueAnyway}
                 className="w-full py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:shadow-lg transition-all flex items-center justify-center gap-2"
@@ -914,15 +914,6 @@ function PracticeSection({
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-600">
               Practice {currentQuestionIndex + 1} of {practiceQuestions.length}
-            </span>
-            <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-              currentQuestion.topic === 'sentence-order' ? 'bg-blue-100 text-blue-700' :
-              currentQuestion.topic === 'affirmative' ? 'bg-green-100 text-green-700' :
-              currentQuestion.topic === 'negative' ? 'bg-red-100 text-red-700' :
-              currentQuestion.topic === 'questions' ? 'bg-purple-100 text-purple-700' :
-              'bg-amber-100 text-amber-700'
-            }`}>
-              {currentQuestion.topic.replace('-', ' ')}
             </span>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -1057,7 +1048,7 @@ function CompletionSection({
         </h2>
         <p className="text-indigo-100">
           {isComplete
-            ? "Nice work — you've completed A1 Lesson 5."
+            ? "Nice work — you've completed A1 Lesson 6."
             : "Review all sections and complete the practice to finish."}
         </p>
       </div>
@@ -1073,8 +1064,8 @@ function CompletionSection({
             </div>
 
             <div className="bg-green-50 rounded-xl p-5 border border-green-200">
-              <p className="text-green-800 font-medium mb-2">You now understand the basic structure of simple French sentences.</p>
-              <p className="text-green-700 text-sm">This will help you read, write, and speak with more confidence.</p>
+              <p className="text-green-800 font-medium mb-2">You now understand how French verbs are grouped!</p>
+              <p className="text-green-700 text-sm">This foundation will help you learn new verbs faster.</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1086,10 +1077,10 @@ function CompletionSection({
                 <span>Review Lessons</span>
               </Link>
               <Link
-                href="/classes/A1/lesson6"
+                href="/classes/A1/lesson7"
                 className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:shadow-lg transition-all"
               >
-                <span>Continue to Lesson 6</span>
+                <span>Continue to Lesson 7</span>
                 <FaArrowRight size={16} />
               </Link>
             </div>
