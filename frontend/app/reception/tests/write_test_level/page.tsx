@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { write_questions } from "../../Questions"
 
 /**
  * Question interface for writing test
@@ -28,6 +27,83 @@ interface Question {
   expectedKeywords?: string[]
   validation?: string
 }
+
+const write_questions: Question[] = [
+  {
+    id: 1,
+    level: "A0",
+    type: "copy",
+    prompt: "Copy the following word:",
+    text: "Bonjour",
+    placeholder: "Type 'Bonjour'",
+    expectedAnswer: "Bonjour",
+    validation: "non-empty"
+  },
+  {
+    id: 2,
+    level: "A0",
+    type: "fill",
+    prompt: "Fill in the blank with the correct word:",
+    text: "Je m'appelle Marie. J'ai 25 ans. J'habite à Paris.",
+    placeholder: "Enter your name",
+    expectedKeywords: ["Marie", "25", "Paris"],
+    validation: "min-words-3"
+  },
+  {
+    id: 3,
+    level: "A1",
+    type: "short",
+    prompt: "Write a short sentence about yourself:",
+    text: "Example: I live in France.",
+    placeholder: "Write your sentence...",
+    validation: "min-words-2"
+  },
+  {
+    id: 4,
+    level: "A1",
+    type: "medium",
+    prompt: "Write a paragraph about your daily routine:",
+    text: "Example: I wake up at 7 AM. I eat breakfast. I go to work.",
+    placeholder: "Write your paragraph...",
+    validation: "min-words-10"
+  },
+  {
+    id: 5,
+    level: "A2",
+    type: "long",
+    prompt: "Write a short story about your last vacation:",
+    text: "Example: Last summer, I went to Spain. I visited Barcelona...",
+    placeholder: "Write your story...",
+    validation: "min-words-20"
+  },
+  {
+    id: 6,
+    level: "B1",
+    type: "short",
+    prompt: "Write a short email to a friend:",
+    text: "Example: Hi Sarah, How are you? I'm doing well...",
+    placeholder: "Write your email...",
+    validation: "min-words-5"
+  },
+  {
+    id: 7,
+    level: "B1",
+    type: "medium",
+    prompt: "Write a review of a book you read:",
+    text: "Example: I read 'The Alchemist' by Paulo Coelho. It was amazing...",
+    placeholder: "Write your review...",
+    validation: "min-words-15"
+  },
+  {
+    id: 8,
+    level: "B2",
+    type: "long",
+    prompt: "Write an essay about your favorite hobby:",
+    text: "Example: My favorite hobby is reading. I love books...",
+    placeholder: "Write your essay...",
+    validation: "min-words-30"
+  }
+]
 
 /**
  * Determines user's French level based on writing test score
