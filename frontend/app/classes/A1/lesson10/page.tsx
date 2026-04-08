@@ -13,20 +13,21 @@ import {
 import Link from 'next/link'
 import {
   guidedExamples,
+  nePasExamples,
+  negations,
+  passeComposeNegation,
   practiceQuestions,
-  prepositions,
-  verbPrepositionPatterns,
   type PracticeQuestion,
   type PracticeTopic
 } from './data'
 
 type SectionKey =
-  | 'what'
-  | 'core'
-  | 'context'
-  | 'verbPatterns'
-  | 'contractions'
-  | 'guidedExamples'
+  | 'recap'
+  | 'structure'
+  | 'other'
+  | 'pc'
+  | 'patterns'
+  | 'guided'
 
 type SectionReview = Record<SectionKey, boolean>
 
@@ -36,14 +37,14 @@ type PracticeAnswer = {
   isCorrect: boolean
 }
 
-export default function A1Lesson4Page() {
+export default function A1Lesson10Page() {
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
-    what: false,
-    core: false,
-    context: false,
-    verbPatterns: false,
-    contractions: false,
-    guidedExamples: false
+    recap: false,
+    structure: false,
+    other: false,
+    pc: false,
+    patterns: false,
+    guided: false
   })
 
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
@@ -59,20 +60,19 @@ export default function A1Lesson4Page() {
 
   const allSectionsReviewed = Object.values(reviewedSections).every(Boolean)
   const practiceComplete = practiceAnswers.length === practiceQuestions.length
-  const correctAnswers = practiceAnswers.filter(a => a.isCorrect).length
-  const percentage = Math.round((correctAnswers / practiceQuestions.length) * 100)
+  const score = practiceAnswers.filter(a => a.isCorrect).length
+  const percentage = Math.round((score / practiceQuestions.length) * 100)
 
-  const topicLabel = useMemo(() => {
-    const counts = practiceAnswers.reduce<Record<PracticeTopic, number>>(
+  const topicCounts = useMemo(() => {
+    return practiceAnswers.reduce<Record<PracticeTopic, number>>(
       (acc, a) => {
         const q = practiceQuestions.find(x => x.id === a.questionId)
         if (!q) return acc
         acc[q.topic] = (acc[q.topic] || 0) + 1
         return acc
       },
-      { meaning: 0, completion: 0, 'verb-pattern': 0, contraction: 0 }
+      { nepas: 0, other: 0, 'passe-compose': 0, structure: 0 }
     )
-    return counts
   }, [practiceAnswers])
 
   const playAudio = (audioSrc: string, id: string) => {
@@ -89,9 +89,7 @@ export default function A1Lesson4Page() {
       setCurrentlyPlaying(null)
     })
 
-    audio.onended = () => {
-      setCurrentlyPlaying(null)
-    }
+    audio.onended = () => setCurrentlyPlaying(null)
   }
 
   const markSectionReviewed = (section: SectionKey) => {
@@ -107,7 +105,6 @@ export default function A1Lesson4Page() {
     if (selectedOption === null) return
     const currentQuestion = practiceQuestions[currentPracticeIndex]
     const isCorrect = selectedOption === currentQuestion.correct
-
     setPracticeAnswers(prev => [
       ...prev,
       { questionId: currentQuestion.id, selectedOption, isCorrect }
@@ -120,10 +117,7 @@ export default function A1Lesson4Page() {
     setSelectedOption(null)
     setShowFeedback(false)
     setCurrentPracticeIndex(nextIndex)
-
-    if (nextIndex >= practiceQuestions.length) {
-      setShowResults(true)
-    }
+    if (nextIndex >= practiceQuestions.length) setShowResults(true)
   }
 
   const retakePractice = () => {
@@ -140,7 +134,8 @@ export default function A1Lesson4Page() {
     setShowCompletion(true)
   }
 
-  const lessonComplete = allSectionsReviewed && practiceComplete && showCompletion
+  const lessonReadyToComplete = allSectionsReviewed && practiceComplete
+  const lessonComplete = lessonReadyToComplete && showCompletion
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
@@ -163,194 +158,183 @@ export default function A1Lesson4Page() {
           totalPractice={practiceQuestions.length}
         />
 
+        {/* 2. Recap ne...pas */}
         <SectionCard
-          title="What is a preposition?"
-          subtitle="Small word, big meaning"
-          icon="🧩"
-          isReviewed={reviewedSections.what}
-          onMarkReviewed={() => markSectionReviewed('what')}
+          title="Quick recap: ne...pas"
+          subtitle="The most common negation"
+          icon="🚫"
+          isReviewed={reviewedSections.recap}
+          onMarkReviewed={() => markSectionReviewed('recap')}
           index={0}
         >
-          <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
-            <ul className="space-y-3 text-slate-700">
-              <li className="flex items-start gap-3">
-                <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>A <strong>preposition</strong> is a small word that connects parts of a sentence.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>It often shows <strong>place</strong>, <strong>direction</strong>, <strong>time</strong>, or a relationship.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>In French, prepositions are used <strong>very frequently</strong>.</span>
-              </li>
-            </ul>
-
-            <div className="mt-6 bg-white rounded-lg p-4 border border-slate-200">
-              <h4 className="font-semibold text-slate-800 mb-3">Examples:</h4>
-              <div className="space-y-2 text-slate-600">
-                <p><span className="font-medium text-purple-600">Je suis à la maison.</span></p>
-                <p><span className="font-medium text-purple-600">Le livre est sur la table.</span></p>
-                <p><span className="font-medium text-purple-600">Il parle avec son ami.</span></p>
-              </div>
-              <div className="mt-4 bg-purple-50 rounded-lg p-3 border border-purple-200 text-sm text-purple-800">
-                <strong>Helper note:</strong> Prepositions are small, but very important.
-              </div>
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          title="Core prepositions"
-          subtitle="Learn them through patterns + examples"
-          icon="🗺️"
-          isReviewed={reviewedSections.core}
-          onMarkReviewed={() => markSectionReviewed('core')}
-          index={1}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {prepositions.map((p, idx) => (
-              <PrepositionCard
-                key={p.prep}
-                prep={p.prep}
-                english={p.english}
-                example={p.example}
-                phonetic={p.phonetic}
-                isPlaying={currentlyPlaying === `prep-${p.prep}`}
-                onPlay={() => playAudio(p.audioSrc, `prep-${p.prep}`)}
-                index={idx}
-              />
-            ))}
-          </div>
-          <div className="mt-5 bg-slate-50 rounded-xl p-4 border border-slate-200 text-sm text-slate-700">
-            <strong>Pattern tip:</strong> Try to notice what comes after the preposition (a place, a person, a country, a thing) rather than memorizing the English word.
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          title="Prepositions in context"
-          subtitle="Location, movement, origin, relationship"
-          icon="📍"
-          isReviewed={reviewedSections.context}
-          onMarkReviewed={() => markSectionReviewed('context')}
-          index={2}
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <ContextGroup
-              title="Location"
-              subtitle="Where is it?"
-              color="blue"
-              items={[
-                { label: "dans (inside)", example: "Le chat est dans la maison." },
-                { label: "sur (on)", example: "Le livre est sur la table." },
-                { label: "sous (under)", example: "Le sac est sous la table." }
-              ]}
-            />
-            <ContextGroup
-              title="Movement"
-              subtitle="Where are you going?"
-              color="emerald"
-              items={[
-                { label: "à (to)", example: "Je vais à Paris." },
-                { label: "en (to/in countries)", example: "Je vais en France." }
-              ]}
-            />
-            <ContextGroup
-              title="Origin"
-              subtitle="Where are you from?"
-              color="amber"
-              items={[
-                { label: "de (from)", example: "Je viens de France." }
-              ]}
-            />
-            <ContextGroup
-              title="Relationship"
-              subtitle="With / for"
-              color="purple"
-              items={[
-                { label: "avec (with)", example: "Je parle avec Marie." },
-                { label: "pour (for)", example: "C’est pour toi." }
-              ]}
-            />
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          title="Verb + preposition patterns"
-          subtitle="Learn the verb together with the preposition"
-          icon="🔗"
-          isReviewed={reviewedSections.verbPatterns}
-          onMarkReviewed={() => markSectionReviewed('verbPatterns')}
-          index={3}
-        >
-          <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+          <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
             <p className="text-slate-700 mb-4">
-              In French, some verbs are followed by specific prepositions. These combinations are best learned as one “chunk”.
+              <strong>Ne...pas</strong> is the most common negation in French. It “wraps around” the verb.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {verbPrepositionPatterns.map((v, idx) => (
-                <VerbPatternCard
-                  key={v.verb}
-                  verb={v.verb}
-                  english={v.english}
-                  example={v.example}
+
+            <div className="space-y-4">
+              {nePasExamples.map((ex, idx) => (
+                <TwoLineExample
+                  key={idx}
+                  positive={ex.french}
+                  negative={ex.negative}
+                  english={ex.english}
                   index={idx}
                 />
               ))}
             </div>
-            <div className="mt-4 bg-white rounded-lg p-4 border border-slate-200 text-sm text-slate-700">
-              <strong>Pattern tip:</strong> When you learn a verb, ask: “Does this verb usually use <em>à</em> or <em>de</em>?”
+
+            <div className="mt-5 bg-purple-50 rounded-xl p-4 border border-purple-200 text-sm text-purple-900">
+              <strong>Note:</strong> <strong>ne</strong> becomes <strong>n’</strong> before a vowel or silent h.
             </div>
           </div>
         </SectionCard>
 
+        {/* 3. Structure */}
         <SectionCard
-          title="Important combinations to remember"
-          subtitle="Common contractions with à and de"
-          icon="🧠"
-          isReviewed={reviewedSections.contractions}
-          onMarkReviewed={() => markSectionReviewed('contractions')}
-          index={4}
+          title="How negation works (structure)"
+          subtitle="Present vs passé composé"
+          icon="🧩"
+          isReviewed={reviewedSections.structure}
+          onMarkReviewed={() => markSectionReviewed('structure')}
+          index={1}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ContractionCard left="à + le" right="au" example="Je vais au marché." />
-            <ContractionCard left="à + les" right="aux" example="Il parle aux enfants." />
-            <ContractionCard left="de + le" right="du" example="Elle joue du piano." />
-            <ContractionCard left="de + les" right="des" example="Nous parlons des films." />
-          </div>
-          <div className="mt-4 bg-amber-50 rounded-xl p-4 border border-amber-200 text-sm text-amber-900">
-            <strong>Beginner-safe rule:</strong> When you see <strong>au/aux</strong>, think “à + the”. When you see <strong>du/des</strong>, think “de + the”.
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <FormulaCard
+              title="Present tense"
+              formula="Subject + ne + verb + negation word"
+              examples={[
+                "Je ne mange pas.",
+                "Je ne mange jamais ici."
+              ]}
+              accent="blue"
+            />
+            <FormulaCard
+              title="Passé composé"
+              formula="Subject + ne + auxiliary + negation + past participle"
+              examples={[
+                "Je n’ai pas mangé.",
+                "Elle n’est jamais arrivée."
+              ]}
+              accent="purple"
+            />
           </div>
         </SectionCard>
 
+        {/* 4. Other negations */}
+        <SectionCard
+          title="Other common negations"
+          subtitle="Same structure — only the second word changes"
+          icon="📌"
+          isReviewed={reviewedSections.other}
+          onMarkReviewed={() => markSectionReviewed('other')}
+          index={2}
+        >
+          <div className="bg-white rounded-2xl p-5 border border-slate-200">
+            <div className="text-sm text-slate-700 mb-4 space-y-1">
+              <p><strong>Helper:</strong> All of these follow the same structure as ne...pas.</p>
+              <p>Only the second word changes.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {negations.map((n, idx) => (
+                <NegationCard
+                  key={n.form}
+                  form={n.form}
+                  meaning={n.meaning}
+                  examples={n.examples}
+                  index={idx}
+                />
+              ))}
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 5. Negation in passé composé */}
+        <SectionCard
+          title="Negation in passé composé"
+          subtitle="Negation wraps around the auxiliary"
+          icon="⏳"
+          isReviewed={reviewedSections.pc}
+          onMarkReviewed={() => markSectionReviewed('pc')}
+          index={3}
+        >
+          <div className="bg-amber-50 rounded-xl p-6 border border-amber-200">
+            <p className="text-amber-900 mb-4">
+              In passé composé, negation goes around the <strong>auxiliary</strong> (avoir/être), not the past participle.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {passeComposeNegation.map((ex, idx) => (
+                <ExampleCard
+                  key={idx}
+                  french={ex.french}
+                  english={ex.english}
+                  tag="past"
+                  isPlaying={currentlyPlaying === `pc-${idx}`}
+                  onPlay={() => playAudio(`/audio/a1/negations/passe-compose/${idx + 1}.mp3`, `pc-${idx}`)}
+                  index={idx}
+                />
+              ))}
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 6. Important patterns */}
+        <SectionCard
+          title="Important patterns and rules"
+          subtitle="3 beginner-safe rules"
+          icon="🧠"
+          isReviewed={reviewedSections.patterns}
+          onMarkReviewed={() => markSectionReviewed('patterns')}
+          index={4}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <RuleCard
+              title="1) ne → n’"
+              body="Before a vowel or silent h, ne becomes n’."
+              examples={["Elle n’aime pas le café.", "Je n’ai pas mangé."]}
+              accent="purple"
+            />
+            <RuleCard
+              title="2) Past tense"
+              body="In passé composé, negation surrounds the auxiliary."
+              examples={["Je n’ai pas mangé.", "Nous n’avons rien vu."]}
+              accent="blue"
+            />
+            <RuleCard
+              title="3) de in negatives"
+              body="“De” often replaces un/une/des in negatives."
+              examples={["J’ai un chien → Je n’ai pas de chien.", "Elle a des amis → Elle n’a pas d’amis."]}
+              accent="amber"
+            />
+          </div>
+        </SectionCard>
+
+        {/* 7. Guided examples */}
         <SectionCard
           title="Guided examples"
-          subtitle="Read, notice patterns, then copy the structure"
+          subtitle="Notice the tense + the negation word"
           icon="🗣️"
-          isReviewed={reviewedSections.guidedExamples}
-          onMarkReviewed={() => markSectionReviewed('guidedExamples')}
+          isReviewed={reviewedSections.guided}
+          onMarkReviewed={() => markSectionReviewed('guided')}
           index={5}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {guidedExamples.map((ex, idx) => (
-              <GuidedExampleCard
-                key={ex.id}
+              <ExampleCard
+                key={idx}
                 french={ex.french}
                 english={ex.english}
-                focus={ex.focus}
-                isPlaying={currentlyPlaying === ex.id}
-                onPlay={() => playAudio(ex.audioSrc, ex.id)}
+                tag={ex.tag === 'present' ? 'present' : 'past'}
+                isPlaying={currentlyPlaying === `guided-${idx}`}
+                onPlay={() => playAudio(`/audio/a1/negations/guided/${idx + 1}.mp3`, `guided-${idx}`)}
                 index={idx}
               />
             ))}
           </div>
-          <div className="mt-5 bg-slate-50 rounded-xl p-4 border border-slate-200 text-sm text-slate-700">
-            <strong>Mini-drill:</strong> Replace the last word to make your own sentence. Example: “Je vais au marché.” → “Je vais au café.”
-          </div>
         </SectionCard>
 
-        {/* Guided interactive practice */}
+        {/* 8. Practice */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -358,17 +342,13 @@ export default function A1Lesson4Page() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-800">Guided interactive practice</h2>
-              <p className="text-sm text-slate-600">16 questions, one at a time</p>
+              <p className="text-sm text-slate-600">20 questions, one at a time</p>
             </div>
           </div>
 
           {!showResults ? (
             <div className="space-y-4">
-              <PracticeMetaRow
-                answered={practiceAnswers.length}
-                total={practiceQuestions.length}
-                counts={topicLabel}
-              />
+              <PracticeMetaRow answered={practiceAnswers.length} total={practiceQuestions.length} counts={topicCounts} />
 
               {currentPracticeIndex < practiceQuestions.length ? (
                 <PracticeCard
@@ -382,25 +362,15 @@ export default function A1Lesson4Page() {
                   onNext={nextQuestion}
                 />
               ) : (
-                <ResultsCard
-                  score={correctAnswers}
-                  total={practiceQuestions.length}
-                  onRetake={retakePractice}
-                  onContinue={continueFromResults}
-                />
+                <PracticeResultsCard score={score} total={practiceQuestions.length} onRetake={retakePractice} onContinue={continueFromResults} />
               )}
             </div>
           ) : (
-            <ResultsCard
-              score={correctAnswers}
-              total={practiceQuestions.length}
-              onRetake={retakePractice}
-              onContinue={continueFromResults}
-            />
+            <PracticeResultsCard score={score} total={practiceQuestions.length} onRetake={retakePractice} onContinue={continueFromResults} />
           )}
         </div>
 
-        {/* Completion section */}
+        {/* 10. Completion */}
         <AnimatePresence>
           {showCompletion && (
             <motion.div
@@ -415,20 +385,19 @@ export default function A1Lesson4Page() {
                     Lesson completion
                   </div>
                   <h2 className="text-2xl font-bold text-slate-800 mb-2">
-                    Nice work — you finished A1 Lesson 4!
+                    You’ve completed Lesson 10.
                   </h2>
-                  <p className="text-slate-700 mb-3">
-                    You can now recognize common prepositions, use them in simple sentences, and spot verb + preposition patterns.
+                  <p className="text-slate-700 mb-4">
+                    You can now form negative sentences using ne...pas and other common negations, in the present and passé composé.
                   </p>
+
                   <div className="bg-white rounded-xl p-4 border border-green-200 text-sm text-slate-700">
-                    <div className="font-semibold text-slate-800 mb-2">Quick recap</div>
+                    <div className="font-semibold text-slate-800 mb-2">Recap</div>
                     <ul className="space-y-1">
-                      <li>- <strong>Location</strong>: dans, sur, sous</li>
-                      <li>- <strong>Movement</strong>: à, en</li>
-                      <li>- <strong>Origin</strong>: de</li>
-                      <li>- <strong>Relationship</strong>: avec, pour</li>
-                      <li>- <strong>Verb chunks</strong>: parler à / parler de, avoir besoin de…</li>
-                      <li>- <strong>Contractions</strong>: au/aux, du/des</li>
+                      <li>- <strong>ne...pas</strong> (not)</li>
+                      <li>- Other negations: <strong>jamais, plus, rien, personne, guerre</strong></li>
+                      <li>- Placement rules (present vs passé composé)</li>
+                      <li>- <strong>de</strong> often replaces un/une/des in negatives</li>
                     </ul>
                   </div>
                 </div>
@@ -436,7 +405,9 @@ export default function A1Lesson4Page() {
                 <div className="w-full md:w-auto">
                   <div className="bg-white rounded-2xl p-5 border border-green-200 text-center">
                     <div className="text-sm text-slate-500 mb-1">Practice score</div>
-                    <div className="text-3xl font-bold text-green-700">{correctAnswers}/16</div>
+                    <div className="text-3xl font-bold text-green-700">
+                      {score}/{practiceQuestions.length}
+                    </div>
                     <div className="text-sm font-medium text-slate-600">{percentage}%</div>
                     <div className="mt-4 flex gap-2 justify-center flex-wrap">
                       <button
@@ -447,7 +418,7 @@ export default function A1Lesson4Page() {
                         Retake
                       </button>
                       <Link
-                        href="/classes/A1/lesson5"
+                        href="/classes/A1"
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg transition-all"
                       >
                         Next lesson
@@ -470,7 +441,7 @@ export default function A1Lesson4Page() {
               <>
                 <div className="w-3 h-3 rounded-full bg-green-500" />
                 <span className="text-sm text-slate-600 truncate">
-                  Lesson complete! You’re ready for the next one.
+                  Lesson complete! You’re ready to continue.
                 </span>
               </>
             ) : (
@@ -488,14 +459,14 @@ export default function A1Lesson4Page() {
           </div>
 
           <button
-            disabled={!allSectionsReviewed || !practiceComplete}
+            disabled={!lessonReadyToComplete}
             onClick={() => {
-              if (!allSectionsReviewed || !practiceComplete) return
+              if (!lessonReadyToComplete) return
               setShowCompletion(true)
               window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
             }}
             className={`shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-              allSectionsReviewed && practiceComplete
+              lessonReadyToComplete
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:scale-105'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
@@ -511,23 +482,18 @@ export default function A1Lesson4Page() {
 
 function LessonHeader() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="text-center mb-10"
-    >
-      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white text-sm font-medium mb-4">
-        <span>A1 Lesson 4</span>
+    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
+      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-slate-800 rounded-full text-white text-sm font-medium mb-4">
+        <span>A1 Lesson 10</span>
       </div>
-
       <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">
-        A1 Lesson 4 — French Prepositions
+        Negation in French
       </h1>
       <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-2">
-        Learn how prepositions connect words and how they are used in everyday French.
+        Learn how to say ‘not’, ‘never’, ‘nothing’, 'hardly' and more in French.
       </p>
       <p className="text-sm text-slate-500">
-        Read the examples, notice patterns, and complete the practice to build confidence.
+        Review ne...pas and discover other common negative structures.
       </p>
     </motion.div>
   )
@@ -542,7 +508,7 @@ function ProgressBar({
   practiceProgress: number
   totalPractice: number
 }) {
-  const sections = ['what', 'core', 'context', 'verbPatterns', 'contractions', 'guidedExamples'] as const
+  const sections = ['recap', 'structure', 'other', 'pc', 'patterns', 'guided'] as const
   const completedSections = sections.filter(s => reviewedSections[s]).length
   const totalProgress = ((completedSections + practiceProgress / totalPractice) / 7) * 100
 
@@ -587,28 +553,21 @@ function SectionCard({
   children: React.ReactNode
 }) {
   const colors = [
-    'from-purple-500 to-pink-500',
-    'from-blue-500 to-cyan-500',
-    'from-emerald-500 to-teal-500',
+    'from-slate-700 to-purple-700',
+    'from-blue-600 to-cyan-600',
     'from-amber-500 to-orange-500',
-    'from-indigo-500 to-purple-500',
-    'from-rose-500 to-pink-500'
+    'from-purple-500 to-blue-500',
+    'from-emerald-500 to-teal-500',
+    'from-indigo-500 to-purple-500'
   ]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className="mb-8"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="mb-8">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-100">
           <div className="flex items-start justify-between gap-4 flex-col sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
-              <div
-                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center text-white shadow-md`}
-              >
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center text-white shadow-md`}>
                 <span className="text-2xl">{icon}</span>
               </div>
               <div>
@@ -619,9 +578,7 @@ function SectionCard({
             <button
               onClick={onMarkReviewed}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                isReviewed
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                isReviewed ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <FaCheck size={14} />
@@ -635,172 +592,123 @@ function SectionCard({
   )
 }
 
-function PrepositionCard({
-  prep,
+function TwoLineExample({
+  positive,
+  negative,
   english,
-  example,
-  phonetic,
-  isPlaying,
-  onPlay,
   index
 }: {
-  prep: string
+  positive: string
+  negative: string
   english: string
-  example: string
-  phonetic: string
-  isPlaying: boolean
-  onPlay: () => void
   index: number
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className="rounded-xl p-4 border-2 bg-slate-50 border-slate-200 hover:border-purple-300 transition-all hover:shadow-md"
-    >
-      <div className="flex items-start justify-between mb-2 gap-3">
-        <div>
-          <div className="flex items-end gap-3">
-            <h3 className="text-3xl font-bold text-slate-800">{prep}</h3>
-            <p className="text-sm text-purple-600 font-medium">/{phonetic}/</p>
-          </div>
-          <p className="text-sm text-slate-600">{english}</p>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-slate-200">
+      <div className="text-sm text-slate-500 font-semibold mb-2">Positive → Negative</div>
+      <div className="space-y-2">
+        <div className="font-semibold text-slate-800">{positive}</div>
+        <div className="font-semibold text-slate-800">
+          <span className="text-slate-400">→ </span>
+          <span className="text-purple-700">{negative}</span>
         </div>
-        <button
-          onClick={onPlay}
-          disabled={isPlaying}
-          aria-label={`Play pronunciation for ${prep}`}
-          className={`p-2 rounded-lg transition-all ${
-            isPlaying
-              ? 'bg-white text-purple-600 animate-pulse'
-              : 'bg-white text-slate-600 hover:text-purple-600 shadow-sm'
-          }`}
-        >
-          <FaPlay size={14} />
-        </button>
-      </div>
-      <div className="text-sm text-slate-500 bg-white rounded-lg p-3 border border-slate-100">
-        <span className="font-medium text-slate-700">{example}</span>
+        <div className="text-sm text-slate-600">{english}</div>
       </div>
     </motion.div>
   )
 }
 
-function ContextGroup({
+function FormulaCard({
   title,
-  subtitle,
-  color,
-  items
+  formula,
+  examples,
+  accent
 }: {
   title: string
-  subtitle: string
-  color: 'blue' | 'emerald' | 'amber' | 'purple'
-  items: { label: string; example: string }[]
+  formula: string
+  examples: string[]
+  accent: 'blue' | 'purple'
 }) {
-  const styles =
-    color === 'blue'
-      ? { bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700' }
-      : color === 'emerald'
-      ? { bg: 'bg-emerald-50', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700' }
-      : color === 'amber'
-      ? { bg: 'bg-amber-50', border: 'border-amber-200', badge: 'bg-amber-100 text-amber-700' }
-      : { bg: 'bg-purple-50', border: 'border-purple-200', badge: 'bg-purple-100 text-purple-700' }
+  const styles = accent === 'blue'
+    ? { bg: 'bg-blue-50', border: 'border-blue-200', chip: 'bg-blue-100 text-blue-700' }
+    : { bg: 'bg-purple-50', border: 'border-purple-200', chip: 'bg-purple-100 text-purple-700' }
 
   return (
     <div className={`rounded-2xl p-5 border-2 ${styles.bg} ${styles.border}`}>
-      <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
-        <div>
-          <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-          <p className="text-sm text-slate-600">{subtitle}</p>
-        </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${styles.badge}`}>context</span>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${styles.chip}`}>pattern</span>
       </div>
-      <div className="space-y-3">
-        {items.map((it, idx) => (
-          <div key={idx} className="bg-white rounded-xl p-3 border border-slate-200">
-            <div className="font-semibold text-slate-800">{it.label}</div>
-            <div className="text-sm text-slate-600 mt-1">{it.example}</div>
-          </div>
-        ))}
+      <div className="bg-white rounded-xl p-4 border border-slate-200">
+        <div className="text-sm text-slate-600 font-semibold">{formula}</div>
+        <div className="mt-3 space-y-2">
+          {examples.map((ex, idx) => (
+            <div key={idx} className="text-sm font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+              {ex}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
 }
 
-function VerbPatternCard({
-  verb,
-  english,
-  example,
+function NegationCard({
+  form,
+  meaning,
+  examples,
   index
 }: {
-  verb: string
-  english: string
-  example: string
+  form: string
+  meaning: string
+  examples: { french: string; english: string }[]
   index: number
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
-      className="bg-white rounded-xl p-4 border border-slate-200"
-    >
-      <div className="flex items-center justify-between gap-3">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-lg font-bold text-slate-800">{verb}</div>
-          <div className="text-sm text-slate-600">{english}</div>
+          <div className="text-lg font-bold text-slate-800">{form}</div>
+          <div className="text-sm text-slate-600">{meaning}</div>
         </div>
-        <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold">
-          verb + prep
-        </span>
+        <span className="text-xs px-2 py-1 rounded-full bg-slate-200 text-slate-700 font-semibold">negation</span>
       </div>
-      <div className="mt-3 text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200">
-        {example}
+      <div className="mt-3 space-y-2">
+        {examples.map((ex, idx2) => (
+          <div key={idx2} className="bg-white rounded-xl p-3 border border-slate-200">
+            <div className="font-semibold text-slate-800">{ex.french}</div>
+            <div className="text-sm text-slate-600">{ex.english}</div>
+          </div>
+        ))}
       </div>
     </motion.div>
   )
 }
 
-function ContractionCard({ left, right, example }: { left: string; right: string; example: string }) {
-  return (
-    <div className="bg-white rounded-2xl p-5 border border-slate-200">
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm text-slate-500 font-medium">{left}</div>
-        <div className="text-2xl font-bold text-purple-700">{right}</div>
-      </div>
-      <div className="mt-3 text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200">
-        {example}
-      </div>
-    </div>
-  )
-}
-
-function GuidedExampleCard({
+function ExampleCard({
   french,
   english,
-  focus,
+  tag,
   isPlaying,
   onPlay,
   index
 }: {
   french: string
   english: string
-  focus: string
+  tag: 'present' | 'past'
   isPlaying: boolean
   onPlay: () => void
   index: number
 }) {
+  const chip = tag === 'present' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
+  const label = tag === 'present' ? 'present' : 'passé composé'
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04 }}
-      className="bg-white rounded-2xl p-5 border border-slate-200"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-slate-200">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-lg font-bold text-slate-800">{french}</div>
+          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${chip}`}>{label}</span>
+          <div className="text-lg font-bold text-slate-800 mt-2">{french}</div>
           <div className="text-sm text-slate-600 mt-1">{english}</div>
         </div>
         <button
@@ -808,18 +716,49 @@ function GuidedExampleCard({
           disabled={isPlaying}
           aria-label="Play audio"
           className={`p-2 rounded-lg transition-all ${
-            isPlaying
-              ? 'bg-purple-100 text-purple-600 animate-pulse'
-              : 'bg-slate-50 text-slate-600 hover:text-purple-600 border border-slate-200'
+            isPlaying ? 'bg-purple-100 text-purple-600 animate-pulse' : 'bg-slate-50 text-slate-600 hover:text-purple-600 border border-slate-200'
           }`}
         >
           <FaPlay size={14} />
         </button>
       </div>
-      <div className="mt-3 text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200 rounded-full inline-flex px-3 py-1">
-        {focus}
-      </div>
     </motion.div>
+  )
+}
+
+function RuleCard({
+  title,
+  body,
+  examples,
+  accent
+}: {
+  title: string
+  body: string
+  examples: string[]
+  accent: 'purple' | 'blue' | 'amber'
+}) {
+  const styles =
+    accent === 'purple'
+      ? { bg: 'bg-purple-50', border: 'border-purple-200', chip: 'bg-purple-100 text-purple-700' }
+      : accent === 'blue'
+      ? { bg: 'bg-blue-50', border: 'border-blue-200', chip: 'bg-blue-100 text-blue-700' }
+      : { bg: 'bg-amber-50', border: 'border-amber-200', chip: 'bg-amber-100 text-amber-700' }
+
+  return (
+    <div className={`rounded-2xl p-5 border-2 ${styles.bg} ${styles.border}`}>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${styles.chip}`}>rule</span>
+      </div>
+      <p className="text-sm text-slate-700 mb-3">{body}</p>
+      <div className="space-y-2">
+        {examples.map((ex, idx) => (
+          <div key={idx} className="text-sm font-semibold text-slate-800 bg-white border border-slate-200 rounded-xl px-3 py-2">
+            {ex}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -838,10 +777,10 @@ function PracticeMetaRow({
         <strong className="text-slate-800">{answered}</strong> / {total} answered
       </div>
       <div className="flex gap-2 flex-wrap">
-        <Chip label={`Meaning: ${counts.meaning}`} />
-        <Chip label={`Completion: ${counts.completion}`} />
-        <Chip label={`Verb patterns: ${counts['verb-pattern']}`} />
-        <Chip label={`Contractions: ${counts.contraction}`} />
+        <Chip label={`ne...pas: ${counts.nepas}`} />
+        <Chip label={`other: ${counts.other}`} />
+        <Chip label={`passé composé: ${counts['passe-compose']}`} />
+        <Chip label={`structure: ${counts.structure}`} />
       </div>
     </div>
   )
@@ -875,24 +814,27 @@ function PracticeCard({
   onNext: () => void
 }) {
   const isCorrect = selectedOption === question.correct
+
+  const feedbackMessagesCorrect = ["Nice 😏", "Good catch", "That’s right", "You’re getting the pattern"]
+  const feedbackMessagesWrong = ["Careful now…", "Good try — check the placement", "Almost — notice the structure"]
+  const message = isCorrect
+    ? feedbackMessagesCorrect[Math.floor(Math.random() * feedbackMessagesCorrect.length)]
+    : feedbackMessagesWrong[Math.floor(Math.random() * feedbackMessagesWrong.length)]
+
   const topicBadge =
-    question.topic === 'meaning'
-      ? 'bg-blue-100 text-blue-700'
-      : question.topic === 'completion'
-      ? 'bg-emerald-100 text-emerald-700'
-      : question.topic === 'verb-pattern'
+    question.topic === 'nepas'
       ? 'bg-purple-100 text-purple-700'
-      : 'bg-amber-100 text-amber-700'
+      : question.topic === 'other'
+      ? 'bg-blue-100 text-blue-700'
+      : question.topic === 'passe-compose'
+      ? 'bg-amber-100 text-amber-700'
+      : 'bg-emerald-100 text-emerald-700'
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-4 gap-3">
         <span className="text-sm font-medium text-slate-500">
-          Question {questionNumber} of {totalQuestions}
+          Practice {questionNumber} of {totalQuestions}
         </span>
         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${topicBadge}`}>
           {question.topic}
@@ -907,7 +849,8 @@ function PracticeCard({
             key={idx}
             onClick={() => onSelectOption(idx)}
             disabled={showFeedback}
-            className={`w-full p-4 rounded-xl border-2 text-left font-medium transition-all ${
+            aria-label={`Answer option ${idx + 1}: ${option}`}
+            className={`w-full p-4 rounded-xl border-2 text-left font-medium transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
               showFeedback
                 ? idx === question.correct
                   ? 'border-green-400 bg-green-50 text-green-800'
@@ -954,7 +897,7 @@ function PracticeCard({
           }`}
         >
           <p className={`font-semibold mb-1 ${isCorrect ? 'text-green-700' : 'text-amber-700'}`}>
-            {isCorrect ? 'Nice — pattern spotted.' : 'Good effort — check the pattern.'}
+            {message}
           </p>
           <p className="text-sm text-slate-600">{question.explanation}</p>
         </motion.div>
@@ -985,7 +928,7 @@ function PracticeCard({
   )
 }
 
-function ResultsCard({
+function PracticeResultsCard({
   score,
   total,
   onRetake,
@@ -999,32 +942,28 @@ function ResultsCard({
   const percentage = Math.round((score / total) * 100)
 
   const feedback =
-    score <= 6
+    score <= 7
       ? {
-          title: "Good effort — prepositions take time.",
-          detail: "Retake the practice, or continue and review examples again later."
+          title: "Good effort — negation takes practice.",
+          body: "Review the patterns, then retake the practice. A small review can help a lot."
         }
-      : score <= 12
+      : score <= 13
       ? {
-          title: "Nice progress — you're starting to see patterns.",
-          detail: "You’re building strong intuition. Try another run to make it automatic."
+          title: "Nice progress — you're understanding the patterns.",
+          body: "You’re getting the placement right. Keep going and repeat the structures."
         }
       : {
-          title: "Great job — you understand prepositions well.",
-          detail: "You can recognize patterns and apply them in simple sentences."
+          title: "Great job — you’re using negation well.",
+          body: "You can use different negations and place them correctly."
         }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
-    >
+    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
       <div className="flex items-start justify-between gap-6 flex-col md:flex-row">
         <div className="flex-1">
           <h3 className="text-2xl font-bold text-slate-800 mb-2">Practice results</h3>
-          <p className="text-slate-600 mb-4">{feedback.title}</p>
-          <p className="text-sm text-slate-500">{feedback.detail}</p>
+          <p className="text-slate-800 font-semibold mb-2">{feedback.title}</p>
+          <p className="text-sm text-slate-600">{feedback.body}</p>
         </div>
         <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 text-center w-full md:w-[260px]">
           <div className="text-sm text-slate-500 mb-1">Score</div>

@@ -12,21 +12,25 @@ import {
 } from 'react-icons/fa'
 import Link from 'next/link'
 import {
+  agreementExamples,
+  avoirExamples,
+  comparisonExamples,
+  etreVerbs,
   guidedExamples,
   practiceQuestions,
-  prepositions,
-  verbPrepositionPatterns,
   type PracticeQuestion,
   type PracticeTopic
 } from './data'
 
 type SectionKey =
   | 'what'
-  | 'core'
-  | 'context'
-  | 'verbPatterns'
-  | 'contractions'
-  | 'guidedExamples'
+  | 'formed'
+  | 'avoir'
+  | 'etre'
+  | 'mnemonic'
+  | 'agreement'
+  | 'comparison'
+  | 'guided'
 
 type SectionReview = Record<SectionKey, boolean>
 
@@ -36,14 +40,16 @@ type PracticeAnswer = {
   isCorrect: boolean
 }
 
-export default function A1Lesson4Page() {
+export default function A1Lesson9Page() {
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
     what: false,
-    core: false,
-    context: false,
-    verbPatterns: false,
-    contractions: false,
-    guidedExamples: false
+    formed: false,
+    avoir: false,
+    etre: false,
+    mnemonic: false,
+    agreement: false,
+    comparison: false,
+    guided: false
   })
 
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
@@ -59,20 +65,19 @@ export default function A1Lesson4Page() {
 
   const allSectionsReviewed = Object.values(reviewedSections).every(Boolean)
   const practiceComplete = practiceAnswers.length === practiceQuestions.length
-  const correctAnswers = practiceAnswers.filter(a => a.isCorrect).length
-  const percentage = Math.round((correctAnswers / practiceQuestions.length) * 100)
+  const score = practiceAnswers.filter(a => a.isCorrect).length
+  const percentage = Math.round((score / practiceQuestions.length) * 100)
 
-  const topicLabel = useMemo(() => {
-    const counts = practiceAnswers.reduce<Record<PracticeTopic, number>>(
+  const topicCounts = useMemo(() => {
+    return practiceAnswers.reduce<Record<PracticeTopic, number>>(
       (acc, a) => {
         const q = practiceQuestions.find(x => x.id === a.questionId)
         if (!q) return acc
         acc[q.topic] = (acc[q.topic] || 0) + 1
         return acc
       },
-      { meaning: 0, completion: 0, 'verb-pattern': 0, contraction: 0 }
+      { recognition: 0, auxiliary: 0, vandertramp: 0, agreement: 0 }
     )
-    return counts
   }, [practiceAnswers])
 
   const playAudio = (audioSrc: string, id: string) => {
@@ -89,9 +94,7 @@ export default function A1Lesson4Page() {
       setCurrentlyPlaying(null)
     })
 
-    audio.onended = () => {
-      setCurrentlyPlaying(null)
-    }
+    audio.onended = () => setCurrentlyPlaying(null)
   }
 
   const markSectionReviewed = (section: SectionKey) => {
@@ -107,7 +110,6 @@ export default function A1Lesson4Page() {
     if (selectedOption === null) return
     const currentQuestion = practiceQuestions[currentPracticeIndex]
     const isCorrect = selectedOption === currentQuestion.correct
-
     setPracticeAnswers(prev => [
       ...prev,
       { questionId: currentQuestion.id, selectedOption, isCorrect }
@@ -120,10 +122,7 @@ export default function A1Lesson4Page() {
     setSelectedOption(null)
     setShowFeedback(false)
     setCurrentPracticeIndex(nextIndex)
-
-    if (nextIndex >= practiceQuestions.length) {
-      setShowResults(true)
-    }
+    if (nextIndex >= practiceQuestions.length) setShowResults(true)
   }
 
   const retakePractice = () => {
@@ -140,7 +139,8 @@ export default function A1Lesson4Page() {
     setShowCompletion(true)
   }
 
-  const lessonComplete = allSectionsReviewed && practiceComplete && showCompletion
+  const lessonReadyToComplete = allSectionsReviewed && practiceComplete
+  const lessonComplete = lessonReadyToComplete && showCompletion
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
@@ -163,10 +163,11 @@ export default function A1Lesson4Page() {
           totalPractice={practiceQuestions.length}
         />
 
+        {/* 2. What is the passé composé? */}
         <SectionCard
-          title="What is a preposition?"
-          subtitle="Small word, big meaning"
-          icon="🧩"
+          title="What is the passé composé?"
+          subtitle="A very useful past tense for beginners"
+          icon="⏳"
           isReviewed={reviewedSections.what}
           onMarkReviewed={() => markSectionReviewed('what')}
           index={0}
@@ -175,182 +176,217 @@ export default function A1Lesson4Page() {
             <ul className="space-y-3 text-slate-700">
               <li className="flex items-start gap-3">
                 <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>A <strong>preposition</strong> is a small word that connects parts of a sentence.</span>
+                <span>The <strong>passé composé</strong> is one of the main past tenses in French.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>It often shows <strong>place</strong>, <strong>direction</strong>, <strong>time</strong>, or a relationship.</span>
+                <span>It is often used to talk about <strong>completed</strong> actions in the past.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>In French, prepositions are used <strong>very frequently</strong>.</span>
+                <span>At beginner level, it’s one of the most useful ways to say what happened.</span>
               </li>
             </ul>
 
             <div className="mt-6 bg-white rounded-lg p-4 border border-slate-200">
               <h4 className="font-semibold text-slate-800 mb-3">Examples:</h4>
               <div className="space-y-2 text-slate-600">
-                <p><span className="font-medium text-purple-600">Je suis à la maison.</span></p>
-                <p><span className="font-medium text-purple-600">Le livre est sur la table.</span></p>
-                <p><span className="font-medium text-purple-600">Il parle avec son ami.</span></p>
+                <p><span className="font-medium text-purple-700">J’ai mangé.</span> = I ate / I have eaten.</p>
+                <p><span className="font-medium text-purple-700">Elle est arrivée.</span> = She arrived / She has arrived.</p>
               </div>
-              <div className="mt-4 bg-purple-50 rounded-lg p-3 border border-purple-200 text-sm text-purple-800">
-                <strong>Helper note:</strong> Prepositions are small, but very important.
+              <div className="mt-4 bg-purple-50 rounded-lg p-3 border border-purple-200 text-sm text-purple-800 space-y-1">
+                <p><strong>Helper:</strong> At A1 level, focus on recognizing the form and building simple sentences.</p>
+                <p>You do not need every exception yet.</p>
               </div>
             </div>
           </div>
         </SectionCard>
 
+        {/* 3. How formed */}
         <SectionCard
-          title="Core prepositions"
-          subtitle="Learn them through patterns + examples"
-          icon="🗺️"
-          isReviewed={reviewedSections.core}
-          onMarkReviewed={() => markSectionReviewed('core')}
+          title="How the passé composé is formed"
+          subtitle="Auxiliary + past participle"
+          icon="🧩"
+          isReviewed={reviewedSections.formed}
+          onMarkReviewed={() => markSectionReviewed('formed')}
           index={1}
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {prepositions.map((p, idx) => (
-              <PrepositionCard
-                key={p.prep}
-                prep={p.prep}
-                english={p.english}
-                example={p.example}
-                phonetic={p.phonetic}
-                isPlaying={currentlyPlaying === `prep-${p.prep}`}
-                onPlay={() => playAudio(p.audioSrc, `prep-${p.prep}`)}
-                index={idx}
-              />
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ExplanationCard
+              title="2 parts"
+              bullets={[
+                "the auxiliary verb (avoir or être)",
+                "the past participle"
+              ]}
+              accent="purple"
+            />
+            <FormulaCard />
           </div>
-          <div className="mt-5 bg-slate-50 rounded-xl p-4 border border-slate-200 text-sm text-slate-700">
-            <strong>Pattern tip:</strong> Try to notice what comes after the preposition (a place, a person, a country, a thing) rather than memorizing the English word.
+
+          <div className="mt-4 bg-white rounded-xl p-4 border border-slate-200">
+            <div className="font-semibold text-slate-800 mb-2">Quick examples</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+              <MiniExample french="J’ai parlé." />
+              <MiniExample french="Nous avons fini." />
+              <MiniExample french="Elle est allée." />
+            </div>
           </div>
         </SectionCard>
 
+        {/* 4. Avoir */}
         <SectionCard
-          title="Prepositions in context"
-          subtitle="Location, movement, origin, relationship"
-          icon="📍"
-          isReviewed={reviewedSections.context}
-          onMarkReviewed={() => markSectionReviewed('context')}
+          title="Avoir as auxiliary"
+          subtitle="The default pattern (most verbs)"
+          icon="✅"
+          isReviewed={reviewedSections.avoir}
+          onMarkReviewed={() => markSectionReviewed('avoir')}
           index={2}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <ContextGroup
-              title="Location"
-              subtitle="Where is it?"
-              color="blue"
-              items={[
-                { label: "dans (inside)", example: "Le chat est dans la maison." },
-                { label: "sur (on)", example: "Le livre est sur la table." },
-                { label: "sous (under)", example: "Le sac est sous la table." }
-              ]}
-            />
-            <ContextGroup
-              title="Movement"
-              subtitle="Where are you going?"
-              color="emerald"
-              items={[
-                { label: "à (to)", example: "Je vais à Paris." },
-                { label: "en (to/in countries)", example: "Je vais en France." }
-              ]}
-            />
-            <ContextGroup
-              title="Origin"
-              subtitle="Where are you from?"
-              color="amber"
-              items={[
-                { label: "de (from)", example: "Je viens de France." }
-              ]}
-            />
-            <ContextGroup
-              title="Relationship"
-              subtitle="With / for"
-              color="purple"
-              items={[
-                { label: "avec (with)", example: "Je parle avec Marie." },
-                { label: "pour (for)", example: "C’est pour toi." }
-              ]}
-            />
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          title="Verb + preposition patterns"
-          subtitle="Learn the verb together with the preposition"
-          icon="🔗"
-          isReviewed={reviewedSections.verbPatterns}
-          onMarkReviewed={() => markSectionReviewed('verbPatterns')}
-          index={3}
-        >
-          <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+          <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
             <p className="text-slate-700 mb-4">
-              In French, some verbs are followed by specific prepositions. These combinations are best learned as one “chunk”.
+              Most verbs use <strong>avoir</strong> in the passé composé. This is the default pattern you’ll see most often.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {verbPrepositionPatterns.map((v, idx) => (
-                <VerbPatternCard
-                  key={v.verb}
-                  verb={v.verb}
-                  english={v.english}
-                  example={v.example}
+              {avoirExamples.map((ex, idx) => (
+                <ExampleCard
+                  key={ex.id}
+                  label={`avoir • ${ex.infinitive}`}
+                  french={ex.sentence}
+                  english={ex.english}
+                  accent="blue"
+                  isPlaying={currentlyPlaying === `avoir-${ex.id}`}
+                  onPlay={() => playAudio(`/audio/a1/passe-compose/avoir/${ex.infinitive}.mp3`, `avoir-${ex.id}`)}
                   index={idx}
                 />
               ))}
             </div>
-            <div className="mt-4 bg-white rounded-lg p-4 border border-slate-200 text-sm text-slate-700">
-              <strong>Pattern tip:</strong> When you learn a verb, ask: “Does this verb usually use <em>à</em> or <em>de</em>?”
+          </div>
+        </SectionCard>
+
+        {/* 5. Être */}
+        <SectionCard
+          title="Être as auxiliary"
+          subtitle="A small but important group"
+          icon="⭐"
+          isReviewed={reviewedSections.etre}
+          onMarkReviewed={() => markSectionReviewed('etre')}
+          index={3}
+        >
+          <div className="bg-amber-50 rounded-xl p-6 border border-amber-200">
+            <p className="text-amber-900 mb-4">
+              A smaller set of verbs uses <strong>être</strong> instead of <strong>avoir</strong>. These are often movement verbs
+              or verbs of change of state.
+            </p>
+            <div className="bg-white rounded-xl p-4 border border-amber-200 text-sm text-slate-700 space-y-1">
+              <p><strong>Do not panic — this is a small group.</strong></p>
+              <p>Most beginners learn them through a mnemonic.</p>
+              <p className="text-slate-500">
+                Note: All reflexive / pronominal verbs also use être, but for this lesson focus mainly on the common movement verbs.
+              </p>
             </div>
           </div>
         </SectionCard>
 
+        {/* 6. Vandertramp */}
         <SectionCard
-          title="Important combinations to remember"
-          subtitle="Common contractions with à and de"
+          title="Dr. & Mrs. Vandertramp verbs"
+          subtitle="Common être verbs (movement / change of state)"
           icon="🧠"
-          isReviewed={reviewedSections.contractions}
-          onMarkReviewed={() => markSectionReviewed('contractions')}
+          isReviewed={reviewedSections.mnemonic}
+          onMarkReviewed={() => markSectionReviewed('mnemonic')}
           index={4}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ContractionCard left="à + le" right="au" example="Je vais au marché." />
-            <ContractionCard left="à + les" right="aux" example="Il parle aux enfants." />
-            <ContractionCard left="de + le" right="du" example="Elle joue du piano." />
-            <ContractionCard left="de + les" right="des" example="Nous parlons des films." />
-          </div>
-          <div className="mt-4 bg-amber-50 rounded-xl p-4 border border-amber-200 text-sm text-amber-900">
-            <strong>Beginner-safe rule:</strong> When you see <strong>au/aux</strong>, think “à + the”. When you see <strong>du/des</strong>, think “de + the”.
+          <div className="space-y-4">
+            <div className="bg-white rounded-2xl p-5 border border-slate-200">
+              <div className="flex items-start justify-between gap-4 flex-col md:flex-row">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800 mb-1">
+                    The mnemonic: “Dr. & Mrs. Vandertramp.”
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    Different teachers may present slightly different mnemonic versions, but this is the classic one learners often see.
+                  </p>
+                </div>
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center w-full md:w-auto">
+                  <div className="text-xs text-slate-500 font-semibold mb-1">Letters</div>
+                  <div className="font-mono text-sm text-slate-800 tracking-wider">
+                    D R M R S V A N D E R T R A M P
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <MnemonicGrid />
           </div>
         </SectionCard>
 
+        {/* 7. Agreement with être */}
+        <SectionCard
+          title="Agreement with être"
+          subtitle="Notice the pattern (don’t panic)"
+          icon="🧷"
+          isReviewed={reviewedSections.agreement}
+          onMarkReviewed={() => markSectionReviewed('agreement')}
+          index={5}
+        >
+          <div className="bg-emerald-50 rounded-xl p-6 border border-emerald-200">
+            <p className="text-emerald-900 mb-4">
+              With <strong>être</strong>, the past participle agrees with the subject in gender and number, so the ending may change.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {agreementExamples.map((ex, idx) => (
+                <AgreementCard
+                  key={ex.id}
+                  sentence={ex.sentence}
+                  english={ex.english}
+                  note={ex.note}
+                  index={idx}
+                />
+              ))}
+            </div>
+            <div className="mt-4 bg-white rounded-xl p-4 border border-emerald-200 text-sm text-slate-700 space-y-1">
+              <p><strong>At A1 level, the most important thing is to notice this pattern.</strong></p>
+              <p>You do not need to master every agreement rule immediately.</p>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 8. Avoir vs être comparison */}
+        <SectionCard
+          title="Avoir vs être comparison"
+          subtitle="Same tense, different auxiliary"
+          icon="⚖️"
+          isReviewed={reviewedSections.comparison}
+          onMarkReviewed={() => markSectionReviewed('comparison')}
+          index={6}
+        >
+          <ComparisonPanel />
+        </SectionCard>
+
+        {/* 9. Guided examples */}
         <SectionCard
           title="Guided examples"
-          subtitle="Read, notice patterns, then copy the structure"
+          subtitle="Read, notice the auxiliary, then copy"
           icon="🗣️"
-          isReviewed={reviewedSections.guidedExamples}
-          onMarkReviewed={() => markSectionReviewed('guidedExamples')}
-          index={5}
+          isReviewed={reviewedSections.guided}
+          onMarkReviewed={() => markSectionReviewed('guided')}
+          index={7}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {guidedExamples.map((ex, idx) => (
               <GuidedExampleCard
-                key={ex.id}
+                key={ex.french}
                 french={ex.french}
                 english={ex.english}
-                focus={ex.focus}
-                isPlaying={currentlyPlaying === ex.id}
-                onPlay={() => playAudio(ex.audioSrc, ex.id)}
+                isPlaying={currentlyPlaying === `guided-${idx}`}
+                onPlay={() => playAudio(`/audio/a1/passe-compose/guided/${idx + 1}.mp3`, `guided-${idx}`)}
                 index={idx}
               />
             ))}
           </div>
-          <div className="mt-5 bg-slate-50 rounded-xl p-4 border border-slate-200 text-sm text-slate-700">
-            <strong>Mini-drill:</strong> Replace the last word to make your own sentence. Example: “Je vais au marché.” → “Je vais au café.”
-          </div>
         </SectionCard>
 
-        {/* Guided interactive practice */}
+        {/* 10. Practice */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -358,17 +394,13 @@ export default function A1Lesson4Page() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-800">Guided interactive practice</h2>
-              <p className="text-sm text-slate-600">16 questions, one at a time</p>
+              <p className="text-sm text-slate-600">18 questions, one at a time</p>
             </div>
           </div>
 
           {!showResults ? (
             <div className="space-y-4">
-              <PracticeMetaRow
-                answered={practiceAnswers.length}
-                total={practiceQuestions.length}
-                counts={topicLabel}
-              />
+              <PracticeMetaRow answered={practiceAnswers.length} total={practiceQuestions.length} counts={topicCounts} />
 
               {currentPracticeIndex < practiceQuestions.length ? (
                 <PracticeCard
@@ -382,25 +414,15 @@ export default function A1Lesson4Page() {
                   onNext={nextQuestion}
                 />
               ) : (
-                <ResultsCard
-                  score={correctAnswers}
-                  total={practiceQuestions.length}
-                  onRetake={retakePractice}
-                  onContinue={continueFromResults}
-                />
+                <PracticeResultsCard score={score} total={practiceQuestions.length} onRetake={retakePractice} onContinue={continueFromResults} />
               )}
             </div>
           ) : (
-            <ResultsCard
-              score={correctAnswers}
-              total={practiceQuestions.length}
-              onRetake={retakePractice}
-              onContinue={continueFromResults}
-            />
+            <PracticeResultsCard score={score} total={practiceQuestions.length} onRetake={retakePractice} onContinue={continueFromResults} />
           )}
         </div>
 
-        {/* Completion section */}
+        {/* 12. Completion */}
         <AnimatePresence>
           {showCompletion && (
             <motion.div
@@ -414,21 +436,21 @@ export default function A1Lesson4Page() {
                     <FaCheck />
                     Lesson completion
                   </div>
-                  <h2 className="text-2xl font-bold text-slate-800 mb-2">
-                    Nice work — you finished A1 Lesson 4!
-                  </h2>
+                  <h2 className="text-2xl font-bold text-slate-800 mb-2">You’ve completed Lesson 9.</h2>
                   <p className="text-slate-700 mb-3">
-                    You can now recognize common prepositions, use them in simple sentences, and spot verb + preposition patterns.
+                    You now understand the basic structure of the passé composé.
                   </p>
+                  <p className="text-slate-700 mb-4">
+                    You’ve also met the common être verbs often remembered with Dr. & Mrs. Vandertramp.
+                  </p>
+
                   <div className="bg-white rounded-xl p-4 border border-green-200 text-sm text-slate-700">
                     <div className="font-semibold text-slate-800 mb-2">Quick recap</div>
                     <ul className="space-y-1">
-                      <li>- <strong>Location</strong>: dans, sur, sous</li>
-                      <li>- <strong>Movement</strong>: à, en</li>
-                      <li>- <strong>Origin</strong>: de</li>
-                      <li>- <strong>Relationship</strong>: avec, pour</li>
-                      <li>- <strong>Verb chunks</strong>: parler à / parler de, avoir besoin de…</li>
-                      <li>- <strong>Contractions</strong>: au/aux, du/des</li>
+                      <li>- Passé composé = <strong>auxiliary</strong> + <strong>past participle</strong></li>
+                      <li>- Most verbs → <strong>avoir</strong></li>
+                      <li>- Small important group → <strong>être</strong> (often movement / change of state)</li>
+                      <li>- With être, <strong>agreement</strong> can appear (allé / allée / allés / allées)</li>
                     </ul>
                   </div>
                 </div>
@@ -436,7 +458,9 @@ export default function A1Lesson4Page() {
                 <div className="w-full md:w-auto">
                   <div className="bg-white rounded-2xl p-5 border border-green-200 text-center">
                     <div className="text-sm text-slate-500 mb-1">Practice score</div>
-                    <div className="text-3xl font-bold text-green-700">{correctAnswers}/16</div>
+                    <div className="text-3xl font-bold text-green-700">
+                      {score}/{practiceQuestions.length}
+                    </div>
                     <div className="text-sm font-medium text-slate-600">{percentage}%</div>
                     <div className="mt-4 flex gap-2 justify-center flex-wrap">
                       <button
@@ -444,15 +468,15 @@ export default function A1Lesson4Page() {
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold transition-colors"
                       >
                         <FaRedoAlt size={14} />
-                        Retake
+                        Retake practice
                       </button>
-                      <Link
-                        href="/classes/A1/lesson5"
+                      <a
+                        href="/learn/a1/lesson-10"
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg transition-all"
                       >
-                        Next lesson
+                        Continue
                         <FaArrowRight size={14} />
-                      </Link>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -470,7 +494,7 @@ export default function A1Lesson4Page() {
               <>
                 <div className="w-3 h-3 rounded-full bg-green-500" />
                 <span className="text-sm text-slate-600 truncate">
-                  Lesson complete! You’re ready for the next one.
+                  Lesson complete! You’re ready to continue.
                 </span>
               </>
             ) : (
@@ -488,14 +512,14 @@ export default function A1Lesson4Page() {
           </div>
 
           <button
-            disabled={!allSectionsReviewed || !practiceComplete}
+            disabled={!lessonReadyToComplete}
             onClick={() => {
-              if (!allSectionsReviewed || !practiceComplete) return
+              if (!lessonReadyToComplete) return
               setShowCompletion(true)
               window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
             }}
             className={`shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-              allSectionsReviewed && practiceComplete
+              lessonReadyToComplete
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:scale-105'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
@@ -511,23 +535,18 @@ export default function A1Lesson4Page() {
 
 function LessonHeader() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="text-center mb-10"
-    >
+    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
       <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white text-sm font-medium mb-4">
-        <span>A1 Lesson 4</span>
+        <span>A1 Lesson 9</span>
       </div>
-
       <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">
-        A1 Lesson 4 — French Prepositions
+        Past Tense — Passé Composé
       </h1>
       <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-2">
-        Learn how prepositions connect words and how they are used in everyday French.
+        Learn how to talk about completed actions in the past in French.
       </p>
       <p className="text-sm text-slate-500">
-        Read the examples, notice patterns, and complete the practice to build confidence.
+        Read the explanations, notice the patterns, and complete the practice.
       </p>
     </motion.div>
   )
@@ -542,9 +561,9 @@ function ProgressBar({
   practiceProgress: number
   totalPractice: number
 }) {
-  const sections = ['what', 'core', 'context', 'verbPatterns', 'contractions', 'guidedExamples'] as const
+  const sections = ['what', 'formed', 'avoir', 'etre', 'mnemonic', 'agreement', 'comparison', 'guided'] as const
   const completedSections = sections.filter(s => reviewedSections[s]).length
-  const totalProgress = ((completedSections + practiceProgress / totalPractice) / 7) * 100
+  const totalProgress = ((completedSections + practiceProgress / totalPractice) / 9) * 100
 
   return (
     <div className="mb-8 bg-white rounded-xl p-4 shadow-sm border border-slate-200">
@@ -561,7 +580,7 @@ function ProgressBar({
         />
       </div>
       <div className="flex items-center gap-4 mt-3 text-xs text-slate-500 flex-wrap">
-        <span>{completedSections}/6 sections reviewed</span>
+        <span>{completedSections}/8 sections reviewed</span>
         <span>•</span>
         <span>{practiceProgress}/{totalPractice} practice questions</span>
       </div>
@@ -592,23 +611,18 @@ function SectionCard({
     'from-emerald-500 to-teal-500',
     'from-amber-500 to-orange-500',
     'from-indigo-500 to-purple-500',
-    'from-rose-500 to-pink-500'
+    'from-rose-500 to-pink-500',
+    'from-sky-500 to-indigo-500',
+    'from-lime-500 to-emerald-500'
   ]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className="mb-8"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="mb-8">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-100">
           <div className="flex items-start justify-between gap-4 flex-col sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
-              <div
-                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center text-white shadow-md`}
-              >
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center text-white shadow-md`}>
                 <span className="text-2xl">{icon}</span>
               </div>
               <div>
@@ -619,9 +633,7 @@ function SectionCard({
             <button
               onClick={onMarkReviewed}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                isReviewed
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                isReviewed ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
               }`}
             >
               <FaCheck size={14} />
@@ -635,142 +647,178 @@ function SectionCard({
   )
 }
 
-function PrepositionCard({
-  prep,
-  english,
-  example,
-  phonetic,
-  isPlaying,
-  onPlay,
-  index
-}: {
-  prep: string
-  english: string
-  example: string
-  phonetic: string
-  isPlaying: boolean
-  onPlay: () => void
-  index: number
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className="rounded-xl p-4 border-2 bg-slate-50 border-slate-200 hover:border-purple-300 transition-all hover:shadow-md"
-    >
-      <div className="flex items-start justify-between mb-2 gap-3">
-        <div>
-          <div className="flex items-end gap-3">
-            <h3 className="text-3xl font-bold text-slate-800">{prep}</h3>
-            <p className="text-sm text-purple-600 font-medium">/{phonetic}/</p>
-          </div>
-          <p className="text-sm text-slate-600">{english}</p>
-        </div>
-        <button
-          onClick={onPlay}
-          disabled={isPlaying}
-          aria-label={`Play pronunciation for ${prep}`}
-          className={`p-2 rounded-lg transition-all ${
-            isPlaying
-              ? 'bg-white text-purple-600 animate-pulse'
-              : 'bg-white text-slate-600 hover:text-purple-600 shadow-sm'
-          }`}
-        >
-          <FaPlay size={14} />
-        </button>
-      </div>
-      <div className="text-sm text-slate-500 bg-white rounded-lg p-3 border border-slate-100">
-        <span className="font-medium text-slate-700">{example}</span>
-      </div>
-    </motion.div>
-  )
-}
-
-function ContextGroup({
+function ExplanationCard({
   title,
-  subtitle,
-  color,
-  items
+  bullets,
+  accent
 }: {
   title: string
-  subtitle: string
-  color: 'blue' | 'emerald' | 'amber' | 'purple'
-  items: { label: string; example: string }[]
+  bullets: string[]
+  accent: 'purple' | 'blue'
 }) {
   const styles =
-    color === 'blue'
-      ? { bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700' }
-      : color === 'emerald'
-      ? { bg: 'bg-emerald-50', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700' }
-      : color === 'amber'
-      ? { bg: 'bg-amber-50', border: 'border-amber-200', badge: 'bg-amber-100 text-amber-700' }
-      : { bg: 'bg-purple-50', border: 'border-purple-200', badge: 'bg-purple-100 text-purple-700' }
+    accent === 'purple'
+      ? { bg: 'bg-purple-50', border: 'border-purple-200' }
+      : { bg: 'bg-blue-50', border: 'border-blue-200' }
 
   return (
     <div className={`rounded-2xl p-5 border-2 ${styles.bg} ${styles.border}`}>
-      <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
-        <div>
-          <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-          <p className="text-sm text-slate-600">{subtitle}</p>
-        </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${styles.badge}`}>context</span>
-      </div>
-      <div className="space-y-3">
-        {items.map((it, idx) => (
-          <div key={idx} className="bg-white rounded-xl p-3 border border-slate-200">
-            <div className="font-semibold text-slate-800">{it.label}</div>
-            <div className="text-sm text-slate-600 mt-1">{it.example}</div>
-          </div>
+      <h3 className="text-lg font-bold text-slate-800 mb-3">{title}</h3>
+      <ul className="space-y-2 text-slate-700">
+        {bullets.map((b, idx) => (
+          <li key={idx} className="flex items-start gap-2">
+            <span className="font-bold text-slate-500">•</span>
+            <span>{b}</span>
+          </li>
         ))}
+      </ul>
+    </div>
+  )
+}
+
+function FormulaCard() {
+  return (
+    <div className="rounded-2xl p-5 border-2 bg-slate-50 border-slate-200">
+      <h3 className="text-lg font-bold text-slate-800 mb-3">Formula</h3>
+      <div className="bg-white rounded-xl p-4 border border-slate-200">
+        <div className="text-sm text-slate-500 font-semibold mb-2">subject + auxiliary + past participle</div>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="px-2 py-1 rounded-lg bg-slate-100 border border-slate-200 font-semibold text-slate-700">Je</span>
+          <span className="px-2 py-1 rounded-lg bg-blue-50 border border-blue-200 font-semibold text-blue-700">ai</span>
+          <span className="px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 font-semibold text-emerald-700">mangé</span>
+        </div>
       </div>
     </div>
   )
 }
 
-function VerbPatternCard({
-  verb,
+function MiniExample({ french }: { french: string }) {
+  return (
+    <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 font-semibold text-slate-800">
+      {french}
+    </div>
+  )
+}
+
+function ExampleCard({
+  label,
+  french,
   english,
-  example,
+  accent,
+  isPlaying,
+  onPlay,
   index
 }: {
-  verb: string
+  label: string
+  french: string
   english: string
-  example: string
+  accent: 'blue' | 'purple'
+  isPlaying: boolean
+  onPlay: () => void
   index: number
 }) {
+  const chip = accent === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
-      className="bg-white rounded-xl p-4 border border-slate-200"
-    >
-      <div className="flex items-center justify-between gap-3">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-slate-200">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-lg font-bold text-slate-800">{verb}</div>
-          <div className="text-sm text-slate-600">{english}</div>
+          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${chip}`}>{label}</span>
+          <div className="text-lg font-bold text-slate-800 mt-2">{french}</div>
+          <div className="text-sm text-slate-600 mt-1">{english}</div>
         </div>
-        <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold">
-          verb + prep
-        </span>
-      </div>
-      <div className="mt-3 text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200">
-        {example}
+        <button
+          onClick={onPlay}
+          disabled={isPlaying}
+          aria-label="Play audio"
+          className={`p-2 rounded-lg transition-all ${
+            isPlaying ? 'bg-purple-100 text-purple-600 animate-pulse' : 'bg-slate-50 text-slate-600 hover:text-purple-600 border border-slate-200'
+          }`}
+        >
+          <FaPlay size={14} />
+        </button>
       </div>
     </motion.div>
   )
 }
 
-function ContractionCard({ left, right, example }: { left: string; right: string; example: string }) {
+function MnemonicGrid() {
   return (
-    <div className="bg-white rounded-2xl p-5 border border-slate-200">
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm text-slate-500 font-medium">{left}</div>
-        <div className="text-2xl font-bold text-purple-700">{right}</div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {etreVerbs.map((v, idx) => (
+        <motion.div
+          key={`${v.letter}-${v.infinitive}`}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: idx * 0.02 }}
+          className="bg-slate-50 rounded-2xl p-4 border border-slate-200"
+        >
+          <div className="flex items-center justify-between">
+            <div className="text-2xl font-bold text-purple-700">{v.letter}</div>
+            <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-semibold">être</span>
+          </div>
+          <div className="mt-2 text-lg font-bold text-slate-800">{v.infinitive}</div>
+          <div className="text-sm text-slate-600">{v.english}</div>
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+
+function AgreementCard({ sentence, english, note, index }: { sentence: string; english: string; note: string; index: number }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-emerald-200">
+      <div className="text-lg font-bold text-slate-800">{sentence}</div>
+      <div className="text-sm text-slate-600 mt-1">{english}</div>
+      <div className="mt-3 text-xs font-semibold text-emerald-800 bg-emerald-100 border border-emerald-200 rounded-full inline-flex px-3 py-1">
+        {note}
       </div>
-      <div className="mt-3 text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200">
-        {example}
+    </motion.div>
+  )
+}
+
+function ComparisonPanel() {
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-blue-50 rounded-2xl p-5 border-2 border-blue-200">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold text-slate-800">Avoir</h3>
+            <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-semibold">most verbs</span>
+          </div>
+          <div className="space-y-3">
+            {comparisonExamples.filter(x => x.type === 'avoir').map((ex, idx) => (
+              <div key={idx} className="bg-white rounded-xl p-4 border border-blue-200">
+                <div className="font-semibold text-slate-800">{ex.sentence}</div>
+                <div className="text-sm text-slate-600">{ex.english}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-amber-50 rounded-2xl p-5 border-2 border-amber-200">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold text-slate-800">Être</h3>
+            <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-semibold">small group</span>
+          </div>
+          <div className="space-y-3">
+            {comparisonExamples.filter(x => x.type === 'etre').map((ex, idx) => (
+              <div key={idx} className="bg-white rounded-xl p-4 border border-amber-200">
+                <div className="font-semibold text-slate-800">{ex.sentence}</div>
+                <div className="text-sm text-slate-600">{ex.english}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl p-5 border border-slate-200">
+        <div className="font-semibold text-slate-800 mb-2">Summary notes</div>
+        <ul className="space-y-1 text-sm text-slate-700">
+          <li>- <strong>Most verbs</strong> → avoir</li>
+          <li>- <strong>Small important group</strong> → être</li>
+          <li>- Être verbs often relate to <strong>movement</strong> or <strong>change of state</strong></li>
+          <li>- With être, <strong>agreement</strong> matters</li>
+        </ul>
       </div>
     </div>
   )
@@ -779,28 +827,26 @@ function ContractionCard({ left, right, example }: { left: string; right: string
 function GuidedExampleCard({
   french,
   english,
-  focus,
   isPlaying,
   onPlay,
   index
 }: {
   french: string
   english: string
-  focus: string
   isPlaying: boolean
   onPlay: () => void
   index: number
 }) {
+  const isEtre = french.includes(' suis ') || french.includes(' sommes ') || french.includes(' sont ') || french.includes(' est ')
+  const chip = isEtre ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+  const label = isEtre ? 'être' : 'avoir'
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04 }}
-      className="bg-white rounded-2xl p-5 border border-slate-200"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-slate-200">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-lg font-bold text-slate-800">{french}</div>
+          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${chip}`}>{label}</span>
+          <div className="text-lg font-bold text-slate-800 mt-2">{french}</div>
           <div className="text-sm text-slate-600 mt-1">{english}</div>
         </div>
         <button
@@ -808,16 +854,11 @@ function GuidedExampleCard({
           disabled={isPlaying}
           aria-label="Play audio"
           className={`p-2 rounded-lg transition-all ${
-            isPlaying
-              ? 'bg-purple-100 text-purple-600 animate-pulse'
-              : 'bg-slate-50 text-slate-600 hover:text-purple-600 border border-slate-200'
+            isPlaying ? 'bg-purple-100 text-purple-600 animate-pulse' : 'bg-slate-50 text-slate-600 hover:text-purple-600 border border-slate-200'
           }`}
         >
           <FaPlay size={14} />
         </button>
-      </div>
-      <div className="mt-3 text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200 rounded-full inline-flex px-3 py-1">
-        {focus}
       </div>
     </motion.div>
   )
@@ -838,10 +879,10 @@ function PracticeMetaRow({
         <strong className="text-slate-800">{answered}</strong> / {total} answered
       </div>
       <div className="flex gap-2 flex-wrap">
-        <Chip label={`Meaning: ${counts.meaning}`} />
-        <Chip label={`Completion: ${counts.completion}`} />
-        <Chip label={`Verb patterns: ${counts['verb-pattern']}`} />
-        <Chip label={`Contractions: ${counts.contraction}`} />
+        <Chip label={`Recognition: ${counts.recognition}`} />
+        <Chip label={`Avoir/Être: ${counts.auxiliary}`} />
+        <Chip label={`Vandertramp: ${counts.vandertramp}`} />
+        <Chip label={`Agreement: ${counts.agreement}`} />
       </div>
     </div>
   )
@@ -875,24 +916,27 @@ function PracticeCard({
   onNext: () => void
 }) {
   const isCorrect = selectedOption === question.correct
+
+  const feedbackMessagesCorrect = ["Nice 😏", "Good catch", "That’s right", "You’re getting the pattern"]
+  const feedbackMessagesWrong = ["Careful now…", "Good try — check the auxiliary", "Almost — notice the pattern"]
+  const message = isCorrect
+    ? feedbackMessagesCorrect[Math.floor(Math.random() * feedbackMessagesCorrect.length)]
+    : feedbackMessagesWrong[Math.floor(Math.random() * feedbackMessagesWrong.length)]
+
   const topicBadge =
-    question.topic === 'meaning'
-      ? 'bg-blue-100 text-blue-700'
-      : question.topic === 'completion'
-      ? 'bg-emerald-100 text-emerald-700'
-      : question.topic === 'verb-pattern'
+    question.topic === 'recognition'
       ? 'bg-purple-100 text-purple-700'
-      : 'bg-amber-100 text-amber-700'
+      : question.topic === 'auxiliary'
+      ? 'bg-blue-100 text-blue-700'
+      : question.topic === 'vandertramp'
+      ? 'bg-amber-100 text-amber-700'
+      : 'bg-emerald-100 text-emerald-700'
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-4 gap-3">
         <span className="text-sm font-medium text-slate-500">
-          Question {questionNumber} of {totalQuestions}
+          Practice {questionNumber} of {totalQuestions}
         </span>
         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${topicBadge}`}>
           {question.topic}
@@ -907,7 +951,8 @@ function PracticeCard({
             key={idx}
             onClick={() => onSelectOption(idx)}
             disabled={showFeedback}
-            className={`w-full p-4 rounded-xl border-2 text-left font-medium transition-all ${
+            aria-label={`Answer option ${idx + 1}: ${option}`}
+            className={`w-full p-4 rounded-xl border-2 text-left font-medium transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
               showFeedback
                 ? idx === question.correct
                   ? 'border-green-400 bg-green-50 text-green-800'
@@ -954,7 +999,7 @@ function PracticeCard({
           }`}
         >
           <p className={`font-semibold mb-1 ${isCorrect ? 'text-green-700' : 'text-amber-700'}`}>
-            {isCorrect ? 'Nice — pattern spotted.' : 'Good effort — check the pattern.'}
+            {message}
           </p>
           <p className="text-sm text-slate-600">{question.explanation}</p>
         </motion.div>
@@ -985,7 +1030,7 @@ function PracticeCard({
   )
 }
 
-function ResultsCard({
+function PracticeResultsCard({
   score,
   total,
   onRetake,
@@ -997,37 +1042,35 @@ function ResultsCard({
   onContinue: () => void
 }) {
   const percentage = Math.round((score / total) * 100)
-
   const feedback =
-    score <= 6
+    score <= 7
       ? {
-          title: "Good effort — prepositions take time.",
-          detail: "Retake the practice, or continue and review examples again later."
+          title: "Good effort",
+          body:
+            "The passé composé takes time, especially with être verbs. You can retake this practice or keep going. A quick review will help a lot."
         }
-      : score <= 12
+      : score <= 13
       ? {
-          title: "Nice progress — you're starting to see patterns.",
-          detail: "You’re building strong intuition. Try another run to make it automatic."
+          title: "Nice progress",
+          body:
+            "You’re starting to recognize the passé composé patterns. Review the être verbs again if you want to feel more confident."
         }
       : {
-          title: "Great job — you understand prepositions well.",
-          detail: "You can recognize patterns and apply them in simple sentences."
+          title: "Great job",
+          body:
+            "You’re handling the passé composé well, including the important être verbs. Keep going."
         }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
-    >
+    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
       <div className="flex items-start justify-between gap-6 flex-col md:flex-row">
         <div className="flex-1">
           <h3 className="text-2xl font-bold text-slate-800 mb-2">Practice results</h3>
-          <p className="text-slate-600 mb-4">{feedback.title}</p>
-          <p className="text-sm text-slate-500">{feedback.detail}</p>
+          <p className="text-slate-800 font-semibold mb-2">{feedback.title}</p>
+          <p className="text-sm text-slate-600">{feedback.body}</p>
         </div>
         <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200 text-center w-full md:w-[260px]">
-          <div className="text-sm text-slate-500 mb-1">Score</div>
+          <div className="text-sm text-slate-500 mb-1">Final score</div>
           <div className="text-4xl font-bold text-purple-700">{score}/{total}</div>
           <div className="text-sm font-semibold text-slate-600 mt-1">{percentage}%</div>
           <div className="mt-4 h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -1042,13 +1085,13 @@ function ResultsCard({
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold transition-colors"
         >
           <FaRedoAlt size={14} />
-          Retake
+          Retake practice
         </button>
         <button
           onClick={onContinue}
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg transition-all"
         >
-          Continue
+          Continue lesson
           <FaArrowRight size={14} />
         </button>
       </div>

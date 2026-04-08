@@ -12,21 +12,24 @@ import {
 } from 'react-icons/fa'
 import Link from 'next/link'
 import {
+  adjectives,
+  adverbs,
   guidedExamples,
+  placementExamples,
   practiceQuestions,
-  prepositions,
-  verbPrepositionPatterns,
   type PracticeQuestion,
   type PracticeTopic
 } from './data'
 
 type SectionKey =
-  | 'what'
-  | 'core'
-  | 'context'
-  | 'verbPatterns'
-  | 'contractions'
-  | 'guidedExamples'
+  | 'whatAdj'
+  | 'commonAdj'
+  | 'agreement'
+  | 'placement'
+  | 'whatAdv'
+  | 'commonAdv'
+  | 'compare'
+  | 'guided'
 
 type SectionReview = Record<SectionKey, boolean>
 
@@ -36,14 +39,16 @@ type PracticeAnswer = {
   isCorrect: boolean
 }
 
-export default function A1Lesson4Page() {
+export default function A1Lesson8Page() {
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
-    what: false,
-    core: false,
-    context: false,
-    verbPatterns: false,
-    contractions: false,
-    guidedExamples: false
+    whatAdj: false,
+    commonAdj: false,
+    agreement: false,
+    placement: false,
+    whatAdv: false,
+    commonAdv: false,
+    compare: false,
+    guided: false
   })
 
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
@@ -62,17 +67,16 @@ export default function A1Lesson4Page() {
   const correctAnswers = practiceAnswers.filter(a => a.isCorrect).length
   const percentage = Math.round((correctAnswers / practiceQuestions.length) * 100)
 
-  const topicLabel = useMemo(() => {
-    const counts = practiceAnswers.reduce<Record<PracticeTopic, number>>(
+  const topicCounts = useMemo(() => {
+    return practiceAnswers.reduce<Record<PracticeTopic, number>>(
       (acc, a) => {
         const q = practiceQuestions.find(x => x.id === a.questionId)
         if (!q) return acc
         acc[q.topic] = (acc[q.topic] || 0) + 1
         return acc
       },
-      { meaning: 0, completion: 0, 'verb-pattern': 0, contraction: 0 }
+      { 'adj-recognition': 0, agreement: 0, 'adverb-usage': 0, 'adj-vs-adv': 0 }
     )
-    return counts
   }, [practiceAnswers])
 
   const playAudio = (audioSrc: string, id: string) => {
@@ -89,9 +93,7 @@ export default function A1Lesson4Page() {
       setCurrentlyPlaying(null)
     })
 
-    audio.onended = () => {
-      setCurrentlyPlaying(null)
-    }
+    audio.onended = () => setCurrentlyPlaying(null)
   }
 
   const markSectionReviewed = (section: SectionKey) => {
@@ -107,7 +109,6 @@ export default function A1Lesson4Page() {
     if (selectedOption === null) return
     const currentQuestion = practiceQuestions[currentPracticeIndex]
     const isCorrect = selectedOption === currentQuestion.correct
-
     setPracticeAnswers(prev => [
       ...prev,
       { questionId: currentQuestion.id, selectedOption, isCorrect }
@@ -120,10 +121,7 @@ export default function A1Lesson4Page() {
     setSelectedOption(null)
     setShowFeedback(false)
     setCurrentPracticeIndex(nextIndex)
-
-    if (nextIndex >= practiceQuestions.length) {
-      setShowResults(true)
-    }
+    if (nextIndex >= practiceQuestions.length) setShowResults(true)
   }
 
   const retakePractice = () => {
@@ -140,7 +138,8 @@ export default function A1Lesson4Page() {
     setShowCompletion(true)
   }
 
-  const lessonComplete = allSectionsReviewed && practiceComplete && showCompletion
+  const lessonReadyToComplete = allSectionsReviewed && practiceComplete
+  const lessonComplete = lessonReadyToComplete && showCompletion
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
@@ -163,174 +162,231 @@ export default function A1Lesson4Page() {
           totalPractice={practiceQuestions.length}
         />
 
+        {/* 2. What is an adjective? */}
         <SectionCard
-          title="What is a preposition?"
-          subtitle="Small word, big meaning"
-          icon="🧩"
-          isReviewed={reviewedSections.what}
-          onMarkReviewed={() => markSectionReviewed('what')}
+          title="What is an adjective?"
+          subtitle="Words that describe nouns"
+          icon="🏷️"
+          isReviewed={reviewedSections.whatAdj}
+          onMarkReviewed={() => markSectionReviewed('whatAdj')}
           index={0}
         >
           <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
             <ul className="space-y-3 text-slate-700">
               <li className="flex items-start gap-3">
                 <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>A <strong>preposition</strong> is a small word that connects parts of a sentence.</span>
+                <span>An <strong>adjective</strong> describes a noun (a person, place, or thing).</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>It often shows <strong>place</strong>, <strong>direction</strong>, <strong>time</strong>, or a relationship.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-purple-500 font-bold text-xl">•</span>
-                <span>In French, prepositions are used <strong>very frequently</strong>.</span>
+                <span>It gives more information: size, color, quality, etc.</span>
               </li>
             </ul>
 
             <div className="mt-6 bg-white rounded-lg p-4 border border-slate-200">
               <h4 className="font-semibold text-slate-800 mb-3">Examples:</h4>
               <div className="space-y-2 text-slate-600">
-                <p><span className="font-medium text-purple-600">Je suis à la maison.</span></p>
-                <p><span className="font-medium text-purple-600">Le livre est sur la table.</span></p>
-                <p><span className="font-medium text-purple-600">Il parle avec son ami.</span></p>
-              </div>
-              <div className="mt-4 bg-purple-50 rounded-lg p-3 border border-purple-200 text-sm text-purple-800">
-                <strong>Helper note:</strong> Prepositions are small, but very important.
+                <p><span className="font-medium text-purple-600">un grand livre</span></p>
+                <p><span className="font-medium text-purple-600">une voiture rouge</span></p>
+                <p><span className="font-medium text-purple-600">un petit chat</span></p>
               </div>
             </div>
           </div>
         </SectionCard>
 
+        {/* 3. Common A1 adjectives */}
         <SectionCard
-          title="Core prepositions"
-          subtitle="Learn them through patterns + examples"
-          icon="🗺️"
-          isReviewed={reviewedSections.core}
-          onMarkReviewed={() => markSectionReviewed('core')}
+          title="Common A1 adjectives"
+          subtitle="Masculine + feminine forms"
+          icon="📚"
+          isReviewed={reviewedSections.commonAdj}
+          onMarkReviewed={() => markSectionReviewed('commonAdj')}
           index={1}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {prepositions.map((p, idx) => (
-              <PrepositionCard
-                key={p.prep}
-                prep={p.prep}
-                english={p.english}
-                example={p.example}
-                phonetic={p.phonetic}
-                isPlaying={currentlyPlaying === `prep-${p.prep}`}
-                onPlay={() => playAudio(p.audioSrc, `prep-${p.prep}`)}
+            {adjectives.map((a, idx) => (
+              <AdjectiveCard
+                key={a.word}
+                masculine={a.word}
+                feminine={a.feminine}
+                english={a.english}
+                example={exampleForAdjective(a.word, a.feminine)}
+                isPlaying={currentlyPlaying === `adj-${a.word}`}
+                onPlay={() => playAudio(`/audio/a1/adj-adverbs/adjectives/${a.word}.mp3`, `adj-${a.word}`)}
+                index={idx}
+              />
+            ))}
+          </div>
+        </SectionCard>
+
+        {/* 4. Agreement */}
+        <SectionCard
+          title="Adjective agreement"
+          subtitle="Masculine/feminine + singular/plural (basic)"
+          icon="🧩"
+          isReviewed={reviewedSections.agreement}
+          onMarkReviewed={() => markSectionReviewed('agreement')}
+          index={2}
+        >
+          <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+            <p className="text-slate-700 mb-4">
+              In French, adjectives <strong>agree</strong> with the noun. That means the adjective can change for:
+            </p>
+            <ul className="space-y-2 text-slate-700 mb-5">
+              <li className="flex items-start gap-2">
+                <span className="font-bold text-slate-500">•</span>
+                <span><strong>Masculine</strong> vs <strong>feminine</strong></span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-bold text-slate-500">•</span>
+                <span><strong>Singular</strong> vs <strong>plural</strong> (basic intro)</span>
+              </li>
+            </ul>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ExampleCard
+                title="Feminine often adds “e”"
+                examples={[
+                  { french: "un petit chat", english: "a small cat" },
+                  { french: "une petite maison", english: "a small house" }
+                ]}
+              />
+              <ExampleCard
+                title="Plural often adds “s”"
+                examples={[
+                  { french: "une voiture rouge", english: "a red car" },
+                  { french: "des voitures rouges", english: "red cars" }
+                ]}
+              />
+            </div>
+
+            <div className="mt-5 bg-amber-50 rounded-xl p-4 border border-amber-200 text-sm text-amber-900">
+              <strong>Simple rule:</strong> often add <strong>e</strong> for feminine, and add <strong>s</strong> for plural.
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 5. Placement */}
+        <SectionCard
+          title="Adjective placement"
+          subtitle="Before vs after the noun"
+          icon="📍"
+          isReviewed={reviewedSections.placement}
+          onMarkReviewed={() => markSectionReviewed('placement')}
+          index={3}
+        >
+          <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+            <p className="text-slate-700 mb-4">
+              Most adjectives come <strong>after</strong> the noun. Some very common adjectives often come <strong>before</strong>
+              (think: small/big/beautiful/good, etc.).
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {placementExamples.map((ex, idx) => (
+                <PlacementCard key={idx} french={ex.french} english={ex.english} index={idx} />
+              ))}
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 6. What is an adverb? */}
+        <SectionCard
+          title="What is an adverb?"
+          subtitle="Words that modify verbs"
+          icon="⚡"
+          isReviewed={reviewedSections.whatAdv}
+          onMarkReviewed={() => markSectionReviewed('whatAdv')}
+          index={4}
+        >
+          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+            <ul className="space-y-3 text-slate-700">
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold text-xl">•</span>
+                <span>An <strong>adverb</strong> modifies a <strong>verb</strong>.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-blue-500 font-bold text-xl">•</span>
+                <span>It describes <strong>how</strong> something is done.</span>
+              </li>
+            </ul>
+
+            <div className="mt-6 bg-white rounded-lg p-4 border border-slate-200">
+              <h4 className="font-semibold text-slate-800 mb-3">Examples:</h4>
+              <div className="space-y-2 text-slate-600">
+                <p><span className="font-medium text-blue-700">Il parle lentement.</span></p>
+                <p><span className="font-medium text-blue-700">Elle travaille bien.</span></p>
+              </div>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 7. Common A1 adverbs */}
+        <SectionCard
+          title="Common A1 adverbs"
+          subtitle="Simple words you can use immediately"
+          icon="🗣️"
+          isReviewed={reviewedSections.commonAdv}
+          onMarkReviewed={() => markSectionReviewed('commonAdv')}
+          index={5}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {adverbs.map((a, idx) => (
+              <WordCard
+                key={a.word}
+                word={a.word}
+                english={a.english}
+                tag="adverb"
+                isPlaying={currentlyPlaying === `adv-${a.word}`}
+                onPlay={() => playAudio(`/audio/a1/adj-adverbs/adverbs/${a.word}.mp3`, `adv-${a.word}`)}
                 index={idx}
               />
             ))}
           </div>
           <div className="mt-5 bg-slate-50 rounded-xl p-4 border border-slate-200 text-sm text-slate-700">
-            <strong>Pattern tip:</strong> Try to notice what comes after the preposition (a place, a person, a country, a thing) rather than memorizing the English word.
+            <strong>Good news:</strong> Adverbs do <strong>not</strong> agree with nouns. They usually stay the same.
           </div>
         </SectionCard>
 
+        {/* 8. Adjectives vs adverbs */}
         <SectionCard
-          title="Prepositions in context"
-          subtitle="Location, movement, origin, relationship"
-          icon="📍"
-          isReviewed={reviewedSections.context}
-          onMarkReviewed={() => markSectionReviewed('context')}
-          index={2}
+          title="Adjectives vs adverbs"
+          subtitle="Same idea, different job"
+          icon="🔍"
+          isReviewed={reviewedSections.compare}
+          onMarkReviewed={() => markSectionReviewed('compare')}
+          index={6}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <ContextGroup
-              title="Location"
-              subtitle="Where is it?"
-              color="blue"
-              items={[
-                { label: "dans (inside)", example: "Le chat est dans la maison." },
-                { label: "sur (on)", example: "Le livre est sur la table." },
-                { label: "sous (under)", example: "Le sac est sous la table." }
+            <CompareCard
+              title="Adjective"
+              bullets={[
+                "describes a noun",
+                "agrees with the noun (basic agreement)"
               ]}
+              exampleFrench="Il est rapide."
+              exampleEnglish="He is fast."
+              accent="purple"
             />
-            <ContextGroup
-              title="Movement"
-              subtitle="Where are you going?"
-              color="emerald"
-              items={[
-                { label: "à (to)", example: "Je vais à Paris." },
-                { label: "en (to/in countries)", example: "Je vais en France." }
+            <CompareCard
+              title="Adverb"
+              bullets={[
+                "describes a verb (an action)",
+                "does NOT change form"
               ]}
-            />
-            <ContextGroup
-              title="Origin"
-              subtitle="Where are you from?"
-              color="amber"
-              items={[
-                { label: "de (from)", example: "Je viens de France." }
-              ]}
-            />
-            <ContextGroup
-              title="Relationship"
-              subtitle="With / for"
-              color="purple"
-              items={[
-                { label: "avec (with)", example: "Je parle avec Marie." },
-                { label: "pour (for)", example: "C’est pour toi." }
-              ]}
+              exampleFrench="Il court rapidement."
+              exampleEnglish="He runs quickly."
+              accent="blue"
             />
           </div>
         </SectionCard>
 
-        <SectionCard
-          title="Verb + preposition patterns"
-          subtitle="Learn the verb together with the preposition"
-          icon="🔗"
-          isReviewed={reviewedSections.verbPatterns}
-          onMarkReviewed={() => markSectionReviewed('verbPatterns')}
-          index={3}
-        >
-          <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-            <p className="text-slate-700 mb-4">
-              In French, some verbs are followed by specific prepositions. These combinations are best learned as one “chunk”.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {verbPrepositionPatterns.map((v, idx) => (
-                <VerbPatternCard
-                  key={v.verb}
-                  verb={v.verb}
-                  english={v.english}
-                  example={v.example}
-                  index={idx}
-                />
-              ))}
-            </div>
-            <div className="mt-4 bg-white rounded-lg p-4 border border-slate-200 text-sm text-slate-700">
-              <strong>Pattern tip:</strong> When you learn a verb, ask: “Does this verb usually use <em>à</em> or <em>de</em>?”
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          title="Important combinations to remember"
-          subtitle="Common contractions with à and de"
-          icon="🧠"
-          isReviewed={reviewedSections.contractions}
-          onMarkReviewed={() => markSectionReviewed('contractions')}
-          index={4}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ContractionCard left="à + le" right="au" example="Je vais au marché." />
-            <ContractionCard left="à + les" right="aux" example="Il parle aux enfants." />
-            <ContractionCard left="de + le" right="du" example="Elle joue du piano." />
-            <ContractionCard left="de + les" right="des" example="Nous parlons des films." />
-          </div>
-          <div className="mt-4 bg-amber-50 rounded-xl p-4 border border-amber-200 text-sm text-amber-900">
-            <strong>Beginner-safe rule:</strong> When you see <strong>au/aux</strong>, think “à + the”. When you see <strong>du/des</strong>, think “de + the”.
-          </div>
-        </SectionCard>
-
+        {/* 9. Guided examples */}
         <SectionCard
           title="Guided examples"
-          subtitle="Read, notice patterns, then copy the structure"
-          icon="🗣️"
-          isReviewed={reviewedSections.guidedExamples}
-          onMarkReviewed={() => markSectionReviewed('guidedExamples')}
-          index={5}
+          subtitle="Read, notice patterns, then copy"
+          icon="🧠"
+          isReviewed={reviewedSections.guided}
+          onMarkReviewed={() => markSectionReviewed('guided')}
+          index={7}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {guidedExamples.map((ex, idx) => (
@@ -340,17 +396,14 @@ export default function A1Lesson4Page() {
                 english={ex.english}
                 focus={ex.focus}
                 isPlaying={currentlyPlaying === ex.id}
-                onPlay={() => playAudio(ex.audioSrc, ex.id)}
+                onPlay={() => playAudio(`/audio/a1/adj-adverbs/examples/${ex.id}.mp3`, ex.id)}
                 index={idx}
               />
             ))}
           </div>
-          <div className="mt-5 bg-slate-50 rounded-xl p-4 border border-slate-200 text-sm text-slate-700">
-            <strong>Mini-drill:</strong> Replace the last word to make your own sentence. Example: “Je vais au marché.” → “Je vais au café.”
-          </div>
         </SectionCard>
 
-        {/* Guided interactive practice */}
+        {/* 10. Practice */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -364,11 +417,7 @@ export default function A1Lesson4Page() {
 
           {!showResults ? (
             <div className="space-y-4">
-              <PracticeMetaRow
-                answered={practiceAnswers.length}
-                total={practiceQuestions.length}
-                counts={topicLabel}
-              />
+              <PracticeMetaRow answered={practiceAnswers.length} total={practiceQuestions.length} counts={topicCounts} />
 
               {currentPracticeIndex < practiceQuestions.length ? (
                 <PracticeCard
@@ -400,7 +449,7 @@ export default function A1Lesson4Page() {
           )}
         </div>
 
-        {/* Completion section */}
+        {/* 12. Completion */}
         <AnimatePresence>
           {showCompletion && (
             <motion.div
@@ -415,20 +464,18 @@ export default function A1Lesson4Page() {
                     Lesson completion
                   </div>
                   <h2 className="text-2xl font-bold text-slate-800 mb-2">
-                    Nice work — you finished A1 Lesson 4!
+                    Nice work — you finished A1 Lesson 8!
                   </h2>
                   <p className="text-slate-700 mb-3">
-                    You can now recognize common prepositions, use them in simple sentences, and spot verb + preposition patterns.
+                    You can now describe things with adjectives, and modify actions with adverbs.
                   </p>
+
                   <div className="bg-white rounded-xl p-4 border border-green-200 text-sm text-slate-700">
-                    <div className="font-semibold text-slate-800 mb-2">Quick recap</div>
+                    <div className="font-semibold text-slate-800 mb-2">Recap</div>
                     <ul className="space-y-1">
-                      <li>- <strong>Location</strong>: dans, sur, sous</li>
-                      <li>- <strong>Movement</strong>: à, en</li>
-                      <li>- <strong>Origin</strong>: de</li>
-                      <li>- <strong>Relationship</strong>: avec, pour</li>
-                      <li>- <strong>Verb chunks</strong>: parler à / parler de, avoir besoin de…</li>
-                      <li>- <strong>Contractions</strong>: au/aux, du/des</li>
+                      <li>- <strong>Adjectives</strong> describe nouns.</li>
+                      <li>- <strong>Adverbs</strong> describe verbs.</li>
+                      <li>- Adjectives can <strong>agree</strong>; adverbs usually <strong>do not change</strong>.</li>
                     </ul>
                   </div>
                 </div>
@@ -447,7 +494,7 @@ export default function A1Lesson4Page() {
                         Retake
                       </button>
                       <Link
-                        href="/classes/A1/lesson5"
+                        href="/classes/A1"
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg transition-all"
                       >
                         Next lesson
@@ -488,14 +535,14 @@ export default function A1Lesson4Page() {
           </div>
 
           <button
-            disabled={!allSectionsReviewed || !practiceComplete}
+            disabled={!lessonReadyToComplete}
             onClick={() => {
-              if (!allSectionsReviewed || !practiceComplete) return
+              if (!lessonReadyToComplete) return
               setShowCompletion(true)
               window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
             }}
             className={`shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-              allSectionsReviewed && practiceComplete
+              lessonReadyToComplete
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:scale-105'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
@@ -511,23 +558,18 @@ export default function A1Lesson4Page() {
 
 function LessonHeader() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="text-center mb-10"
-    >
+    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
       <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white text-sm font-medium mb-4">
-        <span>A1 Lesson 4</span>
+        <span>A1 Lesson 8</span>
       </div>
-
       <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">
-        A1 Lesson 4 — French Prepositions
+        A1 Lesson 8 — Adjectives and Adverbs
       </h1>
       <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-2">
-        Learn how prepositions connect words and how they are used in everyday French.
+        Learn how to describe things and how to modify actions in French.
       </p>
       <p className="text-sm text-slate-500">
-        Read the examples, notice patterns, and complete the practice to build confidence.
+        Read the examples, notice the patterns, and complete the practice.
       </p>
     </motion.div>
   )
@@ -542,9 +584,18 @@ function ProgressBar({
   practiceProgress: number
   totalPractice: number
 }) {
-  const sections = ['what', 'core', 'context', 'verbPatterns', 'contractions', 'guidedExamples'] as const
+  const sections = [
+    'whatAdj',
+    'commonAdj',
+    'agreement',
+    'placement',
+    'whatAdv',
+    'commonAdv',
+    'compare',
+    'guided'
+  ] as const
   const completedSections = sections.filter(s => reviewedSections[s]).length
-  const totalProgress = ((completedSections + practiceProgress / totalPractice) / 7) * 100
+  const totalProgress = ((completedSections + practiceProgress / totalPractice) / 9) * 100
 
   return (
     <div className="mb-8 bg-white rounded-xl p-4 shadow-sm border border-slate-200">
@@ -561,7 +612,7 @@ function ProgressBar({
         />
       </div>
       <div className="flex items-center gap-4 mt-3 text-xs text-slate-500 flex-wrap">
-        <span>{completedSections}/6 sections reviewed</span>
+        <span>{completedSections}/8 sections reviewed</span>
         <span>•</span>
         <span>{practiceProgress}/{totalPractice} practice questions</span>
       </div>
@@ -592,23 +643,18 @@ function SectionCard({
     'from-emerald-500 to-teal-500',
     'from-amber-500 to-orange-500',
     'from-indigo-500 to-purple-500',
-    'from-rose-500 to-pink-500'
+    'from-rose-500 to-pink-500',
+    'from-sky-500 to-indigo-500',
+    'from-lime-500 to-emerald-500'
   ]
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className="mb-8"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="mb-8">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-100">
           <div className="flex items-start justify-between gap-4 flex-col sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
-              <div
-                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center text-white shadow-md`}
-              >
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center text-white shadow-md`}>
                 <span className="text-2xl">{icon}</span>
               </div>
               <div>
@@ -619,9 +665,7 @@ function SectionCard({
             <button
               onClick={onMarkReviewed}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                isReviewed
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                isReviewed ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
               }`}
             >
               <FaCheck size={14} />
@@ -635,46 +679,42 @@ function SectionCard({
   )
 }
 
-function PrepositionCard({
-  prep,
+function AdjectiveCard({
+  masculine,
+  feminine,
   english,
   example,
-  phonetic,
   isPlaying,
   onPlay,
   index
 }: {
-  prep: string
+  masculine: string
+  feminine: string
   english: string
   example: string
-  phonetic: string
   isPlaying: boolean
   onPlay: () => void
   index: number
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className="rounded-xl p-4 border-2 bg-slate-50 border-slate-200 hover:border-purple-300 transition-all hover:shadow-md"
-    >
-      <div className="flex items-start justify-between mb-2 gap-3">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="rounded-xl p-4 border-2 bg-slate-50 border-slate-200 hover:border-purple-300 transition-all hover:shadow-md">
+      <div className="flex items-start justify-between gap-3 mb-2">
         <div>
-          <div className="flex items-end gap-3">
-            <h3 className="text-3xl font-bold text-slate-800">{prep}</h3>
-            <p className="text-sm text-purple-600 font-medium">/{phonetic}/</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-semibold">masc</span>
+            <span className="text-xl font-bold text-slate-800">{masculine}</span>
+            <span className="text-slate-400">→</span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">fem</span>
+            <span className="text-xl font-bold text-purple-700">{feminine}</span>
           </div>
-          <p className="text-sm text-slate-600">{english}</p>
+          <p className="text-sm text-slate-600 mt-1">{english}</p>
         </div>
         <button
           onClick={onPlay}
           disabled={isPlaying}
-          aria-label={`Play pronunciation for ${prep}`}
+          aria-label={`Play pronunciation for ${masculine}`}
           className={`p-2 rounded-lg transition-all ${
-            isPlaying
-              ? 'bg-white text-purple-600 animate-pulse'
-              : 'bg-white text-slate-600 hover:text-purple-600 shadow-sm'
+            isPlaying ? 'bg-white text-purple-600 animate-pulse' : 'bg-white text-slate-600 hover:text-purple-600 shadow-sm'
           }`}
         >
           <FaPlay size={14} />
@@ -687,40 +727,64 @@ function PrepositionCard({
   )
 }
 
-function ContextGroup({
+function WordCard({
+  word,
+  english,
+  tag,
+  isPlaying,
+  onPlay,
+  index
+}: {
+  word: string
+  english: string
+  tag: 'adverb'
+  isPlaying: boolean
+  onPlay: () => void
+  index: number
+}) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="rounded-xl p-4 border-2 bg-slate-50 border-slate-200 hover:border-blue-300 transition-all hover:shadow-md">
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-slate-800">{word}</h3>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">{tag}</span>
+          </div>
+          <p className="text-sm text-slate-600">{english}</p>
+        </div>
+        <button
+          onClick={onPlay}
+          disabled={isPlaying}
+          aria-label={`Play pronunciation for ${word}`}
+          className={`p-2 rounded-lg transition-all ${
+            isPlaying ? 'bg-white text-blue-600 animate-pulse' : 'bg-white text-slate-600 hover:text-blue-600 shadow-sm'
+          }`}
+        >
+          <FaPlay size={14} />
+        </button>
+      </div>
+      <div className="text-xs text-slate-500 bg-white rounded-lg p-3 border border-slate-100">
+        Example: {exampleForAdverb(word)}
+      </div>
+    </motion.div>
+  )
+}
+
+function ExampleCard({
   title,
-  subtitle,
-  color,
-  items
+  examples
 }: {
   title: string
-  subtitle: string
-  color: 'blue' | 'emerald' | 'amber' | 'purple'
-  items: { label: string; example: string }[]
+  examples: { french: string; english: string }[]
 }) {
-  const styles =
-    color === 'blue'
-      ? { bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700' }
-      : color === 'emerald'
-      ? { bg: 'bg-emerald-50', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700' }
-      : color === 'amber'
-      ? { bg: 'bg-amber-50', border: 'border-amber-200', badge: 'bg-amber-100 text-amber-700' }
-      : { bg: 'bg-purple-50', border: 'border-purple-200', badge: 'bg-purple-100 text-purple-700' }
-
   return (
-    <div className={`rounded-2xl p-5 border-2 ${styles.bg} ${styles.border}`}>
-      <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
-        <div>
-          <h3 className="text-lg font-bold text-slate-800">{title}</h3>
-          <p className="text-sm text-slate-600">{subtitle}</p>
-        </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${styles.badge}`}>context</span>
-      </div>
+    <div className="bg-white rounded-2xl p-5 border border-slate-200">
+      <div className="font-bold text-slate-800 mb-3">{title}</div>
       <div className="space-y-3">
-        {items.map((it, idx) => (
-          <div key={idx} className="bg-white rounded-xl p-3 border border-slate-200">
-            <div className="font-semibold text-slate-800">{it.label}</div>
-            <div className="text-sm text-slate-600 mt-1">{it.example}</div>
+        {examples.map((ex, idx) => (
+          <div key={idx} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
+            <div className="font-semibold text-slate-800">{ex.french}</div>
+            <div className="text-sm text-slate-600">{ex.english}</div>
           </div>
         ))}
       </div>
@@ -728,49 +792,54 @@ function ContextGroup({
   )
 }
 
-function VerbPatternCard({
-  verb,
-  english,
-  example,
-  index
-}: {
-  verb: string
-  english: string
-  example: string
-  index: number
-}) {
+function PlacementCard({ french, english, index }: { french: string; english: string; index: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
-      className="bg-white rounded-xl p-4 border border-slate-200"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <div className="text-lg font-bold text-slate-800">{verb}</div>
-          <div className="text-sm text-slate-600">{english}</div>
-        </div>
-        <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold">
-          verb + prep
-        </span>
-      </div>
-      <div className="mt-3 text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200">
-        {example}
-      </div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-slate-200">
+      <div className="text-lg font-bold text-slate-800">{french}</div>
+      <div className="text-sm text-slate-600 mt-1">{english}</div>
     </motion.div>
   )
 }
 
-function ContractionCard({ left, right, example }: { left: string; right: string; example: string }) {
+function CompareCard({
+  title,
+  bullets,
+  exampleFrench,
+  exampleEnglish,
+  accent
+}: {
+  title: string
+  bullets: string[]
+  exampleFrench: string
+  exampleEnglish: string
+  accent: 'purple' | 'blue'
+}) {
+  const header =
+    accent === 'purple'
+      ? 'bg-purple-50 border-purple-200'
+      : 'bg-blue-50 border-blue-200'
+  const badge =
+    accent === 'purple'
+      ? 'bg-purple-100 text-purple-700'
+      : 'bg-blue-100 text-blue-700'
+
   return (
-    <div className="bg-white rounded-2xl p-5 border border-slate-200">
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm text-slate-500 font-medium">{left}</div>
-        <div className="text-2xl font-bold text-purple-700">{right}</div>
+    <div className={`rounded-2xl p-5 border-2 ${header}`}>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${badge}`}>{title.toLowerCase()}</span>
       </div>
-      <div className="mt-3 text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200">
-        {example}
+      <ul className="space-y-2 text-slate-700 mb-4">
+        {bullets.map((b, idx) => (
+          <li key={idx} className="flex items-start gap-2">
+            <span className="font-bold text-slate-500">•</span>
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="bg-white rounded-xl p-4 border border-slate-200">
+        <div className="font-semibold text-slate-800">{exampleFrench}</div>
+        <div className="text-sm text-slate-600">{exampleEnglish}</div>
       </div>
     </div>
   )
@@ -792,12 +861,7 @@ function GuidedExampleCard({
   index: number
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04 }}
-      className="bg-white rounded-2xl p-5 border border-slate-200"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-slate-200">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-lg font-bold text-slate-800">{french}</div>
@@ -808,9 +872,7 @@ function GuidedExampleCard({
           disabled={isPlaying}
           aria-label="Play audio"
           className={`p-2 rounded-lg transition-all ${
-            isPlaying
-              ? 'bg-purple-100 text-purple-600 animate-pulse'
-              : 'bg-slate-50 text-slate-600 hover:text-purple-600 border border-slate-200'
+            isPlaying ? 'bg-purple-100 text-purple-600 animate-pulse' : 'bg-slate-50 text-slate-600 hover:text-purple-600 border border-slate-200'
           }`}
         >
           <FaPlay size={14} />
@@ -838,10 +900,10 @@ function PracticeMetaRow({
         <strong className="text-slate-800">{answered}</strong> / {total} answered
       </div>
       <div className="flex gap-2 flex-wrap">
-        <Chip label={`Meaning: ${counts.meaning}`} />
-        <Chip label={`Completion: ${counts.completion}`} />
-        <Chip label={`Verb patterns: ${counts['verb-pattern']}`} />
-        <Chip label={`Contractions: ${counts.contraction}`} />
+        <Chip label={`Adj recognition: ${counts['adj-recognition']}`} />
+        <Chip label={`Agreement: ${counts.agreement}`} />
+        <Chip label={`Adverb usage: ${counts['adverb-usage']}`} />
+        <Chip label={`Adj vs adv: ${counts['adj-vs-adv']}`} />
       </div>
     </div>
   )
@@ -876,27 +938,21 @@ function PracticeCard({
 }) {
   const isCorrect = selectedOption === question.correct
   const topicBadge =
-    question.topic === 'meaning'
-      ? 'bg-blue-100 text-blue-700'
-      : question.topic === 'completion'
-      ? 'bg-emerald-100 text-emerald-700'
-      : question.topic === 'verb-pattern'
+    question.topic === 'adj-recognition'
       ? 'bg-purple-100 text-purple-700'
-      : 'bg-amber-100 text-amber-700'
+      : question.topic === 'agreement'
+      ? 'bg-amber-100 text-amber-700'
+      : question.topic === 'adverb-usage'
+      ? 'bg-blue-100 text-blue-700'
+      : 'bg-emerald-100 text-emerald-700'
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-4 gap-3">
         <span className="text-sm font-medium text-slate-500">
           Question {questionNumber} of {totalQuestions}
         </span>
-        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${topicBadge}`}>
-          {question.topic}
-        </span>
+        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${topicBadge}`}>{question.topic}</span>
       </div>
 
       <h3 className="text-lg font-medium text-slate-800 mb-6">{question.prompt}</h3>
@@ -934,9 +990,7 @@ function PracticeCard({
                 }`}
               >
                 {showFeedback && idx === question.correct && <FaCheck size={12} className="text-white" />}
-                {showFeedback && selectedOption === idx && idx !== question.correct && (
-                  <span className="text-white text-xs">×</span>
-                )}
+                {showFeedback && selectedOption === idx && idx !== question.correct && <span className="text-white text-xs">×</span>}
                 {!showFeedback && selectedOption === idx && <FaCheck size={12} className="text-white" />}
               </div>
               <span>{option}</span>
@@ -949,9 +1003,7 @@ function PracticeCard({
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className={`p-4 rounded-xl mb-4 ${
-            isCorrect ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'
-          }`}
+          className={`p-4 rounded-xl mb-4 ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'}`}
         >
           <p className={`font-semibold mb-1 ${isCorrect ? 'text-green-700' : 'text-amber-700'}`}>
             {isCorrect ? 'Nice — pattern spotted.' : 'Good effort — check the pattern.'}
@@ -965,9 +1017,7 @@ function PracticeCard({
           onClick={onSubmit}
           disabled={selectedOption === null}
           className={`w-full py-3 rounded-xl font-semibold transition-all ${
-            selectedOption !== null
-              ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            selectedOption !== null ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
         >
           Check Answer
@@ -997,29 +1047,24 @@ function ResultsCard({
   onContinue: () => void
 }) {
   const percentage = Math.round((score / total) * 100)
-
   const feedback =
     score <= 6
       ? {
-          title: "Good effort — prepositions take time.",
+          title: "Good effort — this takes practice.",
           detail: "Retake the practice, or continue and review examples again later."
         }
       : score <= 12
       ? {
-          title: "Nice progress — you're starting to see patterns.",
-          detail: "You’re building strong intuition. Try another run to make it automatic."
+          title: "Nice progress — you're understanding the patterns.",
+          detail: "You’re building intuition. Another run will make it feel automatic."
         }
       : {
-          title: "Great job — you understand prepositions well.",
-          detail: "You can recognize patterns and apply them in simple sentences."
+          title: "Great job — you’re using adjectives and adverbs well.",
+          detail: "You can choose correct forms and use simple adverbs naturally."
         }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
-    >
+    <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
       <div className="flex items-start justify-between gap-6 flex-col md:flex-row">
         <div className="flex-1">
           <h3 className="text-2xl font-bold text-slate-800 mb-2">Practice results</h3>
@@ -1055,4 +1100,33 @@ function ResultsCard({
     </motion.div>
   )
 }
+
+function exampleForAdjective(masc: string, fem: string) {
+  if (masc === 'grand') return `un grand livre → une ${fem} maison`
+  if (masc === 'petit') return `un petit chat → une ${fem} maison`
+  if (masc === 'bon') return `un bon café → une ${fem} idée`
+  if (masc === 'mauvais') return `un mauvais film → une ${fem} journée`
+  if (masc === 'beau') return `un beau jardin → une ${fem} photo`
+  if (masc === 'jeune') return `un jeune homme → une ${fem} femme`
+  if (masc === 'vieux') return `un vieux livre → une ${fem} ville`
+  if (masc === 'rapide') return `un train rapide → une voiture ${fem}`
+  if (masc === 'lent') return `un bus lent → une tortue ${fem}`
+  if (masc === 'facile') return `un exercice facile → une question ${fem}`
+  return `un ${masc} ... → une ${fem} ...`
+}
+
+function exampleForAdverb(word: string) {
+  if (word === 'bien') return 'Elle travaille bien.'
+  if (word === 'mal') return 'Il chante mal.'
+  if (word === 'vite') return 'Je marche vite.'
+  if (word === 'lentement') return 'Il parle lentement.'
+  if (word === 'souvent') return 'Je viens souvent.'
+  if (word === 'toujours') return 'Elle est toujours ici.'
+  if (word === 'parfois') return 'Nous sortons parfois.'
+  if (word === 'ici') return 'Je suis ici.'
+  if (word === 'là') return 'Le livre est là.'
+  if (word === 'très') return 'C’est très facile.'
+  return `... ${word}.`
+}
+
 
