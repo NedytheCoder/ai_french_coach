@@ -1,71 +1,83 @@
-import Link from 'next/link'
-import { FaArrowRight, FaClipboardCheck } from 'react-icons/fa'
+"use client"
+import { FaGraduationCap, FaArrowRight, FaBookOpen, FaClipboardCheck, FaStar } from 'react-icons/fa'
+import { LevelLandingPage } from '../components/LevelLandingPage'
+import { LevelHeader } from '../components/LevelHeader'
+import { LearningPointsList } from '../components/LearningPointsList'
+import { EncouragementCard } from '../components/EncouragementCard'
+import { CTASection } from '../components/CTASection'
 
-export default function A1HomePage() {
+export default function A1LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 pb-24">
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <header className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold mb-3">
-            A1
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900">A1 French</h1>
-          <p className="mt-2 text-slate-700 max-w-2xl">
-            Work through lessons, then take the exam when you’re ready. If you don’t pass the first time, a quick review
-            usually helps a lot.
-          </p>
-        </header>
+    <LevelLandingPage>
+      <LevelHeader
+        badge="Level A1"
+        title="Build Your French Foundation"
+        subtitle="Learn to understand and form simple sentences in French."
+        icon={FaGraduationCap}
+        gradientFrom="from-indigo-500"
+        gradientTo="to-purple-600"
+      />
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Lessons</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                { href: '/classes/A1/lesson1', label: 'Lesson 1' },
-                { href: '/classes/A1/lesson2', label: 'Lesson 2' },
-                { href: '/classes/A1/lesson3', label: 'Lesson 3' },
-                { href: '/classes/A1/lesson4', label: 'Lesson 4' },
-                { href: '/classes/A1/lesson5', label: 'Lesson 5' },
-                { href: '/classes/A1/lesson6', label: 'Lesson 6' },
-                { href: '/classes/A1/lesson7', label: 'Lesson 7' },
-                { href: '/classes/A1/lesson8', label: 'Lesson 8' },
-                { href: '/classes/A1/lesson9', label: 'Lesson 9' },
-                { href: '/classes/A1/lesson10', label: 'Lesson 10' }
-              ].map(x => (
-                <Link
-                  key={x.href}
-                  href={x.href}
-                  className="rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors px-4 py-3 font-semibold text-slate-800 inline-flex items-center justify-between"
-                >
-                  <span>{x.label}</span>
-                  <FaArrowRight className="text-slate-500" />
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold mb-3">
-              <FaClipboardCheck />
-              Exam
-            </div>
-            <h2 className="text-xl font-bold text-slate-900">A1 Final Exam</h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Reading → Listening → Writing → Speaking. You need at least 60% overall to unlock the next class.
-            </p>
-            <Link
-              href="/classes/A1/exam"
-              className="mt-4 inline-flex items-center justify-center gap-2 w-full rounded-xl px-5 py-3 font-semibold bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:shadow-lg transition-all"
-            >
-              Start exam <FaArrowRight />
-            </Link>
-            <div className="mt-3 text-xs text-slate-500">
-              You can review lessons first, and you can retake the exam any time.
-            </div>
-          </div>
-        </div>
+      {/* Intro Section */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+        <p className="text-slate-700 leading-relaxed mb-4">
+          In this level, you will <strong>begin to communicate in French</strong>. 
+          You'll move beyond individual words and start forming complete thoughts.
+        </p>
+        <p className="text-slate-700 leading-relaxed">
+          You'll learn grammar, vocabulary, and sentence structure — the building blocks 
+          that make French start to make sense.
+        </p>
       </div>
-    </div>
+
+      <LearningPointsList
+        title="What you'll learn"
+        points={[
+          "Pronouns and articles",
+          "Verbs and verb groups",
+          "Sentence structure",
+          "Prepositions",
+          "Adjectives and adverbs",
+          "Basic past tense (passé composé)",
+          "Negation and simple communication"
+        ]}
+        iconColor="text-indigo-600"
+      />
+
+      <EncouragementCard
+        title="This is where French starts to make sense"
+        messages={[
+          "Take your time and practice consistently.",
+          "Every lesson builds on the last one."
+        ]}
+        icon={FaStar}
+        bgColor="bg-indigo-50"
+        borderColor="border-indigo-200"
+        textColor="text-indigo-800"
+      />
+
+      <CTASection
+        buttons={[
+          {
+            label: "Continue Learning",
+            href: "/classes/A1/lesson1",
+            primary: true,
+            icon: <FaArrowRight size={18} />
+          },
+          {
+            label: "Review previous lessons",
+            href: "/classes/A0",
+            primary: false,
+            icon: <FaBookOpen size={18} />
+          },
+          {
+            label: "Take placement test",
+            href: "/placement-test",
+            primary: false,
+            icon: <FaClipboardCheck size={18} />
+          }
+        ]}
+      />
+    </LevelLandingPage>
   )
 }
-
