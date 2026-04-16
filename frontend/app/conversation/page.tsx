@@ -1,65 +1,165 @@
+/**
+ * Conversation Page - AI French Tutor Chat Interface
+ * ===================================================
+ *
+ * This is the main conversation/chat interface for the French Coach application.
+ * It provides a real-time chat interface with an AI French tutor, supporting:
+ * - Text-based conversation with context-aware responses
+ * - Voice input (speech-to-text) for practicing pronunciation
+ * - Text-to-speech (TTS) for listening practice
+ * - Multiple conversation modes (Chat, Introduction, Traveling, Daily Conversations)
+ * - Auto-reply functionality for hands-free conversation flow
+ *
+ * **Architecture:**
+ * - Frontend: Next.js page component with React hooks for state management
+ * - Backend: Python FastAPI server (localhost:8000) for AI responses and transcription
+ * - Speech: Web Speech API for TTS, MediaRecorder API for voice input
+ *
+ * **Conversation Modes:**
+ * - chat: General French conversation practice
+ * - introduction: Self-introduction scenarios
+ * - traveling: Travel-related conversations
+ * - daily_conversations: Everyday French dialogues
+ *
+ * **API Endpoints:**
+ * - POST /respond: General chat responses
+ * - POST /introduction: Introduction mode responses
+ * - POST /traveling: Travel mode responses
+ * - POST /daily_conversations: Daily conversation responses
+ * - POST /transcribe: Audio transcription (STT)
+ *
+ * **Key Features:**
+ * - Real-time message streaming with loading states
+ * - Voice recording with visual recording indicator
+ * - French TTS (fr-FR) with slower speech rate (0.9x) for learning
+ * - Auto-scroll to latest message
+ * - Message history maintained in component state
+ */
+
 "use client"
+
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import { useState, useRef, useEffect } from "react"
+// Loading spinner component
 import Loader from "@/app/components/Loader"
+// Button component for actions
 import Button from "@/app/components/Button"
+// Message send icon
 import { FiMessageCircle } from 'react-icons/fi'
+// Microphone icon for voice input
 import { FaMicrophone } from 'react-icons/fa'
+// Toggle switch for auto-reply
 import Toggle from "../components/Toggle"
 
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
+
+/**
+ * Message - Interface for chat messages.
+ *
+ * @property role - Message sender ("user" or "assistant")
+ * @property content - Message text content
+ */
 interface Message {
     role: "user" | "assistant"
     content: string
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+/**
+ * Home - Main conversation/chat page component.
+ *
+ * Manages the complete chat interface including:
+ * - Message state and history
+ * - User input (text and voice)
+ * - AI response handling
+ * - Text-to-speech playback
+ * - Voice recording and transcription
+ * - Conversation mode selection
+ *
+ * @returns JSX.Element - The chat interface
+ */
 export default function Home() {
 
-    // State for the test connection message 
+    // ---------------------------------------------------------------------------
+    // STATE
+    // ---------------------------------------------------------------------------
+
+    // Test connection message (debug/development use)
     const [message, setMessage] = useState("")
 
-    // State for the prompt input 
+    // Current user input text
     const [prompt, setPrompt] = useState("")
 
-    //State for the mode (chat, introduction, traveling, daily_conversations) 
+    // Conversation mode: chat | introduction | traveling | daily_conversations
     const [mode, setMode] = useState<"chat" | "introduction" | "traveling" | "daily_conversations">("chat")
 
-    // State for the series of messages sent to the backend 
+    // Chat message history (user + assistant messages)
     const [messages, setMessages] = useState<Message[]>([])
 
-    // State for loading 
+    // Loading state during API requests
     const [isLoading, setIsLoading] = useState(false)
 
-    // State for recording 
+    // Voice recording state
     const [isRecording, setIsRecording] = useState(false)
 
-    // State for TTS 
+    // Text-to-speech playing state
     const [isSpeaking, setIsSpeaking] = useState(false)
 
-    // State for auto-reply
+    // Auto-reply TTS toggle
     const [autoReply, setAutoReply] = useState(false)
 
+    // Currently speaking message index (for TTS control)
     const [speakingMessageId, setSpeakingMessageId] = useState<number | null>(null)
 
+    // ---------------------------------------------------------------------------
+    // REFS
+    // ---------------------------------------------------------------------------
+
+    // MediaRecorder instance for voice input
     const mediaRecorderRef = useRef<MediaRecorder | null>(null)
 
+    // Audio data chunks during recording
     const audioChunksRef = useRef<Blob[]>([])
 
-    // Ref for scrolling to bottom of messages 
+    // Reference for auto-scrolling to bottom of messages
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
-    // Ref for input focus
+    // Reference for input field focus management
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // Auto-scroll to bottom when messages change 
+    // ---------------------------------------------------------------------------
+    // EFFECTS
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Auto-scroll to bottom when messages change.
+     * Keeps the latest message visible in the conversation area.
+     */
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [messages])
 
-    // Keep input focused
+    /**
+     * Keep input focused after loading completes.
+     * Ensures user can immediately type after receiving a response.
+     */
     useEffect(() => {
         inputRef.current?.focus()
     }, [isLoading])
 
-    // Cleanup TTS on unmount 
+    /**
+     * Cleanup TTS on component unmount.
+     * Prevents speech synthesis from continuing after leaving the page.
+     */
     useEffect(() => {
         return () => {
             if (window.speechSynthesis) {
@@ -68,14 +168,30 @@ export default function Home() {
         }
     }, [])
 
-    //Function to test the connection to the backend
+    // ---------------------------------------------------------------------------
+    // API FUNCTIONS
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Test connection to the backend server.
+     * Development/debug function to verify API availability.
+     */
     async function getData() {
         const res = await fetch("http://127.0.0.1:8000")
         const data = await res.json()
         setMessage(data.message)
     }
 
-    // Function to send the prompt and history to the backend 
+    /**
+     * Send text message to AI and receive response.
+     *
+     * Flow:
+     * 1. Validate input
+     * 2. Add user message to local state
+     * 3. Send to appropriate backend endpoint based on mode
+     * 4. Handle response or error
+     * 5. Add assistant message to state
+     */
     async function sendMessage() {
         if (!prompt.trim()) return
 
@@ -122,7 +238,12 @@ export default function Home() {
         }
     }
 
-    //Function to record audio from the user 
+    /**
+     * Start recording audio from user's microphone.
+     *
+     * Uses MediaRecorder API to capture audio chunks.
+     * Requires microphone permissions from the user.
+     */
     async function recordAudio() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -142,7 +263,16 @@ export default function Home() {
         }
     }
 
-    //Function to send the recorded audio to the backend for transcription and a response 
+    /**
+     * Stop recording, transcribe audio, and get AI response.
+     *
+     * Flow:
+     * 1. Stop MediaRecorder and release microphone
+     * 2. Send audio blob to /transcribe endpoint
+     * 3. Add transcription as user message
+     * 4. Get AI response based on selected mode
+     * 5. Auto-play TTS if autoReply is enabled
+     */
     async function sendAudio() {
         if (!mediaRecorderRef.current || !isRecording) return
         mediaRecorderRef.current.stop()
@@ -192,13 +322,13 @@ export default function Home() {
                             if (autoReply) {
                                 // Calculate the index of the new assistant message
                                 const newMessageIndex = messages.length + 1
-                                speak(aiData.reply, newMessageIndex)
                             }
                         }
                     }
                 }
             } catch (error) {
-                const errorMessage: Message = { role: "assistant", content: "Front End error message: " + error }
+                console.error("Error processing audio:", error)
+                const errorMessage: Message = { role: "assistant", content: "Error: Failed to process audio" }
                 setMessages(prev => [...prev, errorMessage])
             } finally {
                 setIsLoading(false)
@@ -206,7 +336,7 @@ export default function Home() {
         }
     }
 
-    //Function to cancel the recording 
+    //Function to cancel the recording
     function cancelAudio() {
         if (mediaRecorderRef.current && isRecording) {
             mediaRecorderRef.current.stop()
@@ -216,91 +346,111 @@ export default function Home() {
         }
     }
 
-    //Function to speak text using TTS 
-    function speak(text: string, messageId: number) {
-        if (!window.speechSynthesis) {
-            alert("Text-to-speech is not supported in your browser")
-            return
-        }
-        // Cancel any ongoing speech 
-        window.speechSynthesis.cancel()
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.lang = "fr-FR" // French language 
-        utterance.rate = 0.9 // Slightly slower for language learning 
-        utterance.onstart = () => {
-            setIsSpeaking(true)
-            setSpeakingMessageId(messageId)
-        }
-        utterance.onend = () => {
-            setIsSpeaking(false)
-            setSpeakingMessageId(null)
-        }
-        utterance.onerror = () => {
-            setIsSpeaking(false)
-            setSpeakingMessageId(null)
-        }
-        window.speechSynthesis.speak(utterance)
+/**
+ * Speak text using Web Speech API TTS.
+ *
+ * Configuration:
+ * - Language: fr-FR (French)
+ * - Rate: 0.9 (slightly slower for language learning)
+ *
+ * @param text - Text to speak
+ * @param messageId - Index of message being spoken (for UI state)
+ */
+function speak(text: string, messageId: number) {
+    if (!window.speechSynthesis) {
+        alert("Text-to-speech is not supported in your browser")
+        return
     }
-
-    //Function to stop speaking 
-    function stopSpeaking() {
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel()
-        }
+    // Cancel any ongoing speech 
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = "fr-FR" // French language 
+    utterance.rate = 0.9 // Slightly slower for language learning 
+    utterance.onstart = () => {
+        setIsSpeaking(true)
+        setSpeakingMessageId(messageId)
+    }
+    utterance.onend = () => {
         setIsSpeaking(false)
         setSpeakingMessageId(null)
     }
+    utterance.onerror = () => {
+        setIsSpeaking(false)
+        setSpeakingMessageId(null)
+    }
+    window.speechSynthesis.speak(utterance)
+}
 
-    return (
-        <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
-            {/* Header */}
-            <div className="flex justify-between items-center px-8 py-4 border-b border-gray-200 bg-white shrink-0">
-                <h1 className="text-2xl font-bold text-gray-900">French Coach</h1>
-                <div>
-                    <label htmlFor="mode" className="block text-sm font-medium text-gray-700 mb-1"> Mode: </label>
-                    <select id="mode" value={mode} onChange={(e) => setMode(e.target.value as typeof mode)} className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm" disabled={isLoading} >
-                        <option value="chat">Chat</option>
-                        <option value="introduction">Introduction</option>
-                        <option value="traveling">Traveling</option>
-                        <option value="daily_conversations">Daily Conversations</option>
-                    </select>
+/**
+ * Stop current TTS playback.
+ * Cancels any ongoing speech synthesis.
+ */
+function stopSpeaking() {
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel()
+    }
+    setIsSpeaking(false)
+    setSpeakingMessageId(null)
+}
+
+// ---------------------------------------------------------------------------
+// RENDER
+// ---------------------------------------------------------------------------
+return (
+    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+        {/* Main container: full height, flex column layout, gray background */}
+        {/* Header: App title + Mode selector */}
+        <div className="flex justify-between items-center px-8 py-4 border-b border-gray-200 bg-white shrink-0">
+            {/* App branding */}
+            <h1 className="text-2xl font-bold text-gray-900">French Coach</h1>
+            {/* Conversation mode selector */}
+            <div>
+                <label htmlFor="mode" className="block text-sm font-medium text-gray-700 mb-1"> Mode: </label>
+                <select id="mode" value={mode} onChange={(e) => setMode(e.target.value as typeof mode)} className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm" disabled={isLoading} >
+                    <option value="chat">Chat</option>
+                    <option value="introduction">Introduction</option>
+                    <option value="traveling">Traveling</option>
+                    <option value="daily_conversations">Daily Conversations</option>
+                </select>
+            </div>
+        </div>
+        {/* Scrollable Conversation Area */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 relative">
+            {/* Recording Indicator Overlay */}
+            {isRecording && (<div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+                <div className="bg-red-500 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg animate-pulse"> <div className="w-3 h-3 bg-white rounded-full animate-ping" />
+                    <span className="text-sm font-medium">Recording...</span>
                 </div>
             </div>
-            {/* Scrollable Conversation Area */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 relative">
-                {/* Recording Indicator Overlay */}
-                {isRecording && (<div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <div className="bg-red-500 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg animate-pulse"> <div className="w-3 h-3 bg-white rounded-full animate-ping" />
-                        <span className="text-sm font-medium">Recording...</span>
-                    </div>
-                </div>
-                )}
-                <div className="max-w-2xl mx-auto space-y-4">
-                    {messages.length === 0 && (<div className="text-center text-gray-400 mt-20"> Start a conversation in French! </div>)}
-                    {messages.map((msg, index) => (
-                        <div key={index} className={`p-4 rounded-lg ${msg.role === "user" ? "bg-blue-50 border border-blue-200 ml-auto max-w-[80%]" : "bg-white border border-gray-200 mr-auto max-w-[80%]"}`}>
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                                <span className={`text-xs font-semibold ${msg.role === "user" ? "text-blue-700" : "text-gray-700"}`}>
-                                    {msg.role === "user" ? "You" : "Assistant"}
-                                </span>
-                                {msg.role === "assistant" && (
-                                    <button
-                                        onClick={() => isSpeaking && speakingMessageId === index ? stopSpeaking() : speak(msg.content, index)}
-                                        className={`text-xs px-2 py-1 rounded-full transition-colors cursor-pointer ${isSpeaking && speakingMessageId === index ? "bg-red-100 text-red-600 hover:bg-red-200" : "bg-blue-100 text-blue-600 hover:bg-blue-200"}`}
-                                    >
-                                        {isSpeaking && speakingMessageId === index ? "⏹ Stop" : "🔊 Listen"}
-                                    </button>
-                                )}
-                            </div>
-                            <div className="text-gray-800 whitespace-pre-wrap text-sm">{msg.content}</div>
+            )}
+            {/* Messages container */}
+            <div className="max-w-2xl mx-auto space-y-4">
+                {/* Empty state prompt */}
+                {messages.length === 0 && (<div className="text-center text-gray-400 mt-20"> Start a conversation in French! </div>)}
+                {messages.map((msg, index) => (
+                    <div key={index} className={`p-4 rounded-lg ${msg.role === "user" ? "bg-blue-50 border border-blue-200 ml-auto max-w-[80%]" : "bg-white border border-gray-200 mr-auto max-w-[80%]"}`}>
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className={`text-xs font-semibold ${msg.role === "user" ? "text-blue-700" : "text-gray-700"}`}>
+                                {msg.role === "user" ? "You" : "Assistant"}
+                            </span>
+                            {msg.role === "assistant" && (
+                                <button
+                                    onClick={() => isSpeaking && speakingMessageId === index ? stopSpeaking() : speak(msg.content, index)}
+                                    className={`text-xs px-2 py-1 rounded-full transition-colors cursor-pointer ${isSpeaking && speakingMessageId === index ? "bg-red-100 text-red-600 hover:bg-red-200" : "bg-blue-100 text-blue-600 hover:bg-blue-200"}`}
+                                >
+                                    {isSpeaking && speakingMessageId === index ? "⏹ Stop" : "🔊 Listen"}
+                                </button>
+                            )}
                         </div>
-                    ))}
-            <div className="">{isLoading && <Loader />}</div>
+                        <div className="text-gray-800 whitespace-pre-wrap text-sm">{msg.content}</div>
+                    </div>
+                ))}
+                <div className="">{isLoading && <Loader />}</div>
 
-                </div>
+            </div>
             {/* Dummy element to scroll to */ }
             <div ref={messagesEndRef} />
-            </div>
+        </div>
 
         {/* Fixed Input Area */ }
         <div className="border-t border-gray-200 bg-white px-4 py-3 shrink-0">
@@ -314,6 +464,7 @@ export default function Home() {
                 <Button className="cursor-pointer shrink-0" children={<FaMicrophone />} onPointerDown={recordAudio} onPointerUp={sendAudio} onPointerCancel={cancelAudio} disabled={isLoading || isRecording} />
             </div>
             {isRecording && (<div className="text-center text-red-500 text-xs mt-2"> Recording... Release to send </div>)}
-        </div>        
         </div>
-    )}
+    </div>
+    )
+}

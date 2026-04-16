@@ -1,24 +1,72 @@
+/**
+ * A2 Lesson 13 - Advanced Relative Pronouns (Pronoms Relatifs Complexes)
+ * =========================================================================
+ *
+ * This page teaches A2 learners advanced French relative pronouns including
+ * ce qui, ce que, ce à quoi, ce dont, and the lequel family.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to advanced relative pronouns
+ * 2. WhatMakesAdvancedSection - Understanding the complexity
+ * 3. CeQuiSection - Using ce qui for subjects
+ * 4. CeQueSection - Using ce que for objects
+ * 5. CeAQuoiSection - Using ce à quoi with à expressions
+ * 6. CeDontSection - Using ce dont with de expressions
+ * 7. LequelFormsSection - The lequel pronoun family with agreements
+ * 8. ComparisonSection - Comparing different forms
+ * 9. GuidedExamplesSection - Full example sentences
+ * 10. MistakesSection - Common errors to avoid
+ * 11. PracticeSection - Interactive quiz (18 questions)
+ * 12. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Ce qui = what/which (subject of clause)
+ * - Ce que = what/which (object of clause)
+ * - Ce à quoi = what (with verbs taking à like penser à)
+ * - Ce dont = what (with verbs taking de like parler de)
+ * - Lequel/laquelle/lesquels/lesquelles + à/de contractions
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 18-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaLightbulb,
-  FaExchangeAlt,
-  FaLink,
-  FaBalanceScale,
-  FaBookOpen,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaRedo,
-  FaArrowAltCircleRight,
-  FaInfoCircle,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaLightbulb,              // Introduction/tips
+  FaExchangeAlt,            // Exchange/comparison
+  FaLink,                   // Link/joining
+  FaBalanceScale,           // Comparison
+  FaBookOpen,               // Lesson content
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
+  FaInfoCircle,             // Additional info
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   ceQuiExamples,
@@ -34,7 +82,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
-// Types
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -44,7 +98,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
-// Components
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -121,6 +194,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 13 badge
+ * - Main title: "Advanced Relative Pronouns"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-indigo-500 to-violet-400 rounded-2xl p-8 text-white shadow-lg">
@@ -140,6 +222,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({
   current,
   total,
@@ -169,7 +258,18 @@ function ProgressBar({
   );
 }
 
-// Section Components
+// =============================================================================
+// SECTION COMPONENTS
+// =============================================================================
+
+/**
+ * WhatMakesAdvancedSection - Introduction to advanced relative pronouns.
+ *
+ * Content:
+ * - How advanced forms build on basic qui, que, où
+ * - Introducing ce qui, ce que, ce à quoi, ce dont
+ * - The lequel forms with agreements
+ */
 function WhatMakesAdvancedSection({
   isReviewed,
   onMarkReviewed,
@@ -215,6 +315,14 @@ function WhatMakesAdvancedSection({
   );
 }
 
+/**
+ * CeQuiSection - Using ce qui as a relative pronoun.
+ *
+ * Content:
+ * - Ce qui refers to an idea or action (what/which)
+ * - Used when the "what" is the SUBJECT of the clause
+ * - Examples: "Je comprends ce qui se passe"
+ */
 function CeQuiSection({
   isReviewed,
   onMarkReviewed,
@@ -260,6 +368,15 @@ function CeQuiSection({
   );
 }
 
+/**
+ * CeQueSection - Using ce que as a relative pronoun.
+ *
+ * Content:
+ * - Ce que refers to an idea or action (what)
+ * - Used when the "what" is the DIRECT OBJECT of the clause
+ * - Becomes ce qu' before vowels
+ * - Examples: "Je sais ce que tu fais"
+ */
 function CeQueSection({
   isReviewed,
   onMarkReviewed,
@@ -305,6 +422,15 @@ function CeQueSection({
   );
 }
 
+/**
+ * CeAQuoiSection - Using ce à quoi as a relative pronoun.
+ *
+ * Content:
+ * - Used with verbs that take the preposition à
+ * - Means "what" or "to what"
+ * - Used with: penser à, réfléchir à, s'intéresser à
+ * - Examples: "Je pense à ce à quoi tu penses"
+ */
 function CeAQuoiSection({
   isReviewed,
   onMarkReviewed,
@@ -354,6 +480,15 @@ function CeAQuoiSection({
   );
 }
 
+/**
+ * CeDontSection - Using ce dont as a relative pronoun.
+ *
+ * Content:
+ * - Used with verbs and expressions that take de
+ * - Means "what" or "of which"
+ * - Used with: parler de, avoir besoin de, rêver de
+ * - Examples: "C'est ce dont j'ai besoin"
+ */
 function CeDontSection({
   isReviewed,
   onMarkReviewed,
@@ -403,6 +538,15 @@ function CeDontSection({
   );
 }
 
+/**
+ * LequelFormsSection - The lequel family of relative pronouns.
+ *
+ * Content:
+ * - Gender and number agreement (lequel/laquelle/lesquels/lesquelles)
+ * - Contractions with à: auquel, à laquelle, auxquels, auxquelles
+ * - Contractions with de: duquel, de laquelle, desquels, desquelles
+ * - Examples showing practical usage
+ */
 function LequelFormsSection({
   isReviewed,
   onMarkReviewed,
@@ -474,6 +618,15 @@ function LequelFormsSection({
   );
 }
 
+/**
+ * ComparisonSection - Side-by-side comparison of different forms.
+ *
+ * Content:
+ * - Ce qui vs Ce que (subject vs object)
+ * - Ce à quoi vs Ce dont (à vs de)
+ * - When to use each form
+ * - Visual comparison showing the differences
+ */
 function ComparisonSection({
   isReviewed,
   onMarkReviewed,
@@ -533,6 +686,11 @@ function ComparisonSection({
   );
 }
 
+/**
+ * GuidedExamplesSection - Collection of example sentences for study.
+ *
+ * Various contexts showing advanced relative pronouns in everyday French.
+ */
 function GuidedExamplesSection({
   isReviewed,
   onMarkReviewed,
@@ -571,6 +729,15 @@ function GuidedExamplesSection({
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Using ce que instead of ce qui for subjects
+ * - Using ce qui instead of ce que for objects
+ * - Using ce que instead of ce dont with de
+ * - Wrong preposition with penser (à not de)
+ */
 function MistakesSection({
   isReviewed,
   onMarkReviewed,
@@ -620,6 +787,23 @@ function MistakesSection({
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for Lesson 13.
+ *
+ * Features:
+ * - 18 questions testing advanced relative pronoun knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-17)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -887,6 +1071,17 @@ function PracticeSection({
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to B1 lessons (next level)
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({
   practiceScore,
 }: {
@@ -937,16 +1132,41 @@ function CompletionSection({
   );
 }
 
-// Main Page Component
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson13Page - Main component for A2 Lesson 13.
+ *
+ * Manages:
+ * - Section review state (which sections have been reviewed)
+ * - Practice quiz answers and score
+ * - Lesson completion status
+ * - Progress persistence to localStorage
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson13Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Practice answers map (questionId -> selectedOption)
   const [practiceAnswers, setPracticeAnswers] = useState<Record<number, number>>({});
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether entire lesson is marked complete
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
-  // Load progress from localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson13Progress");
@@ -964,7 +1184,9 @@ export default function Lesson13Page() {
     }
   }, []);
 
-  // Save progress to localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(
@@ -980,23 +1202,44 @@ export default function Lesson13Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, practiceScore, lessonCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => {
     setReviewedSections((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
   };
 
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => {
     setPracticeScore(score);
     setPracticeCompleted(true);
   };
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => {
     const totalSections = sectionIds.length;
     const completed = reviewedSections.length;
     return Math.round((completed / totalSections) * 100);
   }, [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-50 flex items-center justify-center">
@@ -1008,7 +1251,7 @@ export default function Lesson13Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Navigation */}
+        {/* Back Navigation */}
         <div className="flex items-center gap-4">
           <Link
             href="/classes/A2"
@@ -1019,10 +1262,10 @@ export default function Lesson13Page() {
           </Link>
         </div>
 
-        {/* Header */}
+        {/* Lesson Header */}
         <LessonHeader />
 
-        {/* Progress */}
+        {/* Progress Bar - Section Review Progress */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
           <ProgressBar
             current={reviewedSections.length}
@@ -1031,7 +1274,7 @@ export default function Lesson13Page() {
           />
         </div>
 
-        {/* Sections */}
+        {/* Lesson Sections - In Order of Instruction */}
         <WhatMakesAdvancedSection
           isReviewed={reviewedSections.includes("what-makes-advanced")}
           onMarkReviewed={handleMarkReviewed}
@@ -1077,7 +1320,7 @@ export default function Lesson13Page() {
           onMarkReviewed={handleMarkReviewed}
         />
 
-        {/* Practice */}
+        {/* Practice Section - 18 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-indigo-50 to-white">
             <div className="flex items-center gap-4">
@@ -1098,7 +1341,7 @@ export default function Lesson13Page() {
           </div>
         </div>
 
-        {/* Completion */}
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection practiceScore={practiceScore} />
         )}

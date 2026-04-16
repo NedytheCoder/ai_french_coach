@@ -1,3 +1,45 @@
+/**
+ * A2 Lesson 6 - Direct Object Pronouns (Pronoms Compléments d'Objet Direct)
+ * ==========================================================================
+ *
+ * This file contains all lesson data for A2 Lesson 6, focusing on using
+ * direct object pronouns in French (le, la, les, me, te, nous, vous).
+ *
+ * **Lesson Content:**
+ * - Identifying direct objects in sentences
+ * - Direct object pronouns table (me, te, le/la, nous, vous, les)
+ * - Placement before the verb (or auxiliary in passé composé)
+ * - Agreement in gender and number (le/la → l' before vowels)
+ * - Using direct object pronouns in passé composé (agreement rules)
+ * - Common mistakes to avoid
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Direct object = answers "what?" or "who?" after the verb
+ * - Pronouns replace the noun to avoid repetition
+ * - Position: before conjugated verb, after infinitive/participle
+ * - Passé composé: agreement with preceding direct object pronoun
+ *
+ * **Data Categories:**
+ * 1. directObjectExamples
+ * 2. directObjectPronouns
+ * 3. placementExamples
+ * 4. passeComposeExamples
+ * 5. commonMistakes
+ * 6. practiceQuestions
+ * 7. sectionIds / SectionId
+ * 8. getPerformanceMessage
+ */
+
+// =============================================================================
+// DIRECT OBJECT EXAMPLES
+// =============================================================================
+
+/**
+ * directObjectExamples - Shows how to identify direct objects.
+ *
+ * The direct object answers "what?" or "who?" after the verb.
+ */
 export const directObjectExamples = [
   {
     sentence: "Je regarde le film.",
@@ -19,6 +61,15 @@ export const directObjectExamples = [
   }
 ]
 
+/**
+ * directObjectPronouns - Table of all direct object pronouns.
+ *
+ * Shows each pronoun with:
+ * - Pronoun form (including elided forms like m', l')
+ * - Usage description (who it refers to)
+ * - Example sentence in French
+ * - English translation
+ */
 export const directObjectPronouns = [
   {
     pronoun: "me / m'",
@@ -64,6 +115,18 @@ export const directObjectPronouns = [
   }
 ]
 
+// =============================================================================
+// REPLACEMENT EXAMPLES
+// =============================================================================
+
+/**
+ * replacementExamples - Shows how to replace nouns with direct object pronouns.
+ *
+ * Each example shows:
+ * - Original sentence with noun
+ * - Transformed sentence with pronoun
+ * - Explanation of which pronoun to use and why
+ */
 export const replacementExamples = [
   {
     original: "Je regarde le livre.",
@@ -87,6 +150,15 @@ export const replacementExamples = [
   }
 ]
 
+// =============================================================================
+// POSITION EXAMPLES
+// =============================================================================
+
+/**
+ * positionExamples - Demonstrates correct pronoun placement.
+ *
+ * Shows pronouns placed before the conjugated verb in simple affirmative sentences.
+ */
 export const positionExamples = [
   {
     french: "Je le vois.",
@@ -106,6 +178,15 @@ export const positionExamples = [
   }
 ]
 
+// =============================================================================
+// NEGATION EXAMPLES
+// =============================================================================
+
+/**
+ * negativeExamples - Using direct object pronouns in negative sentences.
+ *
+ * Pattern: subject + ne + pronoun + verb + pas
+ */
 export const negativeExamples = [
   {
     affirmative: "Je le vois.",
@@ -124,6 +205,18 @@ export const negativeExamples = [
   }
 ]
 
+// =============================================================================
+// PASSÉ COMPOSÉ EXAMPLES
+// =============================================================================
+
+/**
+ * passeComposeExamples - Using direct object pronouns in passé composé.
+ *
+ * Key points:
+ * - Pronoun goes before the auxiliary verb (avoir)
+ * - Past participle agrees with preceding direct object pronoun
+ * - Agreement shown in examples (invitée, mangées)
+ */
 export const passeComposeExamples = [
   {
     original: "J'ai vu le film.",
@@ -147,6 +240,15 @@ export const passeComposeExamples = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing direct object pronouns in everyday French.
+ */
 export const guidedExamples = [
   {
     french: "Je le regarde souvent.",
@@ -174,6 +276,18 @@ export const guidedExamples = [
   }
 ]
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Each mistake shows:
+ * - Wrong formulation (what NOT to do)
+ * - Correct formulation
+ * - Explanation of why the correct form works
+ */
 export const commonMistakes = [
   {
     wrong: "Je vois le.",
@@ -197,6 +311,28 @@ export const commonMistakes = [
   }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS (15 total)
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for Lesson 6.
+ *
+ * Topics covered:
+ * - pronouns (1-4): Choosing correct pronoun
+ * - replacement (5-8): Replacing nouns with pronouns
+ * - position (9-11): Correct word order
+ * - negation (12-13): Negative sentences
+ * - passe-compose (14-15): Passé composé usage
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   {
     id: 1,
@@ -364,6 +500,26 @@ export const practiceQuestions = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections in order:
+ * 1. intro - Introduction to direct objects
+ * 2. what-is-direct-object - Identifying direct objects
+ * 3. what-is-pronoun - Understanding pronouns
+ * 4. pronouns-table - The pronoun table
+ * 5. replacing-nouns - Replacing nouns
+ * 6. position - Word placement
+ * 7. negation - Negative sentences
+ * 8. passe-compose - Passé composé
+ * 9. examples - Guided examples
+ * 10. mistakes - Common errors
+ * 11. practice - Interactive quiz
+ */
 export const sectionIds = [
   'intro',
   'what-is-direct-object',
@@ -378,8 +534,27 @@ export const sectionIds = [
   'practice'
 ] as const
 
+/**
+ * SectionId - Type for all valid section identifiers.
+ */
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-40%: "Good effort" - amber color, suggests review
+ * - 41-73%: "Nice progress" - blue color, encourages continued learning
+ * - 74-100%: "Great job" - green color, congratulates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions
+ * @returns Object with title, message, color, and tone
+ */
 export function getPerformanceMessage(score: number, total: number): {
   title: string
   message: string

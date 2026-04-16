@@ -1,26 +1,70 @@
+/**
+ * A2 Lesson 3 - The Imperfect Past (Imparfait)
+ * ============================================
+ *
+ * This page teaches A2 learners how to use the imparfait tense in French,
+ * essential for describing past habits, ongoing actions, and background situations.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to the imparfait
+ * 2. UsesSection - Four main uses of the imparfait
+ * 3. FormationSection - How to form the tense
+ * 4. VerbsSection - Common verbs in the imparfait
+ * 5. ComparisonSection - Imparfait vs passé composé
+ * 6. ExamplesSection - Guided example sentences
+ * 7. MistakesSection - Common errors to avoid
+ * 8. PracticeSection - Interactive quiz (15 questions)
+ * 9. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Imparfait expresses ongoing/repeated past actions, descriptions, states
+ * - Formation: nous form stem + endings (-ais, -ais, -ait, -ions, -iez, -aient)
+ * - Passé composé = completed actions; Imparfait = background/descriptions
+ * - Être is irregular in imparfait: j'étais, tu étais, il était...
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 15-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state and side effects
 import { useState, useEffect } from 'react'
+
+// Framer Motion for animations
 import { motion, AnimatePresence } from 'framer-motion'
+
+// React Icons for UI elements
 import {
-  FaHome,
-  FaCheck,
-  FaChevronRight,
-  FaArrowRight,
-  FaBookOpen,
-  FaGraduationCap,
-  FaLightbulb,
-  FaTimes,
-  FaRedo,
-  FaChevronDown,
-  FaChevronUp,
-  FaVolumeUp,
-  FaExclamationTriangle,
-  FaClock,
-  FaHistory,
-  FaList
+  FaHome,               // Back navigation
+  FaCheck,              // Reviewed status, correct answer
+  FaChevronRight,       // Next button
+  FaArrowRight,         // Continue button
+  FaBookOpen,           // Section icons
+  FaGraduationCap,      // Lesson header
+  FaLightbulb,          // Tips and intro
+  FaTimes,              // Incorrect answer
+  FaRedo,               // Retake practice
+  FaChevronDown,        // Expand section
+  FaChevronUp,          // Collapse section
+  FaVolumeUp,           // Audio playback
+  FaExclamationTriangle, // Mistakes section
+  FaClock,              // Uses section
+  FaHistory,            // History/past tense
+  FaList                // Endings list
 } from 'react-icons/fa'
+
+// Next.js Link for navigation
 import Link from 'next/link'
+
+// Lesson data
 import {
   imparfaitUses,
   imparfaitEndings,
@@ -36,6 +80,13 @@ import {
   getPerformanceMessage
 } from './data'
 
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * LessonProgress - Shape of persisted lesson progress in localStorage.
+ */
 interface LessonProgress {
   reviewedSections: SectionId[]
   practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[]
@@ -43,23 +94,63 @@ interface LessonProgress {
   lessonCompleted: boolean
 }
 
+// =============================================================================
+// FEEDBACK MESSAGES
+// =============================================================================
+
+/**
+ * feedbackMessages - Random encouraging messages for quiz feedback.
+ */
 const feedbackMessages = {
   correct: ['Nice 😏', 'Good catch', "That's right", "You're getting it", 'Well done!', 'Perfect!'],
   incorrect: ['Careful now…', 'Almost there', 'Keep trying', 'Not quite', 'Review the pattern']
 }
 
+/**
+ * getRandomFeedback - Returns a random feedback message.
+ * @param isCorrect - Whether the answer was correct
+ * @returns Random message string
+ */
 function getRandomFeedback(isCorrect: boolean) {
   const messages = isCorrect ? feedbackMessages.correct : feedbackMessages.incorrect
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+/**
+ * A2Lesson3Page - Main component for the imparfait lesson.
+ *
+ * Manages lesson state, persists progress to localStorage, and renders
+ * all lesson sections with collapsible cards.
+ */
 export default function A2Lesson3Page() {
+  // ---------------------------------------------------------------------------
+  // STATE: Section Review Tracking
+  // ---------------------------------------------------------------------------
   const [reviewedSections, setReviewedSections] = useState<SectionId[]>([])
+
+  // ---------------------------------------------------------------------------
+  // STATE: Practice Quiz
+  // ---------------------------------------------------------------------------
   const [practiceAnswers, setPracticeAnswers] = useState<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>([])
   const [practiceCompleted, setPracticeCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Lesson Completion
+  // ---------------------------------------------------------------------------
   const [lessonCompleted, setLessonCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Hydration Check
+  // ---------------------------------------------------------------------------
   const [isClient, setIsClient] = useState(false)
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true)
     const saved = localStorage.getItem('a2Lesson3Progress')
@@ -72,6 +163,9 @@ export default function A2Lesson3Page() {
     }
   }, [])
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('a2Lesson3Progress', JSON.stringify({
@@ -83,21 +177,33 @@ export default function A2Lesson3Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, lessonCompleted, isClient])
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Mark Section Reviewed
+  // ---------------------------------------------------------------------------
   const markSectionReviewed = (sectionId: SectionId) => {
     if (!reviewedSections.includes(sectionId)) {
       setReviewedSections(prev => [...prev, sectionId])
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
   const allSectionsReviewed = sectionIds.every(id => reviewedSections.includes(id))
   const practiceScore = practiceAnswers.filter(a => a.isCorrect).length
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Complete Lesson
+  // ---------------------------------------------------------------------------
   const completeLesson = () => {
     if (allSectionsReviewed && practiceCompleted) {
       setLessonCompleted(true)
     }
   }
 
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100 pb-24">
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -139,6 +245,20 @@ export default function A2Lesson3Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ *
+ * Features:
+ * - A2 Lesson 3 badge with graduation cap icon
+ * - Main title about the imparfait (imperfect past)
+ * - Indigo/purple gradient header background
+ * - Tip box with lightbulb icon
+ * - Fade-in animation on mount
+ */
 function LessonHeader() {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
@@ -180,11 +300,40 @@ function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionProps Interface
+// =============================================================================
+
+/**
+ * SectionProps - Common props for all lesson section components.
+ */
 interface SectionProps {
   isReviewed: boolean
   onMarkReviewed: () => void
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Clickable header to expand/collapse content
+ * - Auto-mark-as-reviewed when opened
+ * - Icon showing review status (checkmark when reviewed)
+ * - Animated expand/collapse with AnimatePresence
+ * - Color-coded header (indigo when pending, green when reviewed)
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ * @param children - Section content to display when expanded
+ * @param defaultOpen - Whether section starts expanded
+ */
 function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, children, defaultOpen = false }: {
   id: string
   title: string
@@ -225,6 +374,19 @@ function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, childr
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: IntroSection
+// =============================================================================
+
+/**
+ * IntroSection - Introduction to the imparfait tense.
+ *
+ * Content:
+ * - Definition of the imparfait
+ * - English equivalents (was doing, used to do, was, were)
+ * - Visual grid showing different English translations
+ * - Context for when to use this tense
+ */
 function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="intro" title="What is the Imparfait?" icon={FaLightbulb} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -276,6 +438,20 @@ function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: UsesSection
+// =============================================================================
+
+/**
+ * UsesSection - Four main uses of the imparfait tense.
+ *
+ * Content:
+ * - Past habits (repeated actions)
+ * - Descriptions in the past
+ * - Background actions
+ * - Past states and age
+ * - Each use has explanation and example
+ */
 function UsesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="uses" title="When Do We Use the Imparfait?" icon={FaClock} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -310,6 +486,19 @@ function UsesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: FormationSection
+// =============================================================================
+
+/**
+ * FormationSection - How to form the imparfait tense.
+ *
+ * Content:
+ * - 3-step formation process
+ * - Imparfait endings table
+ * - Formation examples showing stem derivation
+ * - Special note about être being irregular
+ */
 function FormationSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="formation" title="How to Form the Imparfait" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>

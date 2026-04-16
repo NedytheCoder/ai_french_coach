@@ -1,3 +1,49 @@
+/**
+ * A1 Lesson 7 - French Pronunciation Patterns Data
+ * =================================================
+ *
+ * This file contains all lesson data for A1 Lesson 7, focusing on French
+ * pronunciation patterns and spelling-to-sound rules. French pronunciation
+ * can be tricky for beginners because spelling doesn't always match English
+ * expectations. This lesson teaches 16 core patterns to help learners
+ * predict how French words should sound.
+ *
+ * Data Categories:
+ * ----------------
+ * 1. Pronunciation Patterns (16 items) - Core spelling-to-sound rules
+ * 2. Sound Comparisons (3 items) - Contrasting similar sounds
+ * 3. Guided Examples (5 items) - Full phrases with audio
+ * 4. Practice Questions (16 items) - Pattern recognition quiz
+ * 5. Section IDs (5 items) - Lesson section identifiers
+ * 6. Performance Message Function - Feedback based on score
+ *
+ * Key Patterns Covered:
+ * ---------------------
+ * - S between vowels sounds like Z
+ * - AU/EAU sounds like O
+ * - Final E effects on consonants
+ * - Silent final consonants
+ * - Nasal vowels (AN, ON, IN)
+ * - OU vs U distinction
+ * - GN sounds like 'ny'
+ * - ILL sounds like 'y'
+ * - Soft/hard C and G
+ * - CH sounds like SH
+ * - OI sounds like WAH
+ * - AI/EI sounds like EH
+ * - Accents effect on pronunciation
+ * - Liaison introduction
+ */
+
+// =============================================================================
+// PRONUNCIATION EXAMPLES AND PATTERNS
+// =============================================================================
+
+/**
+ * PronunciationExample Interface
+ * -----------------------------
+ * Individual word example with French, English, phonetic, and audio.
+ */
 export interface PronunciationExample {
   french: string
   english: string
@@ -5,6 +51,11 @@ export interface PronunciationExample {
   audioSrc: string
 }
 
+/**
+ * PronunciationPattern Interface
+ * -----------------------------
+ * Complete pattern with rule, explanation, examples, and common mistakes.
+ */
 export interface PronunciationPattern {
   id: string
   title: string
@@ -14,6 +65,15 @@ export interface PronunciationPattern {
   mistakeNote: string
 }
 
+/**
+ * Pronunciation Patterns - 16 core French pronunciation rules.
+ *
+ * Each pattern includes:
+ * - A clear title and rule statement
+ * - Detailed explanation of when the pattern applies
+ * - 3-4 example words with phonetic guides
+ * - Common mistake warnings for beginners
+ */
 export const pronunciationPatterns: PronunciationPattern[] = [
   {
     id: "s-between-vowels",
@@ -217,6 +277,15 @@ export const pronunciationPatterns: PronunciationPattern[] = [
   }
 ]
 
+// =============================================================================
+// SOUND COMPARISONS
+// =============================================================================
+
+/**
+ * SoundComparison Interface
+ * -------------------------
+ * Side-by-side comparison of two similar French sounds.
+ */
 export interface SoundComparison {
   id: string
   left: { label: string; example: string; phonetic: string }
@@ -224,6 +293,14 @@ export interface SoundComparison {
   note: string
 }
 
+/**
+ * Sound Comparisons - Three key sound distinctions.
+ *
+ * Comparisons:
+ * - u vs ou (tu vs tout)
+ * - s vs z-sound (salut vs maison)
+ * - au/eau vs oi (beau vs moi)
+ */
 export const soundComparisons: SoundComparison[] = [
   {
     id: "u-vs-ou",
@@ -245,6 +322,15 @@ export const soundComparisons: SoundComparison[] = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * GuidedExample Interface
+ * -----------------------
+ * Full phrase example for listening practice.
+ */
 export interface GuidedExample {
   french: string
   english: string
@@ -252,6 +338,16 @@ export interface GuidedExample {
   audioSrc: string
 }
 
+/**
+ * Guided Examples - 5 full phrases demonstrating multiple patterns.
+ *
+ * Examples:
+ * - la maison (shows s-between-vowels)
+ * - un beau livre (shows au pattern)
+ * - les amis (shows liaison)
+ * - une petite voiture rouge (shows final e effect)
+ * - tu parles français (shows u sound and soft c)
+ */
 export const guidedExamples: GuidedExample[] = [
   { french: "la maison", english: "the house", phonetic: "lah meh-zon", audioSrc: "/audio/a1/pronunciation/la-maison.mp3" },
   { french: "un beau livre", english: "a beautiful book", phonetic: "uhn bo leevr", audioSrc: "/audio/a1/pronunciation/un-beau-livre.mp3" },
@@ -260,6 +356,15 @@ export const guidedExamples: GuidedExample[] = [
   { french: "tu parles français ?", english: "do you speak French?", phonetic: "tew parl frahn-say", audioSrc: "/audio/a1/pronunciation/tu-parles-francais.mp3" }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion Interface
+ * -------------------------
+ * Multiple-choice question for pronunciation pattern recognition.
+ */
 export interface PracticeQuestion {
   id: number
   prompt: string
@@ -268,6 +373,15 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * Practice Questions - 16 questions testing pronunciation knowledge.
+ *
+ * Question topics:
+ * - IDs 1-4: S sounds, AU pattern, final consonants, OI pattern
+ * - IDs 5-8: Nasal vowels, CH sound, soft C, hard G
+ * - IDs 9-12: OU vs U, liaison, ILL pattern, final E effect
+ * - IDs 13-16: Pattern recognition, sound comparisons, learning strategy
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,
@@ -387,16 +501,37 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * Section IDs Array - Ordered list of all lesson section identifiers.
+ * Used for progress tracking and determining completion status.
+ */
 export const sectionIds = [
-  'intro',
-  'core-patterns',
-  'sound-comparisons',
-  'guided-examples',
-  'practice'
+  'intro',                  // Introduction to pronunciation
+  'core-patterns',          // 16 pronunciation patterns
+  'sound-comparisons',      // Side-by-side sound contrasts
+  'guided-examples',        // Full phrase listening practice
+  'practice'                // Interactive quiz (16 questions)
 ] as const
 
+/**
+ * SectionId Type - Union type derived from sectionIds array.
+ * Ensures type safety when referencing section identifiers.
+ */
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * PerformanceMessage Interface
+ * ----------------------------
+ * Structure for personalized feedback based on quiz score.
+ */
 export interface PerformanceMessage {
   title: string
   message: string
@@ -404,6 +539,18 @@ export interface PerformanceMessage {
   color: 'green' | 'blue' | 'amber'
 }
 
+/**
+ * getPerformanceMessage - Returns feedback based on practice score.
+ *
+ * Score tiers:
+ * - 80%+ (13-16 correct): High praise, green theme
+ * - 44-79% (7-12 correct): Encouragement, blue theme
+ * - Below 44% (0-6 correct): Supportive guidance, amber theme
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions
+ * @returns PerformanceMessage with title, message, tone, and color
+ */
 export function getPerformanceMessage(score: number, total: number): PerformanceMessage {
   const percentage = (score / total) * 100
   

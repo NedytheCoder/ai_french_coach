@@ -1,8 +1,46 @@
+/**
+ * A1 Lesson 6 - French Verb Groups Data
+ * =======================================
+ *
+ * This file contains all lesson data for A1 Lesson 6, focusing on French verb groups
+ * and conjugation patterns. French verbs are categorized into three groups based on
+ * their infinitive endings, which determine their conjugation patterns.
+ *
+ * Data Categories:
+ * ----------------
+ * 1. First Group Verbs (5 items) - Regular -er verbs
+ * 2. Second Group Verbs (5 items) - Regular -ir verbs
+ * 3. Third Group Verbs (5 items) - Irregular verbs
+ * 4. Verb Summary (3 items) - Group characteristics overview
+ * 5. Practice Questions (12 items) - Identification and classification
+ * 6. Section IDs (8 items) - Lesson section identifiers
+ * 7. Conjugation Examples (3 items) - Present tense conjugation tables
+ *
+ * Verb Groups:
+ * ------------
+ * - 1st group: Regular verbs ending in -er (parler, aimer, travailler)
+ * - 2nd group: Regular verbs ending in -ir (finir, choisir, réussir)
+ * - 3rd group: Irregular verbs with varied patterns (être, avoir, aller, faire, prendre)
+ */
+
+// =============================================================================
+// VERB EXAMPLES BY GROUP
+// =============================================================================
+
+/**
+ * VerbExample Interface
+ * ---------------------
+ * Simple structure for verb with English translation.
+ */
 export interface VerbExample {
   verb: string
   english: string
 }
 
+/**
+ * First Group Verbs - Regular -er verbs (largest group in French).
+ * Pattern: Drop -er, add endings (e, es, e, ons, ez, ent).
+ */
 export const firstGroupVerbs: VerbExample[] = [
   { verb: "parler", english: "to speak" },
   { verb: "aimer", english: "to like / love" },
@@ -11,6 +49,10 @@ export const firstGroupVerbs: VerbExample[] = [
   { verb: "habiter", english: "to live" }
 ]
 
+/**
+ * Second Group Verbs - Regular -ir verbs.
+ * Pattern: Add -iss- before plural endings (issons, issez, issent).
+ */
 export const secondGroupVerbs: VerbExample[] = [
   { verb: "finir", english: "to finish" },
   { verb: "choisir", english: "to choose" },
@@ -19,6 +61,10 @@ export const secondGroupVerbs: VerbExample[] = [
   { verb: "remplir", english: "to fill" }
 ]
 
+/**
+ * Third Group Verbs - Irregular verbs (most important common verbs).
+ * No single pattern; each verb has unique forms that must be memorized.
+ */
 export const thirdGroupVerbs: VerbExample[] = [
   { verb: "être", english: "to be" },
   { verb: "avoir", english: "to have" },
@@ -27,6 +73,15 @@ export const thirdGroupVerbs: VerbExample[] = [
   { verb: "prendre", english: "to take" }
 ]
 
+// =============================================================================
+// VERB SUMMARY
+// =============================================================================
+
+/**
+ * VerbSummaryItem Interface
+ * -------------------------
+ * Summary of characteristics for each verb group.
+ */
 export interface VerbSummaryItem {
   group: string
   pattern: string
@@ -34,6 +89,10 @@ export interface VerbSummaryItem {
   example: string
 }
 
+/**
+ * Verb Summary - Quick reference for the three verb groups.
+ * Shows ending patterns and regularity type for each group.
+ */
 export const verbSummary: VerbSummaryItem[] = [
   {
     group: "1st group",
@@ -55,6 +114,15 @@ export const verbSummary: VerbSummaryItem[] = [
   }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion Interface
+ * --------------------------
+ * Multiple-choice question for verb group identification.
+ */
 export interface PracticeQuestion {
   id: number
   prompt: string
@@ -63,6 +131,15 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * Practice Questions - 12 questions testing verb group knowledge.
+ *
+ * Question distribution:
+ * - IDs 1-4: Identify verb group by ending
+ * - IDs 5-8: Identify regular vs irregular
+ * - IDs 9-11: Match verb to meaning
+ * - ID 12: Identify third group verbs
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,
@@ -150,19 +227,40 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * Section IDs Array - Ordered list of all lesson section identifiers.
+ * Used for progress tracking and determining completion status.
+ */
 export const sectionIds = [
-  'verb-groups-intro',
-  'first-group',
-  'second-group',
-  'third-group',
-  'regular-vs-irregular',
-  'conjugation-examples',
-  'pattern-summary',
-  'practice'
+  'verb-groups-intro',     // Introduction to verb groups
+  'first-group',            // First group (-er) verbs
+  'second-group',           // Second group (-ir) verbs
+  'third-group',            // Third group (irregular) verbs
+  'regular-vs-irregular',   // Comparison of regular and irregular verbs
+  'conjugation-examples',   // Conjugation table examples
+  'pattern-summary',        // Pattern summary table
+  'practice'                 // Interactive practice section
 ] as const
 
+/**
+ * SectionId Type - Union type derived from sectionIds array.
+ * Ensures type safety when referencing section identifiers.
+ */
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// CONJUGATION EXAMPLES
+// =============================================================================
+
+/**
+ * ConjugationExample Interface
+ * -----------------------------
+ * Present tense conjugation table for a verb.
+ */
 export interface ConjugationExample {
   group: string
   verb: string
@@ -171,6 +269,12 @@ export interface ConjugationExample {
   note?: string
 }
 
+/**
+ * Conjugation Examples - Present tense conjugations for one verb from each group.
+ * - parler (1st group): Standard -er pattern
+ * - finir (2nd group): -iss- infix pattern
+ * - être (3rd group): Irregular unique forms
+ */
 export const conjugationExamples: ConjugationExample[] = [
   {
     group: "1st group (-er)",

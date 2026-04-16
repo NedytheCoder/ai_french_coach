@@ -1,3 +1,42 @@
+/**
+ * A1 Lesson 2 - French Nouns and Gender Data
+ * ===========================================
+ *
+ * This file contains all lesson data for A1 Lesson 2: French Nouns and Gender.
+ * It defines noun vocabulary organized by gender, article usage rules, and
+ * practice questions for mastering French noun gender agreement.
+ *
+ * Data Structure:
+ * ---------------
+ * - Noun interface: Type definition for noun objects
+ * - masculineNouns: 5 common masculine nouns (le)
+ * - feminineNouns: 5 common feminine nouns (la)
+ * - vowelOrSilentHNouns: 5 nouns with l' article
+ * - ArticleRule interface: Structure for article usage rules
+ * - articleRules: 3 rules explaining when to use each article form
+ * - PracticeQuestion interface: Type for quiz questions
+ * - practiceQuestions: 10 questions testing article-noun agreement
+ *
+ * Audio files location: /public/audio/a1/nouns/
+ */
+
+/**
+ * Noun Interface
+ * --------------
+ * Defines the structure for French noun entries with gender, article,
+ * pronunciation, and example sentences.
+ *
+ * @property id - Unique identifier for the noun
+ * @property noun - The French noun word
+ * @property article - The definite article (le, la, l')
+ * @property full - Full phrase (article + noun)
+ * @property english - English translation
+ * @property phonetic - Phonetic pronunciation guide
+ * @property audioSrc - Path to pronunciation audio file
+ * @property example - Example sentence in French
+ * @property exampleEnglish - Translation of example sentence
+ * @property gender - Optional gender classification ('masculine' | 'feminine')
+ */
 export interface Noun {
   id: string
   noun: string
@@ -11,6 +50,14 @@ export interface Noun {
   gender?: 'masculine' | 'feminine'
 }
 
+/**
+ * Masculine Nouns Data (le)
+ * -------------------------
+ * Five common masculine French nouns.
+ * In French, masculine nouns use the definite article "le".
+ *
+ * Pattern: Most nouns ending in a consonant are masculine.
+ */
 export const masculineNouns: Noun[] = [
   {
     id: "livre",
@@ -69,6 +116,14 @@ export const masculineNouns: Noun[] = [
   }
 ]
 
+/**
+ * Feminine Nouns Data (la)
+ * -------------------------
+ * Five common feminine French nouns.
+ * In French, feminine nouns use the definite article "la".
+ *
+ * Pattern: Many nouns ending in -e are feminine (though not all).
+ */
 export const feminineNouns: Noun[] = [
   {
     id: "table",
@@ -127,6 +182,16 @@ export const feminineNouns: Noun[] = [
   }
 ]
 
+/**
+ * Vowel or Silent H Nouns Data (l')
+ * ----------------------------------
+ * Five French nouns that use the contracted article "l'".
+ * This form is used before vowels (a, e, i, o, u) or silent h
+ * to avoid awkward pronunciation (e.g., "la école" → "l'école").
+ *
+ * Note: These nouns have an explicit gender property since the
+ * article alone doesn't indicate gender.
+ */
 export const vowelOrSilentHNouns: Noun[] = [
   {
     id: "ecole",
@@ -190,14 +255,28 @@ export const vowelOrSilentHNouns: Noun[] = [
   }
 ]
 
+/**
+ * ArticleRule Interface
+ * ---------------------
+ * Defines the structure for article usage rules.
+ * These rules help learners understand when to use each article form.
+ */
 export interface ArticleRule {
-  article: string
-  usage: string
-  example: string
-  exampleEnglish: string
-  color: string
+  article: string        // The article (le, la, l')
+  usage: string          // When to use this article
+  example: string        // French example phrase
+  exampleEnglish: string // English translation
+  color: string          // Color code for visual grouping
 }
 
+/**
+ * Article Rules Data
+ * ------------------
+ * Three fundamental rules for choosing the correct definite article:
+ * 1. le = masculine nouns (blue)
+ * 2. la = feminine nouns (pink)
+ * 3. l' = nouns starting with vowel or silent h (purple)
+ */
 export const articleRules: ArticleRule[] = [
   {
     article: "le",
@@ -222,6 +301,12 @@ export const articleRules: ArticleRule[] = [
   }
 ]
 
+/**
+ * PracticeQuestion Interface
+ * --------------------------
+ * Defines the structure for multiple-choice practice questions.
+ * Questions test article-noun agreement and vocabulary knowledge.
+ */
 export interface PracticeQuestion {
   id: number
   type: string
@@ -232,6 +317,17 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * Practice Questions Data
+ * -----------------------
+ * 10 multiple-choice questions testing:
+ * - Masculine article usage (questions 1-3)
+ * - Feminine article usage (questions 4-6)
+ * - Vowel/silent h article usage (questions 7-8)
+ * - Mixed review (questions 9-10)
+ *
+ * Each question provides immediate feedback with explanation.
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,

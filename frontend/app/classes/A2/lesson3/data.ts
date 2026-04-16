@@ -1,3 +1,47 @@
+/**
+ * A2 Lesson 3 - The Imparfait (Imperfect Tense) Data
+ * ====================================================
+ *
+ * This file contains all lesson data for A2 Lesson 3, focusing on the imparfait
+ * tense in French (l'imparfait), used for describing past actions and states.
+ *
+ * **Lesson Content:**
+ * - Uses of the imparfait (habits, descriptions, background actions, states)
+ * - Formation rule: nous form stem + imparfait endings
+ * - Imparfait endings: -ais, -ais, -ait, -ions, -iez, -aient
+ * - Common verbs in the imparfait
+ * - Imparfait vs passé composé comparisons
+ * - The irregular verb être in imparfait
+ * - Common mistakes to avoid
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Imparfait = ongoing/repeated past, descriptions, background
+ * - Passé composé = completed actions, events
+ * - Formation: Remove -ons from nous form, add imparfait endings
+ * - Être is irregular: ét- + endings
+ *
+ * **Data Categories:**
+ * 1. ImparfaitUse / imparfaitUses - Four main uses with examples
+ * 2. ImparfaitEnding / imparfaitEndings - Conjugation endings chart
+ * 3. FormationExample / formationExamples - How to form the tense
+ * 4. EtreImparfaitForm / etreImparfait - Irregular être conjugation
+ * 5. CommonImparfaitVerb / commonImparfaitVerbs - 10 common verbs
+ * 6. TenseComparison / tenseComparisons - Imparfait vs passé composé
+ * 7. GuidedExample / guidedExamples - Full example sentences
+ * 8. CommonMistake / commonMistakes - Error corrections
+ * 9. PracticeQuestion / practiceQuestions - 15 quiz questions
+ * 10. sectionIds / SectionId - Lesson sections
+ * 11. getPerformanceMessage - Score-based feedback
+ */
+
+// =============================================================================
+// IMPARFAIT USES
+// =============================================================================
+
+/**
+ * ImparfaitUse - Describes a specific use case for the imparfait.
+ */
 export interface ImparfaitUse {
   title: string
   explanation: string
@@ -5,6 +49,14 @@ export interface ImparfaitUse {
   english: string
 }
 
+/**
+ * imparfaitUses - The four main uses of the imparfait tense.
+ *
+ * 1. Past habits - Regular/repeated actions in the past
+ * 2. Descriptions in the past - What things/people were like
+ * 3. Background actions - Actions already in progress
+ * 4. Past states / age - Feelings, states, ages
+ */
 export const imparfaitUses: ImparfaitUse[] = [
   {
     title: "Past habits",
@@ -32,11 +84,24 @@ export const imparfaitUses: ImparfaitUse[] = [
   }
 ]
 
+// =============================================================================
+// IMPARFAIT ENDINGS
+// =============================================================================
+
+/**
+ * ImparfaitEnding - A single imparfait conjugation ending.
+ */
 export interface ImparfaitEnding {
   pronoun: string
   ending: string
 }
 
+/**
+ * imparfaitEndings - The six imparfait endings.
+ *
+ * Pattern: -ais, -ais, -ait, -ions, -iez, -aient
+ * Note: je and tu share the same ending (-ais)
+ */
 export const imparfaitEndings: ImparfaitEnding[] = [
   { pronoun: "je", ending: "-ais" },
   { pronoun: "tu", ending: "-ais" },
@@ -46,6 +111,13 @@ export const imparfaitEndings: ImparfaitEnding[] = [
   { pronoun: "ils / elles", ending: "-aient" }
 ]
 
+// =============================================================================
+// FORMATION EXAMPLES
+// =============================================================================
+
+/**
+ * FormationExample - Shows how to derive the imparfait from the present.
+ */
 export interface FormationExample {
   infinitive: string
   nousForm: string
@@ -54,6 +126,12 @@ export interface FormationExample {
   english: string
 }
 
+/**
+ * formationExamples - Step-by-step formation of the imparfait.
+ *
+ * Rule: Take the nous form, remove -ons, add imparfait endings.
+ * Examples show -er, -ir, and -re verbs.
+ */
 export const formationExamples: FormationExample[] = [
   {
     infinitive: "parler",
@@ -78,11 +156,24 @@ export const formationExamples: FormationExample[] = [
   }
 ]
 
+// =============================================================================
+// ÊTRE IN THE IMPARFAIT
+// =============================================================================
+
+/**
+ * EtreImparfaitForm - Conjugated form of être in imparfait.
+ */
 export interface EtreImparfaitForm {
   pronoun: string
   form: string
 }
 
+/**
+ * etreImparfait - The irregular verb être in the imparfait.
+ *
+ * Être is completely irregular: uses stem "ét-" instead of present stem.
+ * Forms: j'étais, tu étais, il était, nous étions, vous étiez, ils étaient
+ */
 export const etreImparfait = {
   infinitive: "être",
   stem: "ét-",
@@ -96,12 +187,25 @@ export const etreImparfait = {
   ] as EtreImparfaitForm[]
 }
 
+// =============================================================================
+// COMMON IMPARFAIT VERBS
+// =============================================================================
+
+/**
+ * CommonImparfaitVerb - Common verb with its imparfait je form.
+ */
 export interface CommonImparfaitVerb {
   infinitive: string
   je: string
   english: string
 }
 
+/**
+ * commonImparfaitVerbs - 10 essential verbs in the imparfait.
+ *
+ * Includes être and avoir (irregular) plus common -er, -ir, -re verbs.
+ * Each shows both translations: "was ___ing" and "used to ___"
+ */
 export const commonImparfaitVerbs: CommonImparfaitVerb[] = [
   { infinitive: "être", je: "j'étais", english: "I was / I used to be" },
   { infinitive: "avoir", je: "j'avais", english: "I had / I used to have" },
@@ -115,6 +219,13 @@ export const commonImparfaitVerbs: CommonImparfaitVerb[] = [
   { infinitive: "travailler", je: "je travaillais", english: "I was working / I used to work" }
 ]
 
+// =============================================================================
+// IMPARFAIT VS PASSÉ COMPOSÉ COMPARISON
+// =============================================================================
+
+/**
+ * TenseComparison - Side-by-side comparison of imparfait and passé composé.
+ */
 export interface TenseComparison {
   imparfait: string
   passeCompose: string
@@ -123,6 +234,13 @@ export interface TenseComparison {
   note: string
 }
 
+/**
+ * tenseComparisons - Examples showing when to use each tense.
+ *
+ * Key distinction:
+ * - Imparfait: Ongoing, background, habitual, descriptive
+ * - Passé composé: Completed events, specific actions
+ */
 export const tenseComparisons: TenseComparison[] = [
   {
     imparfait: "Je lisais quand il est arrivé.",
@@ -147,11 +265,23 @@ export const tenseComparisons: TenseComparison[] = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * GuidedExample - Full sentence demonstrating imparfait usage.
+ */
 export interface GuidedExample {
   french: string
   english: string
 }
 
+/**
+ * guidedExamples - Full sentences showing various imparfait uses.
+ *
+ * Mix of habits, descriptions, background actions, and states.
+ */
 export const guidedExamples: GuidedExample[] = [
   { french: "Quand j'avais dix ans, j'habitais à Lyon.", english: "When I was ten years old, I used to live in Lyon." },
   { french: "Nous regardions souvent des films le soir.", english: "We used to watch films often in the evening." },
@@ -161,12 +291,28 @@ export const guidedExamples: GuidedExample[] = [
   { french: "Vous étudiiez le français tous les jours.", english: "You used to study French every day." }
 ]
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * CommonMistake - Incorrect vs correct imparfait usage.
+ */
 export interface CommonMistake {
   wrong: string
   correct: string
   explanation: string
 }
 
+/**
+ * commonMistakes - Common errors when using the imparfait.
+ *
+ * Typical mistakes:
+ * - Wrong endings (using -ait instead of -ais for je)
+ * - Not removing -ons before adding endings
+ * - Using passé composé for habits
+ * - Wrong tense for weather descriptions
+ */
 export const commonMistakes: CommonMistake[] = [
   { wrong: "Je parlait avec mes amis.", correct: "Je parlais avec mes amis.", explanation: "With je, use the ending -ais." },
   { wrong: "Nous parlionsons souvent.", correct: "Nous parlions souvent.", explanation: "Do not keep the full present tense ending. Remove -ons before adding imparfait endings." },
@@ -174,6 +320,13 @@ export const commonMistakes: CommonMistake[] = [
   { wrong: "Il est beau toute la journée.", correct: "Il faisait beau toute la journée.", explanation: "Weather descriptions in the past often use the imparfait." }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion - Multiple-choice question for the quiz.
+ */
 export interface PracticeQuestion {
   id: number
   topic: string
@@ -183,6 +336,16 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * practiceQuestions - 15 questions testing imparfait knowledge.
+ *
+ * Topic distribution:
+ * - usage (4): When to use imparfait vs other tenses
+ * - formation (4): Conjugation and endings
+ * - etre (3): The irregular verb être
+ * - comparison (2): Imparfait vs passé composé
+ * - correction (2): Error identification
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,
@@ -326,6 +489,23 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections in order:
+ * 1. intro - Introduction to imparfait
+ * 2. uses - Four main uses of imparfait
+ * 3. formation - How to form the tense
+ * 4. verbs - Common imparfait verbs
+ * 5. comparison - Imparfait vs passé composé
+ * 6. examples - Guided example sentences
+ * 7. mistakes - Common errors
+ * 8. practice - Interactive quiz
+ */
 export const sectionIds = [
   'intro',
   'uses',
@@ -339,6 +519,13 @@ export const sectionIds = [
 
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * PerformanceMessage - Feedback message based on quiz performance.
+ */
 export interface PerformanceMessage {
   title: string
   message: string
@@ -346,6 +533,18 @@ export interface PerformanceMessage {
   color: 'green' | 'blue' | 'amber'
 }
 
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score thresholds:
+ * - ≥80% (12/15): "Great job!" - green, high tone
+ * - 47-79% (7-11/15): "Nice progress" - blue, medium tone
+ * - <47% (<7/15): "Good effort" - amber, low tone
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns PerformanceMessage with title, message, tone, and color
+ */
 export function getPerformanceMessage(score: number, total: number): PerformanceMessage {
   const percentage = (score / total) * 100
   

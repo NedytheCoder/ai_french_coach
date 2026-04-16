@@ -1,12 +1,82 @@
-// B2 Lesson 2 — Idiomatic Expressions
+/**
+ * B2 Lesson 2 - Idiomatic Expressions (Expressions Idiomatiques)
+ * ================================================================
+ *
+ * This file contains all lesson data for B2 Lesson 2, teaching high-frequency
+ * French idioms that make speech natural and culturally attuned.
+ *
+ * **Lesson Content:**
+ * - Introduction to why idioms matter and the translation trap
+ * - Common idioms with literal meaning, actual meaning, and register
+ * - Context examples: when to use and when not to use
+ * - Usage vs misuse examples
+ * - Mini dialogues showing idioms in conversation
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Idioms carry cultural wisdom and shared understanding
+ * - Literal translation often produces nonsense
+ * - Register awareness is crucial (formal, neutral, informal, very informal)
+ * - Some idioms have literary origins (e.g., avoir le cafard from Camus)
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. lessonMeta - Lesson metadata (title, subtitle, number)
+ * 3. introSections - Introduction to idioms
+ * 4. commonIdioms - Core idioms with meanings and registers
+ * 5. contextExamples - When to use/when not to use
+ * 6. usageVsMisuse - Correct vs incorrect usage
+ * 7. miniDialogues - Conversational examples
+ * 8. practiceQuestions - 15 quiz questions
+ * 9. getPerformanceMessage - Score-based feedback
+ */
+
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to idioms
+ * 2. what-are-idioms - Explanation of idiomatic expressions
+ * 3. common-idioms - Core French idioms
+ * 4. context-matters - Register and situation awareness
+ * 5. usage-misuse - Correct vs incorrect examples
+ * 6. dialogues - Mini conversations with idioms
+ * 7. practice - Interactive quiz
+ * 8. completion - Lesson completion
+ */
 export const sectionIds = ["intro", "what-are-idioms", "common-idioms", "context-matters", "usage-misuse", "dialogues", "practice", "completion"];
 
+// =============================================================================
+// LESSON METADATA
+// =============================================================================
+
+/**
+ * lessonMeta - Lesson metadata for display in headers and navigation.
+ */
 export const lessonMeta = {
+  /** Lesson title */
   title: "Idiomatic Expressions",
+  /** Brief description of lesson content */
   subtitle: "Go beyond literal meaning. Master high-frequency French idioms that make your speech natural and culturally attuned.",
+  /** Lesson number in B2 series */
   lessonNumber: 2,
 };
 
+// =============================================================================
+// INTRODUCTION SECTIONS
+// =============================================================================
+
+/**
+ * introSections - Introduction to idiomatic expressions.
+ *
+ * Content:
+ * - Why idioms matter: cultural wisdom and shared understanding
+ * - The translation trap: literal translation produces nonsense
+ */
 export const introSections = [
   {
     title: "Why Idioms Matter",
@@ -18,6 +88,25 @@ export const introSections = [
   },
 ];
 
+// =============================================================================
+// COMMON IDIOMS
+// =============================================================================
+
+/**
+ * commonIdioms - High-frequency French idioms with meanings and registers.
+ *
+ * Each idiom includes:
+ * - idiom: French expression
+ * - literal: Word-for-word English translation
+ * - meaning: Actual meaning in English
+ * - context: Usage situation
+ * - register: Formality level (Formal, Neutral, Informal, Very informal, Literary)
+ *
+ * Examples:
+ * - Poser un lapin: To stand someone up (Informal)
+ * - Avoir le cafard: To be depressed (Literary - from Camus)
+ * - Coûter les yeux de la tête: To cost an arm and a leg (Neutral)
+ */
 export const commonIdioms = [
   { idiom: "Poser un lapin", literal: "To leave a rabbit", meaning: "To stand someone up", context: "Rendez-vous, amitié", register: "Informal" },
   { idiom: "Coûter les yeux de la tête", literal: "To cost the eyes from the head", meaning: "To cost an arm and a leg", context: "Argent, achats", register: "Neutral" },
@@ -31,6 +120,19 @@ export const commonIdioms = [
   { idiom: "Être au bout du rouleau", literal: "To be at the end of the roll", meaning: "To be exhausted/at wit's end", context: "Fatigue, épuisement", register: "Neutral" },
 ];
 
+// =============================================================================
+// CONTEXT EXAMPLES
+// =============================================================================
+
+/**
+ * contextExamples - When to use and when not to use specific idioms.
+ *
+ * Each example includes:
+ * - idiom: The French expression
+ * - meaning: English translation
+ * - whenToUse: Appropriate contexts
+ * - whenNot: Inappropriate contexts
+ */
 export const contextExamples = [
   { idiom: "Il pleut comme vache qui pisse", meaning: "It's raining heavily", whenToUse: "Among friends, complaining about weather", whenNot: "Formal weather reports" },
   { idiom: "On verra ça plus tard", meaning: "We'll see about that later", whenToUse: "Neutral contexts, postponing decisions", whenNot: "When you want to be direct and decisive" },
@@ -38,12 +140,37 @@ export const contextExamples = [
   { idiom: "Avoir du pain sur la planche", meaning: "To have a lot of work to do", whenToUse: "Work contexts, describing workload", whenNot: "When describing leisure time" },
 ];
 
+// =============================================================================
+// USAGE VS MISUSE
+// =============================================================================
+
+/**
+ * usageVsMisuse - Examples of correct and incorrect idiom usage.
+ *
+ * Each example shows:
+ * - correct: Proper usage of the idiom
+ * - incorrect: Improper usage with explanation of why
+ * - explanation: Reason for the error
+ */
 export const usageVsMisuse = [
   { correct: "Après ce projet, j'ai la pêche !", incorrect: "Après ce projet, j'ai la pêche, Monsieur le Maire.", explanation: "'La pêche' is too informal for formal authority figures" },
   { correct: "Elle m'a posé un lapin.", incorrect: "Le client a posé un lapin à la réunion.", explanation: "Business contexts require more formal language" },
   { correct: "Cet ordinateur coûte les yeux de la tête.", incorrect: "Cet stylo coûte les yeux de la tête.", explanation: "Idioms should match the scale of the situation" },
 ];
 
+// =============================================================================
+// MINI DIALOGUES
+// =============================================================================
+
+/**
+ * miniDialogues - Conversational examples showing idioms in context.
+ *
+ * Dialogues:
+ * - At work: Expressing frustration with "avoir du pain sur la planche"
+ * - Friends making plans: Using "avoir la pêche" for enthusiasm
+ *
+ * Each dialogue includes speaker labels (A, B) and text.
+ */
 export const miniDialogues = [
   {
     context: "At work, expressing frustration",
@@ -63,6 +190,33 @@ export const miniDialogues = [
   },
 ];
 
+// =============================================================================
+// PRACTICE QUESTIONS - 15 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for B2 Lesson 2.
+ *
+ * Topics covered:
+ * - recognition (1-2): Understanding idiom meanings
+ * - register (3, 6): Appropriate formality levels
+ * - meaning (4, 8, 10, 13): Idiom definitions
+ * - context (5, 9, 13): When to use idioms
+ * - translation (7): Cross-language equivalents
+ * - misuse (9): Common errors
+ * - intensity (11): Strength of expression
+ * - literary (12): Idioms from literature
+ * - politeness (14): Social appropriateness
+ * - appropriateness (15): Formal contexts
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   { id: 1, topic: "recognition", prompt: "What does 'poser un lapin' mean?", options: ["To stand someone up", "To give a gift", "To make someone laugh"], correct: 0, explanation: "Poser un lapin = not showing up for a date/appointment" },
   { id: 2, topic: "recognition", prompt: "What does 'avoir le cafard' express?", options: ["Sadness/depression", "Fear of insects", "Hunger"], correct: 0, explanation: "Avoir le cafard = feeling down (from 'La peste' by Camus)" },
@@ -81,6 +235,22 @@ export const practiceQuestions = [
   { id: 15, topic: "appropriateness", prompt: "In a formal email, replace 'J'en ai marre' with:", options: ["Je souhaite explorer d'autres options", "C'est génial", "Je suis fatigué"], correct: 0, explanation: "Use formal, professional language in emails" },
 ];
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/15: "Good effort" - suggests reviewing core meanings and register
+ * - 8-11/15: "Nice progress" - encourages context awareness
+ * - 12-15/15: "Excellent command" - celebrates idiom mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) return { title: "Good effort", message: "Idioms require exposure and practice. Review the core meanings and pay attention to register.", emoji: "📚", color: "blue" as const };
   if (score <= 11) return { title: "Nice progress", message: "You are recognizing idioms well. Focus on using them appropriately in context.", emoji: "🎯", color: "yellow" as const };

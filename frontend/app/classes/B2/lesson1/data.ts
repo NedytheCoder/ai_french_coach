@@ -1,12 +1,90 @@
-// B2 Lesson 1 — Formal and Informal Registers
+/**
+ * B2 Lesson 1 - Formal and Informal Registers (Soutenu, Courant, Familier)
+ * ========================================================================
+ *
+ * This file contains all lesson data for B2 Lesson 1, teaching register
+ * awareness and the ability to navigate between formal, neutral, and casual
+ * French appropriately.
+ *
+ * **Lesson Content:**
+ * - Introduction to the three registers: soutenu, courant, familier
+ * - Tu vs Vous: Social dynamics and context-based choice
+ * - Formal French markers: subjunctive, passive voice, nominalisation
+ * - Informal French markers: dropped ne, filler words, verlan
+ * - Rewriting examples: same content in three registers
+ * - Comparison table for common situations
+ * - Common mistakes in register usage
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Soutenu: formal/written register
+ * - Courant: neutral/standard register
+ * - Familier: casual/spoken register
+ * - Register mixing creates cognitive dissonance
+ * - Context determines appropriate register
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. lessonMeta - Lesson metadata (title, subtitle, number)
+ * 3. introSections - Introduction to registers
+ * 4. tuVsVous - Tu versus vous usage guide
+ * 5. formalMarkers - Features of formal French
+ * 6. informalMarkers - Features of informal French
+ * 7. rewritingExamples - Same content in three registers
+ * 8. comparisonTable - Situation-based register comparison
+ * 9. commonMistakes - Register errors to avoid
+ * 10. practiceQuestions - 15 quiz questions
+ * 11. getPerformanceMessage - Score-based feedback
+ */
+
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to registers
+ * 2. what-is-register - Three registers explained
+ * 3. tu-vs-vous - Tu versus vous usage
+ * 4. formal-markers - Formal French features
+ * 5. informal-markers - Informal French features
+ * 6. rewriting - Rewriting in different registers
+ * 7. comparison - Situation comparison
+ * 8. mistakes - Common errors
+ * 9. practice - Interactive quiz
+ * 10. completion - Lesson completion
+ */
 export const sectionIds = ["intro", "what-is-register", "tu-vs-vous", "formal-markers", "informal-markers", "rewriting", "comparison", "mistakes", "practice", "completion"];
 
+// =============================================================================
+// LESSON METADATA
+// =============================================================================
+
+/**
+ * lessonMeta - Lesson metadata for display in headers and navigation.
+ */
 export const lessonMeta = {
+  /** Lesson title */
   title: "Formal and Informal Registers",
+  /** Brief description of lesson content */
   subtitle: "Master the art of choosing the right level of language for every situation. At B2, you need to navigate effortlessly between formal, neutral, and casual French.",
+  /** Lesson number in B2 series */
   lessonNumber: 1,
 };
 
+// =============================================================================
+// INTRODUCTION SECTIONS
+// =============================================================================
+
+/**
+ * introSections - Introduction to register concepts.
+ *
+ * Content:
+ * - Why register matters: social intelligence and context awareness
+ * - The three registers: soutenu, courant, familier
+ */
 export const introSections = [
   {
     title: "Why Register Matters",
@@ -18,6 +96,23 @@ export const introSections = [
   },
 ];
 
+// =============================================================================
+// TU VERSUS VOUS
+// =============================================================================
+
+/**
+ * tuVsVous - Guide to choosing between tu and vous.
+ *
+ * The choice reflects social dynamics: power, solidarity, age, and context.
+ * - vous: maintains distance and respect (professional settings)
+ * - tu: signals equality, intimacy, or deliberate informality
+ *
+ * Examples by context:
+ * - Job interview: vous (respect for hierarchy)
+ * - First meeting, same age: vous or ask permission
+ * - Work colleague after months: tu (established rapport)
+ * - Email to unknown: vous (default to formality)
+ */
 export const tuVsVous = {
   title: "Tu versus Vous: Beyond Grammar",
   explanation: "The choice between tu and vous reflects social dynamics: power, solidarity, age, and context. In professional settings, vous maintains distance and respect. Tu signals equality, intimacy, or a deliberate choice to break formality.",
@@ -29,6 +124,21 @@ export const tuVsVous = {
   ],
 };
 
+// =============================================================================
+// FORMAL MARKERS
+// =============================================================================
+
+/**
+ * formalMarkers - Features that mark formal (soutenu) French.
+ *
+ * Markers:
+ * - Subjunctive abundance: more frequent in formal contexts
+ * - Conditional politeness: softens requests
+ * - Passive voice: impersonal constructions
+ * - Nominalisation: using nouns instead of verbs
+ * - Complex connectors: cependant, néanmoins, par conséquent
+ * - Full forms: preservation of ne in negatives
+ */
 export const formalMarkers = {
   title: "Markers of Formal French",
   features: [
@@ -41,6 +151,21 @@ export const formalMarkers = {
   ],
 };
 
+// =============================================================================
+// INFORMAL MARKERS
+// =============================================================================
+
+/**
+ * informalMarkers - Features that mark informal (familier) French.
+ *
+ * Markers:
+ * - Dropping ne: very common in speech
+ * - Reduced forms: Chuis (je suis), T'es (tu es)
+ * - Filler words: genre, du coup, enfin bref
+ * - Vague quantifiers: un truc, des machins
+ * - No question inversion: Tu viens? not Viens-tu?
+ * - Slang and verlan: meuf (femme), keum (mec)
+ */
 export const informalMarkers = {
   title: "Markers of Informal French",
   features: [
@@ -53,6 +178,20 @@ export const informalMarkers = {
   ],
 };
 
+// =============================================================================
+// REWRITING EXAMPLES
+// =============================================================================
+
+/**
+ * rewritingExamples - Same content expressed in three registers.
+ *
+ * Examples:
+ * - Requesting availability
+ * - Expressing misunderstanding
+ * - Urgency in completing work
+ *
+ * Each example shows neutral, formal, and informal versions.
+ */
 export const rewritingExamples = [
   {
     neutral: "Je voudrais savoir si vous êtes disponible demain.",
@@ -74,6 +213,21 @@ export const rewritingExamples = [
   },
 ];
 
+// =============================================================================
+// COMPARISON TABLE
+// =============================================================================
+
+/**
+ * comparisonTable - Situation-based register comparison.
+ *
+ * Situations:
+ * - Job application email
+ * - Asking for help
+ * - Disagreeing politely
+ * - Thanking sincerely
+ *
+ * Each situation shows formal, neutral, and informal versions.
+ */
 export const comparisonTable = [
   { situation: "Job application email", formal: "Je me permets de vous adresser ma candidature", neutral: "Je vous envoie ma candidature", informal: "Je te envoie mon CV (never!)" },
   { situation: "Asking for help", formal: "Pourriez-vous m'accorder votre assistance ?", neutral: "Pourriez-vous m'aider ?", informal: "Tu peux m'aider ?" },
@@ -81,6 +235,21 @@ export const comparisonTable = [
   { situation: "Thanking sincerely", formal: "Je vous saurais gré de bien vouloir...", neutral: "Je vous remercie beaucoup", informal: "Merci, t'es trop cool !" },
 ];
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * commonMistakes - Common errors in register usage.
+ *
+ * Mistakes:
+ * - Using tu with a client's CEO (over-familiarity)
+ * - Writing 'je sais pas' in formal email
+ * - Over-using subjunctive in casual conversation
+ * - Mixing registers inconsistently
+ *
+ * Each mistake includes the problem and solution.
+ */
 export const commonMistakes = [
   { wrong: "Using tu with a client's CEO", problem: "Over-familiarity can damage professional relationships", solution: "Always default to vous in business until invited otherwise" },
   { wrong: "Writing 'je sais pas' in a formal email", problem: "Informal constructions undermine credibility", solution: "Use complete forms: je ne sais pas" },
@@ -88,6 +257,37 @@ export const commonMistakes = [
   { wrong: "Mixing registers inconsistently", problem: "Creates cognitive dissonance for the listener", solution: "Maintain register consistency within a text or conversation" },
 ];
 
+// =============================================================================
+// PRACTICE QUESTIONS - 15 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for B2 Lesson 1.
+ *
+ * Topics covered:
+ * - register-recognition (1): Identifying formal versions
+ * - tu-vous (2): When to use vous vs tu
+ * - formal-markers (3, 8): Features of formal French
+ * - informal-markers (4, 13): Features of informal French
+ * - rewriting (5): Converting to formal register
+ * - context (6): Choosing register for situation
+ * - conditional (7): Polite request forms
+ * - inappropriate (9): What's never formal
+ * - nominalisation (10): Noun-based formal style
+ * - email (11): Formal email openings
+ * - over-formal (12): When formal sounds wrong
+ * - verlan (13): Back slang recognition
+ * - consistency (14): Problems with mixing
+ * - professional (15): Professional communication
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   { id: 1, topic: "register-recognition", prompt: "Which is the most formal version?", options: ["Je me permets de solliciter votre attention", "J'aimerais te parler", "Faut que je te dise un truc"], correct: 0, explanation: "Solliciter and me permets are formal markers" },
   { id: 2, topic: "tu-vous", prompt: "In a first business meeting, you should use:", options: ["vous until invited to use tu", "tu to be friendly", "on"], correct: 0, explanation: "Default to vous in professional contexts" },
@@ -106,6 +306,22 @@ export const practiceQuestions = [
   { id: 15, topic: "professional", prompt: "In a professional email, avoid:", options: ["Abbreviations like 'bcp' for beaucoup", "Complete sentences", "Clear subject lines"], correct: 0, explanation: "Text abbreviations are too informal for professional contexts" },
 ];
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/15: "Good effort" - suggests reviewing formal markers
+ * - 8-11/15: "Solid progress" - encourages continued practice
+ * - 12-15/15: "Excellent command" - celebrates register mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) return { title: "Good effort", message: "Register awareness takes time to develop. Review the formal markers and practice identifying context clues.", emoji: "📚", color: "blue" as const };
   if (score <= 11) return { title: "Solid progress", message: "You are developing good register sensitivity. Focus on distinguishing subtle formal markers and practicing rewrites.", emoji: "🎯", color: "yellow" as const };

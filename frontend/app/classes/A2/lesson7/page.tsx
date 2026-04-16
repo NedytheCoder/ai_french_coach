@@ -1,28 +1,77 @@
+/**
+ * A2 Lesson 7 - Indirect Object Pronouns (Lui, Leur)
+ * =====================================================
+ *
+ * This page teaches A2 learners how to use indirect object pronouns in French,
+ * including me, te, lui, nous, vous, leur.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to indirect objects
+ * 2. WhatIsIndirectObjectSection - Identifying indirect objects (à + person)
+ * 3. PronounsTableSection - Chart of all indirect object pronouns
+ * 4. CommonVerbsSection - Verbs commonly used with indirect objects
+ * 5. ReplacementSection - Replacing nouns with pronouns
+ * 6. PositionSection - Pronoun placement in sentences
+ * 7. NegationSection - Using pronouns with negation
+ * 8. PasseComposeSection - Using pronouns in passé composé
+ * 9. DirectVsIndirectSection - Distinguishing direct vs indirect
+ * 10. GuidedExamplesSection - Full example sentences
+ * 11. MistakesSection - Common errors to avoid
+ * 12. PracticeSection - Interactive quiz (15 questions)
+ * 13. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Indirect objects = à + person (to/for someone)
+ * - Pronouns: me, te, lui, nous, vous, leur
+ * - Placement: before the conjugated verb
+ * - Passé composé: no agreement with indirect objects
+ * - Different from direct objects (le, la, les)
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 15-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaLightbulb,
-  FaGraduationCap,
-  FaComments,
-  FaList,
-  FaExchangeAlt,
-  FaMapMarkerAlt,
-  FaBan,
-  FaClock,
-  FaBalanceScale,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaBookOpen,
-  FaRedo,
-  FaArrowAltCircleRight,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaLightbulb,              // Introduction/tips
+  FaGraduationCap,          // Lesson badge
+  FaComments,               // Communication/speaking
+  FaList,                   // Lists/tables
+  FaExchangeAlt,            // Replacement examples
+  FaMapMarkerAlt,           // Position/placement
+  FaBan,                    // Negation
+  FaClock,                  // Passé composé/timing
+  FaBalanceScale,           // Direct vs Indirect comparison
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaBookOpen,               // Lesson content
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   indirectObjectExamples,
@@ -42,7 +91,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
-// Types
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -52,7 +107,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
-// Components
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -129,6 +203,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 7 badge
+ * - Main title: "Indirect Object Pronouns"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-cyan-600 to-teal-500 rounded-2xl p-8 text-white shadow-lg">
@@ -150,6 +233,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({
   current,
   total,
@@ -179,7 +269,18 @@ function ProgressBar({
   );
 }
 
-// Section Components
+// =============================================================================
+// SECTION COMPONENTS
+// =============================================================================
+
+/**
+ * IntroSection - Introduction to indirect objects.
+ *
+ * Content:
+ * - Definition of indirect objects (to whom? for whom?)
+ * - Examples showing indirect objects in sentences
+ * - Explanation of à + person pattern
+ */
 function IntroSection({
   isReviewed,
   onMarkReviewed,
@@ -234,6 +335,14 @@ function IntroSection({
   );
 }
 
+/**
+ * WhatIsPronounSection - Explains what indirect object pronouns are.
+ *
+ * Content:
+ * - Definition and purpose of indirect object pronouns
+ * - Before/after examples showing noun replacement
+ * - Key insight about pronoun placement
+ */
 function WhatIsPronounSection({
   isReviewed,
   onMarkReviewed,
@@ -283,6 +392,14 @@ function WhatIsPronounSection({
   );
 }
 
+/**
+ * PronounsTableSection - Table of all indirect object pronouns.
+ *
+ * Content:
+ * - Full pronoun table (me, te, lui, nous, vous, leur)
+ * - Elision examples (m', t' before vowels)
+ * - Important note about lui/leur gender neutrality
+ */
 function PronounsTableSection({
   isReviewed,
   onMarkReviewed,
@@ -368,6 +485,13 @@ function PronounsTableSection({
   );
 }
 
+/**
+ * CommonVerbsSection - Verbs commonly used with indirect objects.
+ *
+ * Content:
+ * - Explanation of à + person pattern
+ * - Grid of common verbs (parler à, téléphoner à, etc.)
+ */
 function CommonVerbsSection({
   isReviewed,
   onMarkReviewed,
@@ -404,6 +528,14 @@ function CommonVerbsSection({
   );
 }
 
+/**
+ * ReplacingSection - How to replace nouns with indirect object pronouns.
+ *
+ * Content:
+ * - Step-by-step replacement process
+ * - Before/after transformation examples
+ * - Key placement reminder
+ */
 function ReplacingSection({
   isReviewed,
   onMarkReviewed,
@@ -452,6 +584,14 @@ function ReplacingSection({
   );
 }
 
+/**
+ * PositionSection - Where to place indirect object pronouns in sentences.
+ *
+ * Content:
+ * - Word order pattern explanation
+ * - Example sentences showing correct placement
+ * - Important reminder about pronoun position
+ */
 function PositionSection({
   isReviewed,
   onMarkReviewed,
@@ -503,6 +643,14 @@ function PositionSection({
   );
 }
 
+/**
+ * NegationSection - Using indirect object pronouns with negation.
+ *
+ * Content:
+ * - Word order in negative sentences (ne...pas)
+ * - Before/after examples
+ * - Elision of ne before vowels
+ */
 function NegationSection({
   isReviewed,
   onMarkReviewed,
@@ -567,6 +715,14 @@ function NegationSection({
   );
 }
 
+/**
+ * PasseComposeSection - Using indirect object pronouns in passé composé.
+ *
+ * Content:
+ * - Pronoun placement before auxiliary verb
+ * - No agreement needed with indirect objects (unlike direct)
+ * - Example sentences
+ */
 function PasseComposeSection({
   isReviewed,
   onMarkReviewed,
@@ -631,6 +787,14 @@ function PasseComposeSection({
   );
 }
 
+/**
+ * DirectVsIndirectSection - Comparison of direct vs indirect object pronouns.
+ *
+ * Content:
+ * - Side-by-side definitions
+ * - Examples showing both types
+ * - Key distinction question
+ */
 function DirectVsIndirectSection({
   isReviewed,
   onMarkReviewed,
@@ -696,6 +860,13 @@ function DirectVsIndirectSection({
   );
 }
 
+/**
+ * GuidedExamplesSection - Full example sentences for study.
+ *
+ * Content:
+ * - Collection of example sentences
+ * - French and English translations
+ */
 function GuidedExamplesSection({
   isReviewed,
   onMarkReviewed,
@@ -734,6 +905,14 @@ function GuidedExamplesSection({
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Warning about confusing direct/indirect patterns
+ * - Wrong vs correct examples
+ * - Detailed explanations for each mistake
+ */
 function MistakesSection({
   isReviewed,
   onMarkReviewed,
@@ -783,6 +962,24 @@ function MistakesSection({
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for lesson 7.
+ *
+ * Features:
+ * - 15 questions testing indirect object pronoun knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ * - Option to retake or continue
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-14)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -1043,6 +1240,17 @@ function PracticeSection({
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to next lesson
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({
   practiceScore,
 }: {
@@ -1094,16 +1302,41 @@ function CompletionSection({
   );
 }
 
-// Main Page Component
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson7Page - Main component for A2 Lesson 7.
+ *
+ * Manages:
+ * - Section review state (which sections have been reviewed)
+ * - Practice quiz answers and score
+ * - Lesson completion status
+ * - Progress persistence to localStorage
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson7Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Practice answers map (questionId -> selectedOption)
   const [practiceAnswers, setPracticeAnswers] = useState<Record<number, number>>({});
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether entire lesson is marked complete
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
-  // Load progress from localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson7Progress");
@@ -1121,7 +1354,9 @@ export default function Lesson7Page() {
     }
   }, []);
 
-  // Save progress to localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(
@@ -1137,23 +1372,44 @@ export default function Lesson7Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, practiceScore, lessonCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => {
     setReviewedSections((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
   };
 
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => {
     setPracticeScore(score);
     setPracticeCompleted(true);
   };
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => {
     const totalSections = sectionIds.length;
     const completed = reviewedSections.length;
     return Math.round((completed / totalSections) * 100);
   }, [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-slate-50 flex items-center justify-center">
@@ -1165,7 +1421,7 @@ export default function Lesson7Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Navigation */}
+        {/* Back Navigation */}
         <div className="flex items-center gap-4">
           <Link
             href="/classes/A2"
@@ -1176,10 +1432,10 @@ export default function Lesson7Page() {
           </Link>
         </div>
 
-        {/* Header */}
+        {/* Lesson Header */}
         <LessonHeader />
 
-        {/* Progress */}
+        {/* Progress Bar - Section Review Progress */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
           <ProgressBar
             current={reviewedSections.length}
@@ -1188,7 +1444,7 @@ export default function Lesson7Page() {
           />
         </div>
 
-        {/* Sections */}
+        {/* Lesson Sections - In Order of Instruction */}
         <IntroSection
           isReviewed={reviewedSections.includes("intro")}
           onMarkReviewed={handleMarkReviewed}
@@ -1244,7 +1500,7 @@ export default function Lesson7Page() {
           onMarkReviewed={handleMarkReviewed}
         />
 
-        {/* Practice */}
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-cyan-50 to-white">
             <div className="flex items-center gap-4">
@@ -1265,7 +1521,7 @@ export default function Lesson7Page() {
           </div>
         </div>
 
-        {/* Completion */}
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection practiceScore={practiceScore} />
         )}

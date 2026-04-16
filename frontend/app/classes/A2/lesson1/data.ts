@@ -1,9 +1,49 @@
+/**
+ * A2 Lesson 1 - Near Future (Futur Proche) Data
+ * ==============================================
+ *
+ * This file contains all lesson data for A2 Lesson 1, focusing on the near future
+ * tense using aller + infinitive (le futur proche).
+ *
+ * **Lesson Content:**
+ * - Conjugation of the verb "aller" (to go) in present tense
+ * - Formula: subject + aller + infinitive
+ * - Common infinitives used with aller
+ * - Present vs near future comparisons
+ * - Guided example sentences
+ * - Common beginner mistakes to avoid
+ * - 15 practice quiz questions
+ *
+ * **Data Categories:**
+ * 1. AllerForm / allerConjugation - Present tense conjugation table
+ * 2. Infinitive / commonInfinitives - Common verbs to use after aller
+ * 3. TenseComparison / tenseComparisons - Present vs near future examples
+ * 4. GuidedExample / guidedExamples - Full near future sentences
+ * 5. CommonMistake / commonMistakes - Incorrect vs correct examples
+ * 6. PracticeQuestion / practiceQuestions - 15 quiz questions
+ * 7. sectionIds / SectionId - Lesson section identifiers
+ * 8. getPerformanceMessage - Score-based feedback messages
+ */
+
+// =============================================================================
+// ALLER CONJUGATION
+// =============================================================================
+
+/**
+ * AllerForm - Represents a single conjugated form of "aller".
+ */
 export interface AllerForm {
   pronoun: string
   form: string
   full: string
 }
 
+/**
+ * allerConjugation - Present tense conjugation of "aller" (to go).
+ *
+ * Used in the conjugation section and as the foundation for forming
+ * the near future tense: aller + infinitive.
+ */
 export const allerConjugation: AllerForm[] = [
   { pronoun: "je", form: "vais", full: "je vais" },
   { pronoun: "tu", form: "vas", full: "tu vas" },
@@ -13,11 +53,24 @@ export const allerConjugation: AllerForm[] = [
   { pronoun: "ils / elles", form: "vont", full: "ils / elles vont" }
 ]
 
+// =============================================================================
+// COMMON INFINITIVES
+// =============================================================================
+
+/**
+ * Infinitive - Represents a French infinitive verb with English translation.
+ */
 export interface Infinitive {
   infinitive: string
   english: string
 }
 
+/**
+ * commonInfinitives - Common verbs frequently used after "aller".
+ *
+ * These are everyday actions that learners commonly talk about
+ * when expressing future intentions.
+ */
 export const commonInfinitives: Infinitive[] = [
   { infinitive: "manger", english: "to eat" },
   { infinitive: "parler", english: "to speak" },
@@ -31,6 +84,13 @@ export const commonInfinitives: Infinitive[] = [
   { infinitive: "voyager", english: "to travel" }
 ]
 
+// =============================================================================
+// PRESENT VS NEAR FUTURE COMPARISON
+// =============================================================================
+
+/**
+ * TenseComparison - Shows parallel present tense and near future sentences.
+ */
 export interface TenseComparison {
   present: string
   future: string
@@ -38,6 +98,13 @@ export interface TenseComparison {
   futureEnglish: string
 }
 
+/**
+ * tenseComparisons - Side-by-side examples of present vs near future.
+ *
+ * Helps learners understand the difference between:
+ * - Present: What is happening now (maintenant, aujourd'hui)
+ * - Near future: What is going to happen (bientôt, demain, ce soir)
+ */
 export const tenseComparisons: TenseComparison[] = [
   {
     present: "Je mange maintenant.",
@@ -59,11 +126,24 @@ export const tenseComparisons: TenseComparison[] = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * GuidedExample - A complete near future sentence with English translation.
+ */
 export interface GuidedExample {
   french: string
   english: string
 }
 
+/**
+ * guidedExamples - Full sentences demonstrating aller + infinitive.
+ *
+ * Covers all subject pronouns (je, tu, il/elle, nous, vous, elles)
+ * with common everyday actions.
+ */
 export const guidedExamples: GuidedExample[] = [
   { french: "Je vais étudier ce soir.", english: "I am going to study tonight." },
   { french: "Tu vas parler avec le professeur.", english: "You are going to speak with the teacher." },
@@ -73,12 +153,27 @@ export const guidedExamples: GuidedExample[] = [
   { french: "Elles vont voyager en France.", english: "They are going to travel in France." }
 ]
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * CommonMistake - An incorrect example with the correct form and explanation.
+ */
 export interface CommonMistake {
   wrong: string
   correct: string
   explanation: string
 }
 
+/**
+ * commonMistakes - Frequent errors learners make with the near future.
+ *
+ * Typical mistakes:
+ * - Conjugating the second verb instead of using infinitive
+ * - Incorrect agreement of aller with the subject
+ * - These help learners recognize and avoid common pitfalls
+ */
 export const commonMistakes: CommonMistake[] = [
   { wrong: "Je vais mange.", correct: "Je vais manger.", explanation: "After aller, use the infinitive." },
   { wrong: "Nous va partir.", correct: "Nous allons partir.", explanation: "Aller must agree with the subject." },
@@ -86,6 +181,13 @@ export const commonMistakes: CommonMistake[] = [
   { wrong: "Ils vont parlent.", correct: "Ils vont parler.", explanation: "Do not conjugate the second verb here." }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion - Multiple-choice question for the quiz.
+ */
 export interface PracticeQuestion {
   id: number
   topic: string
@@ -95,6 +197,15 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * practiceQuestions - 15 questions testing near future knowledge.
+ *
+ * Topic distribution:
+ * - structure (5): Formula and sentence construction
+ * - aller (4): Conjugation of aller with different subjects
+ * - meaning (4): Understanding near future translations
+ * - correction (2): Identifying and fixing common errors
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,
@@ -218,6 +329,23 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections in order:
+ * 1. intro - Introduction to near future concept
+ * 2. formula - Structure formula explanation
+ * 3. conjugation - Aller conjugation table
+ * 4. infinitives - Common infinitives to use
+ * 5. comparison - Present vs near future comparison
+ * 6. examples - Guided example sentences
+ * 7. mistakes - Common beginner mistakes
+ * 8. practice - Interactive practice quiz
+ */
 export const sectionIds = [
   'intro',
   'formula',
@@ -231,6 +359,13 @@ export const sectionIds = [
 
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * PerformanceMessage - Feedback message based on quiz performance.
+ */
 export interface PerformanceMessage {
   title: string
   message: string
@@ -238,6 +373,18 @@ export interface PerformanceMessage {
   color: 'green' | 'blue' | 'amber'
 }
 
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score thresholds:
+ * - ≥80% (12/15): "Great job!" - green, high tone
+ * - 47-79% (7-11/15): "Nice progress" - blue, medium tone
+ * - <47% (<7/15): "Good effort" - amber, low tone
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns PerformanceMessage with title, message, tone, and color
+ */
 export function getPerformanceMessage(score: number, total: number): PerformanceMessage {
   const percentage = (score / total) * 100
   

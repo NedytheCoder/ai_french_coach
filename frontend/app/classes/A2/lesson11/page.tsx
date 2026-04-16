@@ -1,27 +1,73 @@
+/**
+ * A2 Lesson 11 - Y and En (Pronoms Adverbiaux)
+ * =============================================
+ *
+ * This page teaches A2 learners how to use the French adverbial pronouns Y and En,
+ * including when to use each and how to position them in sentences.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to Y and En
+ * 2. WhatAreYEnSection - Understanding these pronouns
+ * 3. UnderstandingYSection - How to use Y (places, à + things)
+ * 4. UnderstandingEnSection - How to use En (de + things, quantities)
+ * 5. YVsEnSection - Comparing when to use each
+ * 6. PositionSection - Where to place Y and En in sentences
+ * 7. TensesSection - Usage in different tenses
+ * 8. GuidedExamplesSection - Full example sentences
+ * 9. MistakesSection - Common errors to avoid
+ * 10. PracticeSection - Interactive quiz (18 questions)
+ * 11. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Y replaces à + place/thing (not people)
+ * - En replaces de + thing, quantities, partitive articles
+ * - Both go before the verb (or auxiliary in passé composé)
+ * - For people, use stressed pronouns instead
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 18-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaLightbulb,
-  FaExchangeAlt,
-  FaMapMarkerAlt,
-  FaBox,
-  FaBalanceScale,
-  FaAlignLeft,
-  FaClock,
-  FaBookOpen,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaRedo,
-  FaArrowAltCircleRight,
-  FaInfoCircle,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaLightbulb,              // Introduction/tips
+  FaExchangeAlt,            // Exchange/comparison
+  FaMapMarkerAlt,           // Location (Y for places)
+  FaBox,                    // Object/container (En for quantities)
+  FaBalanceScale,           // Comparison Y vs En
+  FaAlignLeft,              // Position/alignment
+  FaClock,                  // Tenses/timing
+  FaBookOpen,               // Lesson content
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
+  FaInfoCircle,             // Additional info
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   yUses,
@@ -37,7 +83,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
-// Types
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -47,7 +99,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
-// Components
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -124,6 +195,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 11 badge
+ * - Main title: "Y and En"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-rose-500 to-pink-400 rounded-2xl p-8 text-white shadow-lg">
@@ -143,6 +223,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({
   current,
   total,
@@ -172,7 +259,18 @@ function ProgressBar({
   );
 }
 
-// Section Components
+// =============================================================================
+// SECTION COMPONENTS
+// =============================================================================
+
+/**
+ * WhatAreYEnSection - Introduction to Y and En pronouns.
+ *
+ * Content:
+ * - Definition of Y and En as adverbial pronouns
+ * - Quick overview of their uses
+ * - Why they are important in everyday French
+ */
 function WhatAreYEnSection({
   isReviewed,
   onMarkReviewed,
@@ -223,6 +321,15 @@ function WhatAreYEnSection({
   );
 }
 
+/**
+ * UnderstandingYSection - How to use the pronoun Y.
+ *
+ * Content:
+ * - Y replaces à + place (Je vais à Paris → J'y vais)
+ * - Y replaces à + thing/idea (Tu penses à ton travail → Tu y penses)
+ * - Y is NOT used for people after à
+ * - Common verbs that use Y (aller à, penser à, répondre à)
+ */
 function UnderstandingYSection({
   isReviewed,
   onMarkReviewed,
@@ -288,6 +395,15 @@ function UnderstandingYSection({
   );
 }
 
+/**
+ * UnderstandingEnSection - How to use the pronoun En.
+ *
+ * Content:
+ * - En replaces de + thing (Je parle de ce livre → J'en parle)
+ * - En replaces quantities (J'ai trois frères → J'en ai trois)
+ * - En replaces partitive articles (Tu veux du pain → J'en veux)
+ * - Common verbs that use En (parler de, avoir besoin de, rêver de)
+ */
 function UnderstandingEnSection({
   isReviewed,
   onMarkReviewed,
@@ -361,6 +477,14 @@ function UnderstandingEnSection({
   );
 }
 
+/**
+ * YVsEnSection - Comparing Y and En usage.
+ *
+ * Content:
+ * - Side-by-side examples showing when to use Y vs En
+ * - Key rule: à → Y, de → En
+ * - Visual comparison of similar contexts
+ */
 function YVsEnSection({
   isReviewed,
   onMarkReviewed,
@@ -428,6 +552,15 @@ function YVsEnSection({
   );
 }
 
+/**
+ * PositionSection - Where Y and En go in sentences.
+ *
+ * Content:
+ * - Both pronouns go before the conjugated verb
+ * - Position in passé composé (before auxiliary)
+ * - Position in near future (before infinitive)
+ * - Example positions in different contexts
+ */
 function PositionSection({
   isReviewed,
   onMarkReviewed,
@@ -480,6 +613,15 @@ function PositionSection({
   );
 }
 
+/**
+ * TensesSection - Usage of Y and En in different tenses.
+ *
+ * Content:
+ * - Present tense usage
+ * - Negation with Y and En
+ * - Near future (aller + infinitive)
+ * - Passé composé
+ */
 function TensesSection({
   isReviewed,
   onMarkReviewed,
@@ -530,6 +672,11 @@ function TensesSection({
   );
 }
 
+/**
+ * GuidedExamplesSection - Collection of example sentences for study.
+ *
+ * Various contexts showing Y and En in natural French conversations.
+ */
 function GuidedExamplesSection({
   isReviewed,
   onMarkReviewed,
@@ -566,6 +713,14 @@ function GuidedExamplesSection({
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Using wrong pronoun (Y vs En confusion)
+ * - Using Y/En for people instead of stressed pronouns
+ * - Wrong word order in different tenses
+ */
 function MistakesSection({
   isReviewed,
   onMarkReviewed,
@@ -615,6 +770,23 @@ function MistakesSection({
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for Lesson 11.
+ *
+ * Features:
+ * - 18 questions testing Y and En knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-17)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -882,6 +1054,17 @@ function PracticeSection({
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to B1 lessons (next level)
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({
   practiceScore,
 }: {
@@ -932,16 +1115,41 @@ function CompletionSection({
   );
 }
 
-// Main Page Component
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson11Page - Main component for A2 Lesson 11.
+ *
+ * Manages:
+ * - Section review state (which sections have been reviewed)
+ * - Practice quiz answers and score
+ * - Lesson completion status
+ * - Progress persistence to localStorage
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson11Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Practice answers map (questionId -> selectedOption)
   const [practiceAnswers, setPracticeAnswers] = useState<Record<number, number>>({});
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether entire lesson is marked complete
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
-  // Load progress from localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson11Progress");
@@ -959,7 +1167,9 @@ export default function Lesson11Page() {
     }
   }, []);
 
-  // Save progress to localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(
@@ -975,23 +1185,44 @@ export default function Lesson11Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, practiceScore, lessonCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => {
     setReviewedSections((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
   };
 
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => {
     setPracticeScore(score);
     setPracticeCompleted(true);
   };
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => {
     const totalSections = sectionIds.length;
     const completed = reviewedSections.length;
     return Math.round((completed / totalSections) * 100);
   }, [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 to-slate-50 flex items-center justify-center">
@@ -1003,7 +1234,7 @@ export default function Lesson11Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Navigation */}
+        {/* Back Navigation */}
         <div className="flex items-center gap-4">
           <Link
             href="/classes/A2"
@@ -1014,10 +1245,10 @@ export default function Lesson11Page() {
           </Link>
         </div>
 
-        {/* Header */}
+        {/* Lesson Header */}
         <LessonHeader />
 
-        {/* Progress */}
+        {/* Progress Bar - Section Review Progress */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
           <ProgressBar
             current={reviewedSections.length}
@@ -1026,7 +1257,7 @@ export default function Lesson11Page() {
           />
         </div>
 
-        {/* Sections */}
+        {/* Lesson Sections - In Order of Instruction */}
         <WhatAreYEnSection
           isReviewed={reviewedSections.includes("what-are-y-en")}
           onMarkReviewed={handleMarkReviewed}
@@ -1067,7 +1298,7 @@ export default function Lesson11Page() {
           onMarkReviewed={handleMarkReviewed}
         />
 
-        {/* Practice */}
+        {/* Practice Section - 18 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-rose-50 to-white">
             <div className="flex items-center gap-4">
@@ -1088,7 +1319,7 @@ export default function Lesson11Page() {
           </div>
         </div>
 
-        {/* Completion */}
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection practiceScore={practiceScore} />
         )}

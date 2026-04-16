@@ -1,4 +1,41 @@
+/**
+ * B2 Shared Components
+ * =====================
+ *
+ * This file contains shared React components used across all B2 (Upper Intermediate)
+ * French lessons. These components provide a sophisticated, consistent UI for
+ * advanced French language learning content.
+ *
+ * **Components:**
+ * 1. SectionCard - Collapsible lesson section with review marking
+ * 2. ProgressBar - Visual progress indicator
+ * 3. PracticeSection - Interactive 15-question quiz
+ * 4. CompletionSection - Lesson completion celebration
+ * 5. LessonNav - Navigation back to B2 lessons
+ * 6. LessonHeader - B2 lesson header with accent color
+ * 7. AnalysisCard - Text analysis display (B2 specific)
+ * 8. ComparisonCard - Side-by-side comparison (B2 specific)
+ * 9. QuoteCard - Quote/example display with context (B2 specific)
+ *
+ * **Features:**
+ * - Sophisticated color palette (slate, stone, amber, teal, indigo, etc.)
+ * - Framer Motion animations for smooth interactions
+ * - Consistent B2 styling with rounded corners and gradients
+ * - Accessibility support with ARIA attributes
+ * - Responsive design for all screen sizes
+ *
+ * **B2 Specific Features:**
+ * - AnalysisCard for literary/linguistic analysis
+ * - ComparisonCard for contrasting concepts
+ * - QuoteCard for authentic French text examples
+ * - More sophisticated feedback messages in practice
+ */
+
 "use client";
+
+// =============================================================================
+// IMPORTS
+// =============================================================================
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,34 +57,79 @@ import {
   FaComments,
 } from "react-icons/fa";
 
-// Types
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
+/**
+ * SectionCardProps - Props for the SectionCard component.
+ */
 export interface SectionCardProps {
+  /** Unique section identifier */
   id: string;
+  /** Section title */
   title: string;
+  /** Icon component to display */
   icon: React.ElementType;
+  /** Section content */
   children: React.ReactNode;
+  /** Whether section has been reviewed */
   isReviewed: boolean;
+  /** Callback when section is marked reviewed */
   onMarkReviewed: (id: string) => void;
+  /** Accent color theme */
   accentColor?: string;
 }
 
+/**
+ * PracticeQuestion - Single quiz question structure.
+ */
 export interface PracticeQuestion {
+  /** Question ID */
   id: number;
+  /** Topic/category for grouping */
   topic: string;
+  /** Question text */
   prompt: string;
+  /** Array of 3 answer options */
   options: string[];
+  /** Index of correct answer (0-2) */
   correct: number;
+  /** Explanation for correct answer */
   explanation: string;
 }
 
+/**
+ * PerformanceMessage - Feedback structure for quiz completion.
+ */
 export interface PerformanceMessage {
+  /** Feedback title (e.g., "Great job") */
   title: string;
+  /** Detailed feedback message */
   message: string;
+  /** Emoji for visual feedback */
   emoji: string;
+  /** Color theme for feedback */
   color: "blue" | "yellow" | "green";
 }
 
-// Color schemes for B2 (more sophisticated palette)
+// =============================================================================
+// COLOR SCHEMES
+// =============================================================================
+
+/**
+ * colorClasses - Sophisticated color palette for B2 lessons.
+ *
+ * Each color includes:
+ * - bg: Background gradient classes
+ * - border: Border color class
+ * - button: Button background/text classes
+ * - buttonHover: Button hover state classes
+ * - text: Text color class
+ * - gradient: Gradient background classes
+ *
+ * Available colors: slate, zinc, stone, neutral, orange, amber, yellow, lime,
+ * green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose
+ */
 const colorClasses: Record<string, { bg: string; border: string; button: string; buttonHover: string; text: string; gradient: string }> = {
   slate: { bg: "from-slate-50 to-white", border: "border-slate-200", button: "bg-slate-100 text-slate-700", buttonHover: "hover:bg-slate-200", text: "text-slate-800", gradient: "from-slate-600 to-slate-400" },
   zinc: { bg: "from-zinc-50 to-white", border: "border-zinc-200", button: "bg-zinc-100 text-zinc-700", buttonHover: "hover:bg-zinc-200", text: "text-zinc-800", gradient: "from-zinc-600 to-zinc-400" },
@@ -71,7 +153,23 @@ const colorClasses: Record<string, { bg: string; border: string; button: string;
   rose: { bg: "from-rose-50 to-white", border: "border-rose-200", button: "bg-rose-100 text-rose-700", buttonHover: "hover:bg-rose-200", text: "text-rose-800", gradient: "from-rose-600 to-rose-400" },
 };
 
-// Shared Section Card Component (B2 style - more sophisticated)
+// =============================================================================
+// SECTION CARD COMPONENT
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible lesson section with review marking.
+ *
+ * Features:
+ * - Animated expand/collapse with Framer Motion
+ * - Icon header with accent color gradient
+ * - "Mark as reviewed" button when not reviewed
+ * - "Reviewed" badge when section is complete
+ * - Accessible with ARIA expanded attribute
+ *
+ * @param props - SectionCardProps
+ * @returns JSX.Element - Collapsible section card
+ */
 export function SectionCard({
   id,
   title,
@@ -143,7 +241,24 @@ export function SectionCard({
   );
 }
 
-// Progress Bar Component
+// =============================================================================
+// PROGRESS BAR COMPONENT
+// =============================================================================
+
+/**
+ * ProgressBar - Visual progress indicator for lesson completion.
+ *
+ * Features:
+ * - Animated width transition
+ * - Percentage label
+ * - Customizable accent color
+ *
+ * @param current - Number of completed items
+ * @param total - Total number of items
+ * @param label - Progress bar label
+ * @param accentColor - Color theme
+ * @returns JSX.Element - Progress bar
+ */
 export function ProgressBar({ current, total, label, accentColor = "slate" }: { current: number; total: number; label: string; accentColor?: string }) {
   const percentage = Math.round((current / total) * 100);
   const colors = colorClasses[accentColor] || colorClasses.slate;
@@ -166,16 +281,43 @@ export function ProgressBar({ current, total, label, accentColor = "slate" }: { 
   );
 }
 
-// Practice Section Component
+// =============================================================================
+// PRACTICE SECTION COMPONENT
+// =============================================================================
+
+/**
+ * PracticeSectionProps - Props for the PracticeSection component.
+ */
 interface PracticeSectionProps {
+  /** Array of quiz questions */
   questions: PracticeQuestion[];
+  /** Whether practice has been reviewed */
   isReviewed: boolean;
+  /** Callback to mark practice as reviewed */
   onMarkReviewed: (id: string) => void;
+  /** Callback when quiz is completed with final score */
   onComplete: (score: number) => void;
+  /** Function to get performance message based on score */
   getPerformanceMessage: (score: number, total: number) => PerformanceMessage;
+  /** Accent color theme */
   accentColor?: string;
 }
 
+/**
+ * PracticeSection - Interactive 15-question quiz component.
+ *
+ * Features:
+ * - Multiple choice questions with 3 options
+ * - Animated question transitions
+ * - Immediate feedback after submitting
+ * - Score tracking
+ * - Results screen with performance message
+ * - Retake option
+ * - Sophisticated feedback messages for B2 level
+ *
+ * @param props - PracticeSectionProps
+ * @returns JSX.Element - Quiz interface
+ */
 export function PracticeSection({
   questions,
   isReviewed,
@@ -305,17 +447,44 @@ export function PracticeSection({
   );
 }
 
-// Completion Section Component
+// =============================================================================
+// COMPLETION SECTION COMPONENT
+// =============================================================================
+
+/**
+ * CompletionSectionProps - Props for the CompletionSection component.
+ */
 interface CompletionSectionProps {
+  /** Lesson number */
   lessonNumber: number;
+  /** Lesson title */
   lessonTitle: string;
+  /** Final practice score */
   practiceScore: number;
+  /** Total number of questions */
   totalQuestions: number;
+  /** Path to next lesson */
   nextLessonPath: string;
+  /** Array of recap items to display */
   recapItems: string[];
+  /** Accent color theme */
   accentColor?: string;
 }
 
+/**
+ * CompletionSection - Lesson completion celebration component.
+ *
+ * Features:
+ * - Trophy icon with gradient background
+ * - Lesson completion message
+ * - Practice score display
+ * - Recap list of mastered concepts
+ * - Link to next lesson
+ * - Animated entrance with Framer Motion
+ *
+ * @param props - CompletionSectionProps
+ * @returns JSX.Element - Completion celebration
+ */
 export function CompletionSection({ lessonNumber, lessonTitle, practiceScore, totalQuestions, nextLessonPath, recapItems, accentColor = "slate" }: CompletionSectionProps) {
   const colors = colorClasses[accentColor] || colorClasses.slate;
 
@@ -338,7 +507,17 @@ export function CompletionSection({ lessonNumber, lessonTitle, practiceScore, to
   );
 }
 
-// Navigation Header Component
+// =============================================================================
+// NAVIGATION COMPONENTS
+// =============================================================================
+
+/**
+ * LessonNav - Navigation back to B2 lessons.
+ *
+ * @param backPath - URL path for back navigation
+ * @param backLabel - Label for back button
+ * @returns JSX.Element - Navigation link
+ */
 export function LessonNav({ backPath, backLabel = "Back to B2 Lessons" }: { backPath: string; backLabel?: string }) {
   return (
     <div className="flex items-center gap-4">
@@ -349,14 +528,32 @@ export function LessonNav({ backPath, backLabel = "Back to B2 Lessons" }: { back
   );
 }
 
-// B2 Lesson Header Component
+/**
+ * LessonHeaderProps - Props for the LessonHeader component.
+ */
 interface LessonHeaderProps {
+  /** Lesson number */
   lessonNumber: number;
+  /** Lesson title */
   title: string;
+  /** Lesson subtitle/description */
   subtitle: string;
+  /** Accent color theme */
   accentColor?: string;
 }
 
+/**
+ * LessonHeader - B2 lesson header with accent color.
+ *
+ * Features:
+ * - Gradient background based on accent color
+ * - Lesson number badge
+ * - Title and subtitle display
+ * - Responsive text sizing
+ *
+ * @param props - LessonHeaderProps
+ * @returns JSX.Element - Lesson header
+ */
 export function LessonHeader({ lessonNumber, title, subtitle, accentColor = "slate" }: LessonHeaderProps) {
   const colors = colorClasses[accentColor] || colorClasses.slate;
   
@@ -371,13 +568,34 @@ export function LessonHeader({ lessonNumber, title, subtitle, accentColor = "sla
   );
 }
 
-// Analysis Card Component (B2 specific)
+// =============================================================================
+// B2 SPECIFIC COMPONENTS
+// =============================================================================
+
+/**
+ * AnalysisCardProps - Props for the AnalysisCard component.
+ */
 interface AnalysisCardProps {
+  /** Card title */
   title: string;
+  /** Analysis content text */
   content: string;
+  /** Accent color theme */
   accentColor?: string;
 }
 
+/**
+ * AnalysisCard - Text analysis display component (B2 specific).
+ *
+ * Features:
+ * - Pen fancy icon header
+ * - Gradient background
+ * - Used for literary/linguistic analysis
+ * - Sophisticated styling for advanced content
+ *
+ * @param props - AnalysisCardProps
+ * @returns JSX.Element - Analysis card
+ */
 export function AnalysisCard({ title, content, accentColor = "slate" }: AnalysisCardProps) {
   const colors = colorClasses[accentColor] || colorClasses.slate;
   
@@ -391,13 +609,30 @@ export function AnalysisCard({ title, content, accentColor = "slate" }: Analysis
   );
 }
 
-// Comparison Card Component (B2 specific)
+/**
+ * ComparisonCardProps - Props for the ComparisonCard component.
+ */
 interface ComparisonCardProps {
+  /** Card title */
   title: string;
+  /** Array of comparison items with label and content */
   items: { label: string; content: string }[];
+  /** Accent color theme */
   accentColor?: string;
 }
 
+/**
+ * ComparisonCard - Side-by-side comparison component (B2 specific).
+ *
+ * Features:
+ * - Balance scale icon header
+ * - Divided list layout
+ * - Used for contrasting concepts or usages
+ * - Label and content pairs
+ *
+ * @param props - ComparisonCardProps
+ * @returns JSX.Element - Comparison card
+ */
 export function ComparisonCard({ title, items, accentColor = "slate" }: ComparisonCardProps) {
   const colors = colorClasses[accentColor] || colorClasses.slate;
   
@@ -420,14 +655,33 @@ export function ComparisonCard({ title, items, accentColor = "slate" }: Comparis
   );
 }
 
-// Quote/Example Card Component (B2 specific)
+/**
+ * QuoteCardProps - Props for the QuoteCard component.
+ */
 interface QuoteCardProps {
+  /** Quote or example text */
   quote: string;
+  /** Optional source attribution */
   source?: string;
+  /** Optional context explanation */
   context?: string;
+  /** Accent color theme */
   accentColor?: string;
 }
 
+/**
+ * QuoteCard - Quote/example display with context (B2 specific).
+ *
+ * Features:
+ * - Quote left icon with decorative styling
+ * - Italicized quote text
+ * - Optional source attribution
+ * - Optional context explanation
+ * - Used for authentic French text examples
+ *
+ * @param props - QuoteCardProps
+ * @returns JSX.Element - Quote card
+ */
 export function QuoteCard({ quote, source, context, accentColor = "slate" }: QuoteCardProps) {
   const colors = colorClasses[accentColor] || colorClasses.slate;
   
@@ -441,5 +695,11 @@ export function QuoteCard({ quote, source, context, accentColor = "slate" }: Quo
   );
 }
 
-// Re-export all icons for convenience
+// =============================================================================
+// ICON RE-EXPORTS
+// =============================================================================
+
+/**
+ * Re-export commonly used icons for convenience in B2 lessons.
+ */
 export { FaGraduationCap, FaBookOpen, FaBalanceScale, FaExclamationTriangle, FaLightbulb, FaQuoteLeft, FaPenFancy, FaComments };

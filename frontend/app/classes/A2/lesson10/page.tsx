@@ -1,26 +1,72 @@
+/**
+ * A2 Lesson 10 - The Present Conditional (Le Conditionnel Présent)
+ * ===================================================================
+ *
+ * This page teaches A2 learners how to use the present conditional in French
+ * for polite requests, wishes, hypothetical situations, and soft advice.
+ *
+ * **Lesson Structure:**
+ * 1. WhatIsConditionalSection - Introduction to the conditional
+ * 2. WhenToUseSection - Appropriate contexts (polite requests, wishes, advice)
+ * 3. FormationSection - How to form: future stem + imparfait endings
+ * 4. EndingsSection - The imparfait endings used (-ais, -ait, -ions, -iez, -aient)
+ * 5. RegularVerbsSection - Common regular verb conjugations
+ * 6. IrregularStemsSection - Common irregular stems (être→ser-, avoir→aur-, etc.)
+ * 7. VsFuturSection - Distinguishing conditional from futur simple
+ * 8. GuidedExamplesSection - Full example sentences
+ * 9. MistakesSection - Common errors to avoid
+ * 10. PracticeSection - Interactive quiz (15 questions)
+ * 11. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Formation: future stem + imparfait endings
+ * - Often corresponds to "would" in English
+ * - Used for: polite requests, wishes, hypothetical situations, advice
+ * - Irregular stems must be memorized
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 15-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaLightbulb,
-  FaClock,
-  FaCogs,
-  FaTable,
-  FaBolt,
-  FaBalanceScale,
-  FaBookOpen,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaRedo,
-  FaArrowAltCircleRight,
-  FaInfoCircle,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaLightbulb,              // Introduction/tips
+  FaClock,                  // Time/usage contexts
+  FaCogs,                   // Formation/settings
+  FaTable,                  // Tables/endings
+  FaBolt,                   // Irregular verbs
+  FaBalanceScale,           // Comparisons
+  FaBookOpen,               // Lesson content
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
+  FaInfoCircle,             // Additional info
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   conditionalUses,
@@ -35,7 +81,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
-// Types
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -45,7 +97,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
-// Components
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -122,6 +193,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 10 badge
+ * - Main title: "The Present Conditional"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-teal-500 to-cyan-400 rounded-2xl p-8 text-white shadow-lg">
@@ -141,6 +221,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({
   current,
   total,
@@ -170,7 +257,18 @@ function ProgressBar({
   );
 }
 
-// Section Components
+// =============================================================================
+// SECTION COMPONENTS
+// =============================================================================
+
+/**
+ * WhatIsConditionalSection - Introduction to the present conditional.
+ *
+ * Content:
+ * - Definition of the conditional (would, would like, could)
+ * - Example sentences showing conditional forms
+ * - Key points about polite French and imagined situations
+ */
 function WhatIsConditionalSection({
   isReviewed,
   onMarkReviewed,
@@ -233,6 +331,15 @@ function WhatIsConditionalSection({
   );
 }
 
+/**
+ * WhenToUseSection - Appropriate contexts for the conditional.
+ *
+ * Content:
+ * - Polite requests (Je voudrais...)
+ * - Wishes or desires (J'aimerais...)
+ * - Hypothetical situations
+ * - Soft suggestions or advice (Tu devrais...)
+ */
 function WhenToUseSection({
   isReviewed,
   onMarkReviewed,
@@ -267,6 +374,14 @@ function WhenToUseSection({
   );
 }
 
+/**
+ * FormationSection - How to form the present conditional.
+ *
+ * Content:
+ * - Formation rule: future stem + imparfait endings
+ * - Step-by-step explanation
+ * - Examples showing the pattern
+ */
 function FormationSection({
   isReviewed,
   onMarkReviewed,
@@ -324,6 +439,14 @@ function FormationSection({
   );
 }
 
+/**
+ * EndingsSection - The imparfait endings used in conditional.
+ *
+ * Content:
+ * - Table of endings (-ais, -ais, -ait, -ions, -iez, -aient)
+ * - Corresponding pronouns
+ * - Example conjugations
+ */
 function EndingsSection({
   isReviewed,
   onMarkReviewed,
@@ -375,6 +498,13 @@ function EndingsSection({
   );
 }
 
+/**
+ * RegularVerbsSection - Common regular verbs in conditional.
+ *
+ * Content:
+ * - parler, finir, travailler, étudier, manger, habiter, vendre, attendre
+ * - Shows infinitive and je form for each
+ */
 function RegularVerbsSection({
   isReviewed,
   onMarkReviewed,
@@ -412,6 +542,14 @@ function RegularVerbsSection({
   );
 }
 
+/**
+ * IrregularStemsSection - Common irregular conditional stems.
+ *
+ * Content:
+ * - être → ser-, avoir → aur-, aller → ir-, faire → fer-
+ * - venir → viendr-, voir → verr-, vouloir → voudr-
+ * - pouvoir → pourr-, devoir → devr-, savoir → saur-
+ */
 function IrregularStemsSection({
   isReviewed,
   onMarkReviewed,
@@ -461,6 +599,14 @@ function IrregularStemsSection({
   );
 }
 
+/**
+ * VsFuturSection - Distinguishing conditional from futur simple.
+ *
+ * Content:
+ * - Side-by-side comparison of future and conditional
+ * - Future: real action (will)
+ * - Conditional: imagined action (would)
+ */
 function VsFuturSection({
   isReviewed,
   onMarkReviewed,
@@ -523,6 +669,11 @@ function VsFuturSection({
   );
 }
 
+/**
+ * GuidedExamplesSection - Collection of example sentences for study.
+ *
+ * Various contexts showing conditional in everyday French.
+ */
 function GuidedExamplesSection({
   isReviewed,
   onMarkReviewed,
@@ -561,6 +712,14 @@ function GuidedExamplesSection({
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Confusing future and conditional
+ * - Wrong irregular stems
+ * - Wrong endings
+ */
 function MistakesSection({
   isReviewed,
   onMarkReviewed,
@@ -610,6 +769,23 @@ function MistakesSection({
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for Lesson 10.
+ *
+ * Features:
+ * - 15 questions testing conditional knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-14)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -877,6 +1053,17 @@ function PracticeSection({
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to next lesson
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({
   practiceScore,
 }: {
@@ -927,8 +1114,10 @@ function CompletionSection({
   );
 }
 
-// Main Page Component
 export default function Lesson10Page() {
+  // ---------------------------------------------------------------------------
+  // STATE: Section Review Tracking
+  // ---------------------------------------------------------------------------
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
   const [practiceAnswers, setPracticeAnswers] = useState<Record<number, number>>({});
   const [practiceCompleted, setPracticeCompleted] = useState(false);
@@ -936,7 +1125,9 @@ export default function Lesson10Page() {
   const [lessonCompleted, setLessonCompleted] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
-  // Load progress from localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson10Progress");
@@ -954,7 +1145,9 @@ export default function Lesson10Page() {
     }
   }, []);
 
-  // Save progress to localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(
@@ -970,23 +1163,35 @@ export default function Lesson10Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, practiceScore, lessonCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Mark Section Reviewed
+  // ---------------------------------------------------------------------------
   const handleMarkReviewed = (id: string) => {
     setReviewedSections((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
   };
 
-  const handlePracticeComplete = (score: number) => {
-    setPracticeScore(score);
-    setPracticeCompleted(true);
-  };
-
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
   const progress = useMemo(() => {
     const totalSections = sectionIds.length;
     const completed = reviewedSections.length;
     return Math.round((completed / totalSections) * 100);
   }, [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Complete Lesson
+  // ---------------------------------------------------------------------------
+  const handlePracticeComplete = (score: number) => {
+    setPracticeScore(score);
+    setPracticeCompleted(true);
+  };
+
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-50 to-slate-50 flex items-center justify-center">

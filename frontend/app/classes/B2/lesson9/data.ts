@@ -1,12 +1,86 @@
-// B2 Lesson 9 — Advanced Pronoun System
+/**
+ * B2 Lesson 9 - Advanced Pronoun System
+ * =======================================
+ *
+ * This file contains all lesson data for B2 Lesson 9, teaching the complete
+ * French pronoun system including double object pronouns, y, en, and
+ * sophisticated ordering rules.
+ *
+ * **Lesson Content:**
+ * - Introduction: The pronoun matrix and pronouns as cohesion
+ * - Double object pronouns: Strict order based on grammatical function
+ * - Pronoun position: Affirmative, negative, imperative rules
+ * - Y and en: Adverbial pronouns for à + place/thing and de + thing/quantity
+ * - Complex combinations: Three or more pronouns
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Order rule: me/te/se/nous/vous → le/la/les → lui/leur → y → en
+ * - 3rd person order flips: Direct (le/la/les) before indirect (lui/leur)
+ * - Y replaces à + place/thing; en replaces de + thing/quantity
+ * - Imperative affirmative: Pronouns after verb with hyphens (me → moi, te → toi)
+ * - Imperative negative: Normal position before verb
+ * - Elision: Le + en → l'en
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. lessonMeta - Lesson metadata (title, subtitle, number)
+ * 3. introSections - Introduction to pronoun system
+ * 4. doubleObjectSection - Double object pronoun order
+ * 5. positionSection - Pronoun position rules
+ * 6. yEnSection - Y and en usage
+ * 7. advancedOrderSection - Complex pronoun combinations
+ * 8. practiceQuestions - 15 quiz questions
+ * 9. getPerformanceMessage - Score-based feedback
+ */
+
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to pronoun matrix
+ * 2. double-object - Double object pronouns
+ * 3. position - Pronoun position rules
+ * 4. y-en - Y and en adverbial pronouns
+ * 5. advanced-order - Complex combinations
+ * 6. emphasis - Emphasis structures (if applicable)
+ * 7. stylistic - Stylistic usage (if applicable)
+ * 8. practice - Interactive quiz
+ * 9. completion - Lesson completion
+ */
 export const sectionIds = ["intro", "double-object", "position", "y-en", "advanced-order", "emphasis", "stylistic", "practice", "completion"];
 
+// =============================================================================
+// LESSON METADATA
+// =============================================================================
+
+/**
+ * lessonMeta - Lesson metadata for display in headers and navigation.
+ */
 export const lessonMeta = {
+  /** Lesson title */
   title: "Advanced Pronoun System",
+  /** Brief description of lesson content */
   subtitle: "Master double object pronouns, y and en in all positions, and sophisticated pronoun ordering for elegant French expression.",
+  /** Lesson number in B2 series */
   lessonNumber: 9,
 };
 
+// =============================================================================
+// INTRODUCTION SECTIONS
+// =============================================================================
+
+/**
+ * introSections - Introduction to the advanced pronoun system.
+ *
+ * Content:
+ * - The Pronoun Matrix: Combining pronouns efficiently with strict order
+ * - Pronouns as Cohesion: Creating fluid, sophisticated sentences
+ */
 export const introSections = [
   {
     title: "The Pronoun Matrix",
@@ -18,6 +92,22 @@ export const introSections = [
   },
 ];
 
+// =============================================================================
+// DOUBLE OBJECT SECTION
+// =============================================================================
+
+/**
+ * doubleObjectSection - Double object pronouns and their strict order.
+ *
+ * Order rule: me/te/se/nous/vous → le/la/les → lui/leur → y → en
+ *
+ * Examples:
+ * - me + le: Il me le donne (indirect + direct)
+ * - te + la: Elle te la montre (indirect + direct)
+ * - le + lui: Je le lui donne (direct + indirect - 3rd person flips)
+ * - lui + y: Il y lui répond (indirect + location)
+ * - le + en: Je l'en prie (direct + quantity, with elision)
+ */
 export const doubleObjectSection = {
   title: "Double Object Pronouns",
   explanation: "When two pronouns combine, they follow a strict order based on grammatical function.",
@@ -32,6 +122,22 @@ export const doubleObjectSection = {
   ],
 };
 
+// =============================================================================
+// POSITION SECTION
+// =============================================================================
+
+/**
+ * positionSection - Pronoun position rules by sentence type.
+ *
+ * Positions:
+ * - Affirmative: Before conjugated verb (Je le lui donne)
+ * - Infinitive: Before infinitive (Je vais le lui donner)
+ * - Negative: Before verb, same position (Je ne le lui donne pas)
+ * - Imperative affirmative: After verb with hyphen (Donne-le-moi!)
+ * - Imperative negative: Before verb, normal position (Ne me le donne pas)
+ *
+ * Imperative note: me → moi, te → toi after imperative; keep hyphen
+ */
 export const positionSection = {
   title: "Pronoun Position: Affirmative, Negative, Imperative",
   explanation: "Pronoun position changes based on sentence type.",
@@ -45,6 +151,26 @@ export const positionSection = {
   imperativeNote: "me → moi after imperative; te → toi; keep hyphen",
 };
 
+// =============================================================================
+// Y AND EN SECTION
+// =============================================================================
+
+/**
+ * yEnSection - Y and en: Adverbial pronouns.
+ *
+ * Y replaces à + place/thing:
+ * - À + place: Je vais à Paris → J'y vais
+ * - À + thing (non-person): Je pense à ce problème → J'y pense
+ * - In + location: Il est dans la maison → Il y est
+ *
+ * En replaces de + thing/quantity:
+ * - De + thing: Je parle de ce livre → J'en parle
+ * - Partitive (some/any): Je veux du pain → J'en veux
+ * - Number + de: J'ai trois livres → J'en ai trois
+ * - Adverbial de: Je viens de France → J'en viens
+ *
+ * Together: Il y en a (There are some) - Y before en
+ */
 export const yEnSection = {
   title: "Y and En: Adverbial Pronouns",
   explanation: "Y replaces à + place/thing; en replaces de + thing/quantity. They follow all other pronouns.",
@@ -62,6 +188,22 @@ export const yEnSection = {
   together: "Il y en a. (There are some.) - Y and en can coexist with y first.",
 };
 
+// =============================================================================
+// ADVANCED ORDER SECTION
+// =============================================================================
+
+/**
+ * advancedOrderSection - Complex pronoun combinations.
+ *
+ * Three or more pronouns create sophisticated constructions:
+ * - me + le + lui: Il me le lui donne (me 1st, le 2nd, lui 3rd)
+ * - le + en: Je l'en prie (le + en with elision)
+ * - y + en: Il y en a (y before en)
+ *
+ * Tricky cases:
+ * - Imperative with moi/toi: Donne-le-moi! (me → moi)
+ * - Neuter le: Je le sais (le = the fact, not replaceable)
+ */
 export const advancedOrderSection = {
   title: "Complex Pronoun Combinations",
   explanation: "Three or more pronouns create sophisticated but precise constructions.",
@@ -76,6 +218,38 @@ export const advancedOrderSection = {
   ],
 };
 
+// =============================================================================
+// PRACTICE QUESTIONS - 15 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for B2 Lesson 9.
+ *
+ * Topics covered:
+ * - order (1): Indirect before direct (me + le)
+ * - 3rd-person (2): Direct before indirect for 3rd person (le + lui)
+ * - y (3): Y = à + place
+ * - en (4): En = de + thing
+ * - imperative (5): After imperative with hyphen (Donne-le-moi!)
+ * - imperative-negative (6): Negative imperative normal position
+ * - infinitive (7): Pronouns before infinitive
+ * - en-quantity (8): En + number for quantity
+ * - y-en (9): Y before en (Il y en a)
+ * - partitive (10): En = partitive
+ * - elision (11): Le + en → l'en
+ * - neuter (12): Le as neuter (fact/truth)
+ * - lui-leur (13): Lui/leur = indirect, people only
+ * - moi-toi (14): After affirmative imperative, me → moi
+ * - y-location (15): Y replaces à + place
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text with fill-in-the-blank or translation
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   { id: 1, topic: "order", prompt: "'Il _____ donne' (me + le)", options: ["me le", "le me", "m'en"], correct: 0, explanation: "Indirect before direct: me + le" },
   { id: 2, topic: "3rd-person", prompt: "'Je _____ donne' (le + lui)", options: ["le lui", "lui le", "le leur"], correct: 0, explanation: "Direct before indirect for 3rd person" },
@@ -94,6 +268,24 @@ export const practiceQuestions = [
   { id: 15, topic: "y-location", prompt: "Y replaces:", options: ["À + place", "De + thing", "Direct object"], correct: 0, explanation: "Y = à + place/thing" },
 ];
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/15: "Good effort" - suggests focusing on pronoun order sequence
+ *   (indirect 1st/2nd → direct → indirect 3rd → y → en)
+ * - 8-11/15: "Nice progress" - encourages focusing on imperative position
+ *   and elision rules
+ * - 12-15/15: "Excellent command" - celebrates complex pronoun mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) return { title: "Good effort", message: "Pronoun order takes practice. Focus on the sequence: indirect (1st/2nd) → direct → indirect (3rd) → y → en.", emoji: "📚", color: "blue" as const };
   if (score <= 11) return { title: "Nice progress", message: "You are mastering pronoun combinations. Focus on imperative position and elision rules.", emoji: "🎯", color: "yellow" as const };

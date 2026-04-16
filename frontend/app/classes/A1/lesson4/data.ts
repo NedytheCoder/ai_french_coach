@@ -1,3 +1,39 @@
+/**
+ * A1 Lesson 4 - French Prepositions Data
+ * ======================================
+ *
+ * This file contains all lesson data for A1 Lesson 4, focusing on French prepositions.
+ * Prepositions are small but essential words that connect parts of sentences and show
+ * relationships between words (location, movement, origin, time).
+ *
+ * Data Categories:
+ * ----------------
+ * 1. Core Prepositions (8 items) - à, de, dans, sur, sous, avec, pour, en
+ * 2. Verb-Preposition Patterns (8 items) - Common verb+preposition combinations
+ * 3. Guided Examples (8 items) - Annotated example sentences with audio
+ * 4. Practice Questions (16 items) - Multiple choice questions by topic
+ *
+ * Practice Topics:
+ * ----------------
+ * - meaning: Preposition meanings and translations
+ * - completion: Fill-in-the-blank sentence completion
+ * - verb-pattern: Verb + preposition combinations
+ * - contraction: à/de + article contractions (au, aux, du, des)
+ */
+
+// =============================================================================
+// CORE PREPOSITIONS
+// =============================================================================
+
+/**
+ * Core prepositions array - 8 essential French prepositions for A1 learners.
+ * Each preposition includes:
+ * - prep: The French preposition
+ * - english: English translation(s)
+ * - example: Example sentence demonstrating usage
+ * - phonetic: Pronunciation guide in IPA-like notation
+ * - audioSrc: Path to audio pronunciation file
+ */
 export const prepositions = [
   { prep: "à", english: "to / at", example: "Je vais à Paris.", phonetic: "ah", audioSrc: "/audio/a1/prepositions/a.mp3" },
   { prep: "de", english: "from / of", example: "Je viens de France.", phonetic: "duh", audioSrc: "/audio/a1/prepositions/de.mp3" },
@@ -5,10 +41,24 @@ export const prepositions = [
   { prep: "sur", english: "on", example: "Le livre est sur la table.", phonetic: "soor", audioSrc: "/audio/a1/prepositions/sur.mp3" },
   { prep: "sous", english: "under", example: "Le sac est sous la table.", phonetic: "soo", audioSrc: "/audio/a1/prepositions/sous.mp3" },
   { prep: "avec", english: "with", example: "Je parle avec Marie.", phonetic: "ah-vek", audioSrc: "/audio/a1/prepositions/avec.mp3" },
-  { prep: "pour", english: "for", example: "C’est pour toi.", phonetic: "poor", audioSrc: "/audio/a1/prepositions/pour.mp3" },
+  { prep: "pour", english: "for", example: "C'est pour toi.", phonetic: "poor", audioSrc: "/audio/a1/prepositions/pour.mp3" },
   { prep: "en", english: "in / by", example: "Je vais en France.", phonetic: "ahn", audioSrc: "/audio/a1/prepositions/en.mp3" }
 ]
 
+// =============================================================================
+// VERB-PREPOSITION PATTERNS
+// =============================================================================
+
+/**
+ * Verb-preposition pattern combinations - 8 common French verb+preposition pairs.
+ * These are best learned as "chunks" since the preposition usage often differs
+ * from English equivalents.
+ *
+ * Key patterns:
+ * - parler à vs parler de (speak TO vs talk ABOUT)
+ * - jouer à vs jouer de (play games vs play instruments)
+ * - aller à, venir de, penser à, avoir besoin de
+ */
 export const verbPrepositionPatterns = [
   {
     verb: "parler à",
@@ -23,7 +73,7 @@ export const verbPrepositionPatterns = [
   {
     verb: "aller à",
     english: "to go to",
-    example: "Je vais à l’école."
+    example: "Je vais à l'école."
   },
   {
     verb: "venir de",
@@ -38,7 +88,7 @@ export const verbPrepositionPatterns = [
   {
     verb: "avoir besoin de",
     english: "to need",
-    example: "J’ai besoin de temps."
+    example: "J'ai besoin de temps."
   },
   {
     verb: "jouer à",
@@ -52,19 +102,39 @@ export const verbPrepositionPatterns = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES TYPES AND DATA
+// =============================================================================
+
+/**
+ * GuidedExample Type
+ * ------------------
+ * Type definition for annotated example sentences with audio.
+ * Used in the "Guided Examples" section to teach preposition usage patterns.
+ */
 export type GuidedExample = {
-  id: string
-  french: string
-  english: string
-  focus: string
-  audioSrc: string
+  id: string       // Unique identifier for the example
+  french: string   // French sentence
+  english: string // English translation
+  focus: string   // Learning focus note (e.g., "à + le → au")
+  audioSrc: string // Path to audio file
 }
 
+/**
+ * Guided Examples Array - 8 annotated sentences for pattern learning.
+ * Each example highlights a specific preposition usage pattern:
+ * - ex-1: à + le contraction (au)
+ * - ex-2, ex-3: Location prepositions (sur, dans)
+ * - ex-4: Origin (venir de)
+ * - ex-5, ex-6: Verb patterns (parler de vs parler à)
+ * - ex-7: de + le contraction (du) for instruments
+ * - ex-8: en + country, avec for companionship
+ */
 export const guidedExamples: GuidedExample[] = [
   {
     id: "ex-1",
     french: "Je vais au marché.",
-    english: "I’m going to the market.",
+    english: "I'm going to the market.",
     focus: "à + le → au (movement)",
     audioSrc: "/audio/a1/prepositions/examples/je-vais-au-marche.mp3"
   },
@@ -113,14 +183,36 @@ export const guidedExamples: GuidedExample[] = [
   {
     id: "ex-8",
     french: "Je vais en France avec Marie.",
-    english: "I’m going to France with Marie.",
+    english: "I'm going to France with Marie.",
     focus: "en + country, avec (relation)",
     audioSrc: "/audio/a1/prepositions/examples/je-vais-en-france-avec-marie.mp3"
   }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeTopic Type
+ * ------------------
+ * Type definition for practice question topics.
+ */
 export type PracticeTopic = "meaning" | "completion" | "verb-pattern" | "contraction"
 
+/**
+ * PracticeQuestion Type
+ * ---------------------
+ * Type definition for multiple-choice practice questions.
+ *
+ * Properties:
+ * - id: Unique question number (1-16)
+ * - topic: Question category (meaning, completion, verb-pattern, contraction)
+ * - prompt: The question text
+ * - options: Array of 4 answer choices
+ * - correct: Index of the correct answer (0-3)
+ * - explanation: Detailed explanation shown after answering
+ */
 export type PracticeQuestion = {
   id: number
   topic: PracticeTopic
@@ -130,8 +222,19 @@ export type PracticeQuestion = {
   explanation: string
 }
 
+/**
+ * Practice Questions Array - 16 multiple-choice questions organized by topic.
+ *
+ * Distribution:
+ * - 5 meaning questions (IDs 1-5): Preposition meanings
+ * - 5 completion questions (IDs 6-10): Fill-in-the-blank sentences
+ * - 4 verb-pattern questions (IDs 11-14): Verb + preposition combinations
+ * - 2 contraction questions (IDs 15-16): à/de + article contractions
+ */
 export const practiceQuestions: PracticeQuestion[] = [
-  // 5 meaning questions
+  // --------------------------------------------------
+  // 5 MEANING QUESTIONS: Test preposition definitions
+  // --------------------------------------------------
   {
     id: 1,
     topic: "meaning",
@@ -173,7 +276,9 @@ export const practiceQuestions: PracticeQuestion[] = [
     explanation: "“Pour” means “for”. Example: C’est pour toi."
   },
 
-  // 5 sentence completion
+  // --------------------------------------------------
+  // 5 COMPLETION QUESTIONS: Fill-in-the-blank sentences
+  // --------------------------------------------------
   {
     id: 6,
     topic: "completion",
@@ -215,7 +320,9 @@ export const practiceQuestions: PracticeQuestion[] = [
     explanation: "For “with”: avec → Il parle avec son ami."
   },
 
-  // 4 verb-preposition matching
+  // --------------------------------------------------
+  // 4 VERB-PATTERN QUESTIONS: Test verb+preposition knowledge
+  // --------------------------------------------------
   {
     id: 11,
     topic: "verb-pattern",
@@ -249,7 +356,9 @@ export const practiceQuestions: PracticeQuestion[] = [
     explanation: "You usually use “jouer de” for instruments: Elle joue du piano."
   },
 
-  // 2 contraction questions
+  // --------------------------------------------------
+  // 2 CONTRACTION QUESTIONS: à/de + article combinations
+  // --------------------------------------------------
   {
     id: 15,
     topic: "contraction",

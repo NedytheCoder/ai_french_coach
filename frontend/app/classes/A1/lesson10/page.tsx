@@ -1,16 +1,67 @@
+/**
+ * A1 Lesson 10 - Negation in French
+ * ===================================
+ *
+ * This page teaches A1 learners how to form negative sentences in French.
+ *
+ * **Lesson Scope:**
+ * - ne...pas (not) - the most common negation form
+ * - Other negations: ne...jamais, ne...plus, ne...rien, ne...personne, ne...guerre
+ * - Negation placement in passé composé (around the auxiliary)
+ * - Important patterns: ne → n' before vowels, de replacing un/une/des
+ *
+ * **Page Structure:**
+ * 1. Navigation link to A1 lessons
+ * 2. LessonHeader - Title and description
+ * 3. ProgressBar - Visual progress tracking
+ * 4. 6 Content Sections (SectionCard):
+ *    - Recap: ne...pas review
+ *    - Structure: Present vs passé composé formulas
+ *    - Other negations: jamais, plus, rien, personne, guerre
+ *    - Passé composé: Negation around auxiliary
+ *    - Patterns: ne→n', de replacement rules
+ *    - Guided examples: Mixed present and past examples
+ * 5. Practice Quiz - 20 questions with feedback
+ * 6. Completion UI - Recap and navigation
+ * 7. Sticky footer - Progress and continue button
+ *
+ * **State Management:**
+ * - reviewedSections: Tracks which 6 sections have been reviewed
+ * - currentlyPlaying: ID of active audio playback
+ * - Practice state: Answers, selection, feedback, results, completion
+ *
+ * **Sub-components:**
+ * - LessonHeader, ProgressBar, SectionCard, TwoLineExample
+ * - FormulaCard, NegationCard, ExampleCard, RuleCard
+ * - PracticeMetaRow, Chip, PracticeCard, PracticeResultsCard
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import { useMemo, useRef, useState } from 'react'
+
+// Framer Motion for page animations and transitions
 import { motion, AnimatePresence } from 'framer-motion'
+
+// React Icons for UI elements
 import {
-  FaArrowRight,
-  FaCheck,
-  FaChevronRight,
-  FaHome,
-  FaPlay,
-  FaRedoAlt
+  FaArrowRight,   // Continue/Next button
+  FaCheck,        // Reviewed status indicator
+  FaChevronRight, // Next question arrow
+  FaHome,         // Back to lessons navigation
+  FaPlay,         // Audio playback
+  FaRedoAlt       // Retake practice
 } from 'react-icons/fa'
+
+// Next.js Link for navigation
 import Link from 'next/link'
+
+// Lesson data: examples, negations, questions
 import {
   guidedExamples,
   nePasExamples,
@@ -21,6 +72,13 @@ import {
   type PracticeTopic
 } from './data'
 
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
+
+/**
+ * SectionKey - Union type of all lesson section identifiers.
+ */
 type SectionKey =
   | 'recap'
   | 'structure'
@@ -29,15 +87,34 @@ type SectionKey =
   | 'patterns'
   | 'guided'
 
+/**
+ * SectionReview - Type mapping each section to its reviewed status.
+ */
 type SectionReview = Record<SectionKey, boolean>
 
+/**
+ * PracticeAnswer - Records a single practice quiz response.
+ */
 type PracticeAnswer = {
   questionId: number
   selectedOption: number
   isCorrect: boolean
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+/**
+ * A1Lesson10Page - Main component for the negation lesson.
+ *
+ * Manages lesson state including section reviews, audio playback, and practice quiz.
+ */
 export default function A1Lesson10Page() {
+  // ---------------------------------------------------------------------------
+  // STATE: Section Review Tracking
+  // ---------------------------------------------------------------------------
+  // Tracks which of the 6 content sections have been reviewed by the learner.
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
     recap: false,
     structure: false,
@@ -47,22 +124,48 @@ export default function A1Lesson10Page() {
     guided: false
   })
 
+  // ---------------------------------------------------------------------------
+  // STATE: Audio Playback
+  // ---------------------------------------------------------------------------
+  // currentlyPlaying - ID of the currently playing audio clip.
+  // audioRef - Reference to the active HTMLAudioElement for control.
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // ---------------------------------------------------------------------------
+  // STATE: Practice Quiz
+  // ---------------------------------------------------------------------------
+  // currentPracticeIndex - Index of the current question being displayed.
+  // practiceAnswers - Array of the learner's submitted answers.
+  // selectedOption - Currently selected option before submission.
+  // showFeedback - Whether to show correct/incorrect feedback for current question.
   const [currentPracticeIndex, setCurrentPracticeIndex] = useState(0)
   const [practiceAnswers, setPracticeAnswers] = useState<PracticeAnswer[]>([])
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [showFeedback, setShowFeedback] = useState(false)
 
+  // ---------------------------------------------------------------------------
+  // STATE: UI Display Flags
+  // ---------------------------------------------------------------------------
+  // showResults - Display the practice results card after completing all questions.
+  // showCompletion - Display the lesson completion UI.
   const [showResults, setShowResults] = useState(false)
   const [showCompletion, setShowCompletion] = useState(false)
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  // Boolean flags computed from state for conditional rendering and UI logic.
   const allSectionsReviewed = Object.values(reviewedSections).every(Boolean)
   const practiceComplete = practiceAnswers.length === practiceQuestions.length
   const score = practiceAnswers.filter(a => a.isCorrect).length
   const percentage = Math.round((score / practiceQuestions.length) * 100)
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE: Topic Counts
+  // ---------------------------------------------------------------------------
+  // Counts how many questions have been answered from each practice topic.
+  // Used for the PracticeMetaRow topic breakdown.
   const topicCounts = useMemo(() => {
     return practiceAnswers.reduce<Record<PracticeTopic, number>>(
       (acc, a) => {
@@ -75,6 +178,11 @@ export default function A1Lesson10Page() {
     )
   }, [practiceAnswers])
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Audio Playback
+  // ---------------------------------------------------------------------------
+  // Plays French audio for example sentences.
+  // Stops any currently playing audio before starting new clip.
   const playAudio = (audioSrc: string, id: string) => {
     if (audioRef.current) {
       audioRef.current.pause()
@@ -92,15 +200,28 @@ export default function A1Lesson10Page() {
     audio.onended = () => setCurrentlyPlaying(null)
   }
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Mark Section Reviewed
+  // ---------------------------------------------------------------------------
+  // Updates the reviewed status of a lesson section.
   const markSectionReviewed = (section: SectionKey) => {
     setReviewedSections(prev => ({ ...prev, [section]: true }))
   }
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Practice Answer Selection
+  // ---------------------------------------------------------------------------
+  // Selects an option for the current question.
+  // Disabled while feedback is showing.
   const handlePracticeAnswer = (optionIndex: number) => {
     if (showFeedback) return
     setSelectedOption(optionIndex)
   }
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Submit Practice Answer
+  // ---------------------------------------------------------------------------
+  // Validates the selected answer, records it, and displays feedback.
   const submitAnswer = () => {
     if (selectedOption === null) return
     const currentQuestion = practiceQuestions[currentPracticeIndex]
@@ -112,6 +233,10 @@ export default function A1Lesson10Page() {
     setShowFeedback(true)
   }
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Next Question
+  // ---------------------------------------------------------------------------
+  // Advances to the next practice question or shows results if complete.
   const nextQuestion = () => {
     const nextIndex = currentPracticeIndex + 1
     setSelectedOption(null)
@@ -120,6 +245,10 @@ export default function A1Lesson10Page() {
     if (nextIndex >= practiceQuestions.length) setShowResults(true)
   }
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Retake Practice
+  // ---------------------------------------------------------------------------
+  // Resets all practice state to start fresh.
   const retakePractice = () => {
     setCurrentPracticeIndex(0)
     setPracticeAnswers([])
@@ -129,14 +258,25 @@ export default function A1Lesson10Page() {
     setShowCompletion(false)
   }
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Continue From Results
+  // ---------------------------------------------------------------------------
+  // Transitions from results screen to lesson completion UI.
   const continueFromResults = () => {
     setShowResults(false)
     setShowCompletion(true)
   }
 
+  // ---------------------------------------------------------------------------
+  // DERIVED: Lesson Completion Status
+  // ---------------------------------------------------------------------------
+  // Flags to determine if lesson is ready to complete and if fully complete.
   const lessonReadyToComplete = allSectionsReviewed && practiceComplete
   const lessonComplete = lessonReadyToComplete && showCompletion
 
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -150,15 +290,26 @@ export default function A1Lesson10Page() {
           </Link>
         </div>
 
+        {/* =================================================================
+            HEADER SECTION
+            ================================================================= */}
         <LessonHeader />
 
+        {/* =================================================================
+            PROGRESS BAR
+            Shows lesson progress: sections reviewed and practice questions answered.
+            ================================================================= */}
         <ProgressBar
           reviewedSections={reviewedSections}
           practiceProgress={practiceAnswers.length}
           totalPractice={practiceQuestions.length}
         />
 
-        {/* 2. Recap ne...pas */}
+        {/* =================================================================
+            SECTION 1: Quick Recap - ne...pas
+            Reviews the most common French negation form.
+            Shows positive → negative transformations with examples.
+            ================================================================= */}
         <SectionCard
           title="Quick recap: ne...pas"
           subtitle="The most common negation"
@@ -190,7 +341,11 @@ export default function A1Lesson10Page() {
           </div>
         </SectionCard>
 
-        {/* 3. Structure */}
+        {/* =================================================================
+            SECTION 2: Structure
+            Explains the formula for negation in present tense and passé composé.
+            Uses FormulaCard components to show the patterns.
+            ================================================================= */}
         <SectionCard
           title="How negation works (structure)"
           subtitle="Present vs passé composé"
@@ -221,7 +376,11 @@ export default function A1Lesson10Page() {
           </div>
         </SectionCard>
 
-        {/* 4. Other negations */}
+        {/* =================================================================
+            SECTION 3: Other Negations
+            Covers ne...jamais, ne...plus, ne...rien, ne...personne, ne...guerre.
+            Uses NegationCard to display each form with meaning and examples.
+            ================================================================= */}
         <SectionCard
           title="Other common negations"
           subtitle="Same structure — only the second word changes"
@@ -250,7 +409,11 @@ export default function A1Lesson10Page() {
           </div>
         </SectionCard>
 
-        {/* 5. Negation in passé composé */}
+        {/* =================================================================
+            SECTION 4: Negation in Passé Composé
+            Explains that negation wraps around the auxiliary (avoir/être).
+            Shows examples with audio playback.
+            ================================================================= */}
         <SectionCard
           title="Negation in passé composé"
           subtitle="Negation wraps around the auxiliary"
@@ -279,7 +442,13 @@ export default function A1Lesson10Page() {
           </div>
         </SectionCard>
 
-        {/* 6. Important patterns */}
+        {/* =================================================================
+            SECTION 5: Important Patterns and Rules
+            Three key patterns:
+            1. ne → n' before vowels
+            2. Negation surrounds auxiliary in passé composé
+            3. de replaces un/une/des in negatives
+            ================================================================= */}
         <SectionCard
           title="Important patterns and rules"
           subtitle="3 beginner-safe rules"
@@ -310,7 +479,11 @@ export default function A1Lesson10Page() {
           </div>
         </SectionCard>
 
-        {/* 7. Guided examples */}
+        {/* =================================================================
+            SECTION 6: Guided Examples
+            Mixed present and passé composé sentences for practice.
+            Each example shows French, English, and tense tag with audio.
+            ================================================================= */}
         <SectionCard
           title="Guided examples"
           subtitle="Notice the tense + the negation word"
@@ -334,7 +507,12 @@ export default function A1Lesson10Page() {
           </div>
         </SectionCard>
 
-        {/* 8. Practice */}
+        {/* =================================================================
+            INTERACTIVE PRACTICE SECTION
+            20 multiple-choice questions covering all negation topics.
+            Displays PracticeMetaRow (topic breakdown) and PracticeCard.
+            Shows PracticeResultsCard when all questions are answered.
+            ================================================================= */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -370,7 +548,11 @@ export default function A1Lesson10Page() {
           )}
         </div>
 
-        {/* 10. Completion */}
+        {/* =================================================================
+            LESSON COMPLETION UI
+            Animated card shown when all sections reviewed and practice complete.
+            Displays recap of learned concepts and navigation buttons.
+            ================================================================= */}
         <AnimatePresence>
           {showCompletion && (
             <motion.div
@@ -433,7 +615,14 @@ export default function A1Lesson10Page() {
         </AnimatePresence>
       </div>
 
-      {/* Sticky footer */}
+      {/* =================================================================
+        STICKY FOOTER
+        Shows lesson progress status and the Continue button.
+        - Amber status: sections pending review
+        - Amber status: practice pending
+        - Green status: lesson complete
+        Continue button is disabled until lesson is ready to complete.
+        ================================================================= */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
@@ -480,6 +669,19 @@ export default function A1Lesson10Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ *
+ * Features:
+ * - A1 Lesson 10 badge with gradient background
+ * - Main title "Negation in French"
+ * - Subtitle describing the lesson scope
+ * - Fade-in animation on page load
+ */
 function LessonHeader() {
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
@@ -499,6 +701,22 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual indicator of lesson progress.
+ *
+ * Calculates total progress based on:
+ * - Number of sections reviewed (6 total)
+ * - Number of practice questions answered (20 total)
+ * - Progress is divided by 7 (6 sections + practice)
+ *
+ * @param reviewedSections - Object tracking reviewed status of each section
+ * @param practiceProgress - Number of practice questions answered so far
+ * @param totalPractice - Total number of practice questions (20)
+ */
 function ProgressBar({
   reviewedSections,
   practiceProgress,
@@ -535,6 +753,27 @@ function ProgressBar({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Wrapper component for lesson content sections.
+ *
+ * Features:
+ * - Gradient icon with unique color per section (based on index)
+ * - Title and subtitle header
+ * - "Mark as Reviewed" / "Reviewed" button with visual feedback
+ * - Animation on mount with staggered delay
+ *
+ * @param title - Section title displayed in the header
+ * @param subtitle - Section subtitle providing additional context
+ * @param icon - Emoji icon displayed in the section badge
+ * @param isReviewed - Whether this section has been marked as reviewed
+ * @param onMarkReviewed - Callback to mark the section as reviewed
+ * @param index - Section index for color rotation and animation delay
+ * @param children - Content to display inside the card
+ */
 function SectionCard({
   title,
   subtitle,
@@ -592,6 +831,25 @@ function SectionCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: TwoLineExample
+// =============================================================================
+
+/**
+ * TwoLineExample - Displays a positive sentence and its negative form.
+ *
+ * Shows the transformation from affirmative to negative with:
+ * - Original French sentence (positive)
+ * - Transformed French sentence (negative, highlighted in purple)
+ * - English translation
+ *
+ * Used in the ne...pas recap section.
+ *
+ * @param positive - The original affirmative sentence
+ * @param negative - The negative version of the sentence
+ * @param english - English translation
+ * @param index - Index for animation stagger delay
+ */
 function TwoLineExample({
   positive,
   negative,
@@ -618,6 +876,24 @@ function TwoLineExample({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: FormulaCard
+// =============================================================================
+
+/**
+ * FormulaCard - Displays a negation formula with examples.
+ *
+ * Used in the "Structure" section to show:
+ * - Present tense negation formula
+ * - Passé composé negation formula
+ *
+ * Color-coded by accent: blue for present, purple for passé composé.
+ *
+ * @param title - Formula title (e.g., "Present tense", "Passé composé")
+ * @param formula - The grammatical formula string
+ * @param examples - Array of example sentences
+ * @param accent - Color scheme: 'blue' for present, 'purple' for passé composé
+ */
 function FormulaCard({
   title,
   formula,
@@ -653,6 +929,25 @@ function FormulaCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: NegationCard
+// =============================================================================
+
+/**
+ * NegationCard - Displays information about a specific negation form.
+ *
+ * Used in the "Other negations" section to show:
+ * - ne...jamais (never)
+ * - ne...plus (no longer)
+ * - ne...rien (nothing)
+ * - ne...personne (nobody)
+ * - ne...guerre (hardly)
+ *
+ * @param form - The negation form (e.g., "ne...jamais")
+ * @param meaning - English meaning of the negation
+ * @param examples - Array of French/English example sentences
+ * @param index - Index for animation stagger delay
+ */
 function NegationCard({
   form,
   meaning,
@@ -685,6 +980,28 @@ function NegationCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ExampleCard
+// =============================================================================
+
+/**
+ * ExampleCard - Displays a French sentence with audio playback.
+ *
+ * Features:
+ * - Tense badge (present = blue, passé composé = amber)
+ * - French sentence text
+ * - English translation
+ * - Play button with audio state indicator
+ *
+ * Used in guided examples and passé composé sections.
+ *
+ * @param french - The French sentence to display
+ * @param english - English translation
+ * @param tag - Tense indicator: 'present' or 'past'
+ * @param isPlaying - Whether audio is currently playing for this card
+ * @param onPlay - Callback to trigger audio playback
+ * @param index - Index for animation stagger delay
+ */
 function ExampleCard({
   french,
   english,
@@ -726,6 +1043,23 @@ function ExampleCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: RuleCard
+// =============================================================================
+
+/**
+ * RuleCard - Displays an important negation rule with examples.
+ *
+ * Used in the "Important patterns" section for:
+ * - Rule 1: ne → n' before vowels
+ * - Rule 2: Negation surrounds auxiliary in passé composé
+ * - Rule 3: de replaces un/une/des in negatives
+ *
+ * @param title - Rule title/number
+ * @param body - Rule explanation text
+ * @param examples - Array of example sentences demonstrating the rule
+ * @param accent - Color scheme: 'purple', 'blue', or 'amber'
+ */
 function RuleCard({
   title,
   body,
@@ -762,6 +1096,21 @@ function RuleCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: PracticeMetaRow
+// =============================================================================
+
+/**
+ * PracticeMetaRow - Displays practice quiz progress and topic breakdown.
+ *
+ * Shows:
+ * - Number of questions answered out of total
+ * - Chip breakdown by topic (ne...pas, other, passé composé, structure)
+ *
+ * @param answered - Number of questions answered so far
+ * @param total - Total number of practice questions
+ * @param counts - Object tracking answered count per topic
+ */
 function PracticeMetaRow({
   answered,
   total,
@@ -786,6 +1135,18 @@ function PracticeMetaRow({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: Chip
+// =============================================================================
+
+/**
+ * Chip - Small badge component for displaying topic counts.
+ *
+ * Used within PracticeMetaRow to show how many questions
+ * have been answered from each topic category.
+ *
+ * @param label - Text to display inside the chip (e.g., "ne...pas: 3")
+ */
 function Chip({ label }: { label: string }) {
   return (
     <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">
@@ -794,6 +1155,30 @@ function Chip({ label }: { label: string }) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: PracticeCard
+// =============================================================================
+
+/**
+ * PracticeCard - Interactive multiple-choice question card.
+ *
+ * Features:
+ * - Question prompt with topic badge
+ * - Four selectable answer options
+ * - Visual feedback on selection (purple highlight)
+ * - Correct/incorrect feedback after submission (green/red)
+ * - Random encouraging feedback messages
+ * - "Check Answer" / "Next Question" buttons
+ *
+ * @param question - The practice question data
+ * @param questionNumber - Current question number (1-20)
+ * @param totalQuestions - Total number of questions (20)
+ * @param selectedOption - Index of currently selected option (null if none)
+ * @param showFeedback - Whether to show correct/incorrect feedback
+ * @param onSelectOption - Callback when user selects an option
+ * @param onSubmit - Callback to submit the selected answer
+ * @param onNext - Callback to advance to the next question
+ */
 function PracticeCard({
   question,
   questionNumber,
@@ -928,6 +1313,28 @@ function PracticeCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: PracticeResultsCard
+// =============================================================================
+
+/**
+ * PracticeResultsCard - Displays final practice quiz results.
+ *
+ * Features:
+ * - Score display (e.g., "15/20")
+ * - Percentage calculation
+ * - Personalized feedback message based on score:
+ *   - Score ≤ 7: "Good effort — negation takes practice"
+ *   - Score 8-13: "Nice progress — you're understanding the patterns"
+ *   - Score ≥ 14: "Great job — you're using negation well"
+ * - Visual progress bar
+ * - Retake and Continue buttons
+ *
+ * @param score - Number of correctly answered questions
+ * @param total - Total number of questions (20)
+ * @param onRetake - Callback to restart the practice quiz
+ * @param onContinue - Callback to proceed to lesson completion
+ */
 function PracticeResultsCard({
   score,
   total,

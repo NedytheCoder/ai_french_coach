@@ -1,11 +1,73 @@
-// A2 Lesson 15 — Communicating in Longer Sentences
+/**
+ * A2 Lesson 15 - Communicating in Longer Sentences
+ * ===================================================
+ *
+ * This file contains all lesson data for A2 Lesson 15, the final A2 lesson,
+ * focusing on combining skills to create more complex French sentences.
+ *
+ * **Lesson Content:**
+ * - Storytelling with connected events (passé composé + imparfait)
+ * - Expressing opinions (je pense que, à mon avis)
+ * - Making comparisons (plus...que, moins...que, aussi...que)
+ * - Sentence connectors (et, mais, parce que, ensuite, donc, puis)
+ * - Building complex sentences with multiple clauses
+ * - Common mistakes to avoid in longer sentences
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Combine tenses for richer storytelling
+ * - Use connectors to link ideas smoothly
+ * - Express personal opinions and preferences
+ * - Build on all A2 skills learned throughout the level
+ *
+ * **Data Categories:**
+ * 1. storytellingExamples
+ * 2. opinionExpressions
+ * 3. comparisonExamples
+ * 4. connectors
+ * 5. commonMistakes
+ * 6. practiceQuestions
+ * 7. sectionIds / SectionId
+ * 8. getPerformanceMessage
+ */
+
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ */
 export const sectionIds = ["intro", "why-matters", "storytelling", "opinions", "comparisons", "connectors", "guided-examples", "patterns", "mistakes", "practice", "completion"];
 
+// =============================================================================
+// STORYTELLING EXAMPLES
+// =============================================================================
+
+/**
+ * storytellingExamples - Examples of connected sentences for storytelling.
+ *
+ * Shows how to link multiple past events using the passé composé
+ * and imparfait together with connectors like et, ensuite.
+ */
 export const storytellingExamples = [
   { french: "Hier, je suis allé au marché. J'ai acheté des fruits et j'ai parlé avec un ami. C'était agréable.", english: "Yesterday, I went to the market. I bought fruit and talked with a friend. It was nice." },
   { french: "Le week-end dernier, nous avons visité un musée. Ensuite, nous avons mangé au restaurant.", english: "Last weekend, we visited a museum. Then, we ate at a restaurant." },
 ];
 
+// =============================================================================
+// OPINION EXPRESSIONS
+// =============================================================================
+
+/**
+ * opinionExpressions - Common phrases for expressing opinions in French.
+ *
+ * Patterns:
+ * - Je pense que... (I think that...)
+ * - À mon avis... (In my opinion...)
+ * - Je trouve... (I find...)
+ * - Je préfère... parce que... (I prefer... because...)
+ */
 export const opinionExpressions = [
   { french: "Je pense que ce film est intéressant.", english: "I think this film is interesting." },
   { french: "À mon avis, cette ville est trop bruyante.", english: "In my opinion, this city is too noisy." },
@@ -13,12 +75,34 @@ export const opinionExpressions = [
   { french: "Je préfère étudier le matin parce que je suis plus concentré.", english: "I prefer to study in the morning because I am more focused." },
 ];
 
+// =============================================================================
+// COMPARISON EXAMPLES
+// =============================================================================
+
+/**
+ * comparisonExamples - Examples of comparative sentences in French.
+ *
+ * Shows the three main comparison patterns:
+ * - plus...que (more...than)
+ * - moins...que (less...than)
+ * - aussi...que (as...as)
+ */
 export const comparisonExamples = [
   { french: "Paris est plus grand que Lyon.", english: "Paris is bigger than Lyon." },
   { french: "Ce livre est moins intéressant que l'autre.", english: "This book is less interesting than the other one." },
   { french: "Mon frère est aussi sportif que moi.", english: "My brother is as sporty as me." },
 ];
 
+// =============================================================================
+// CONNECTORS
+// =============================================================================
+
+/**
+ * connectors - Common French connectors for linking ideas.
+ *
+ * These small words help join sentences and show relationships
+ * between ideas (addition, contrast, cause, sequence).
+ */
 export const connectors = [
   { word: "et", english: "and" },
   { word: "mais", english: "but" },
@@ -28,12 +112,30 @@ export const connectors = [
   { word: "puis", english: "then" },
 ];
 
+/**
+ * connectorExamples - Examples showing connectors in context.
+ *
+ * Demonstrates how et, mais, donc, and parce que connect
+ * ideas in longer sentences.
+ */
 export const connectorExamples = [
   { french: "Je suis allé au café et j'ai rencontré un ami.", english: "I went to the café and met a friend." },
   { french: "Il voulait sortir, mais il était fatigué.", english: "He wanted to go out, but he was tired." },
   { french: "J'ai étudié, donc j'ai réussi.", english: "I studied, so I succeeded." },
 ];
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * guidedExamples - Complete example sentences combining multiple A2 skills.
+ *
+ * These examples show how to combine:
+ * - Storytelling with opinions
+ * - Comparisons with reasons
+ * - Multiple connectors in one narrative
+ */
 export const guidedExamples = [
   { french: "Hier, j'ai étudié le français et j'ai regardé un film. Je pense que c'était une bonne journée.", english: "Yesterday, I studied French and watched a film. I think it was a good day." },
   { french: "Je préfère le café parce qu'il est plus fort que le thé.", english: "I prefer coffee because it is stronger than tea." },
@@ -41,12 +143,39 @@ export const guidedExamples = [
   { french: "À mon avis, cette ville est plus agréable que l'autre parce qu'elle est moins bruyante.", english: "In my opinion, this city is more pleasant than the other because it is less noisy." },
 ];
 
+// =============================================================================
+// COMMUNICATION PATTERNS
+// =============================================================================
+
+/**
+ * communicationPatterns - Common patterns for building longer sentences.
+ *
+ * Three key patterns:
+ * 1. Story pattern: Time + action + detail + feeling
+ * 2. Opinion pattern: Opinion + reason (with parce que)
+ * 3. Comparison pattern: Thing A + comparison + thing B
+ */
 export const communicationPatterns = [
   { title: "Story pattern", structure: "Time + action + detail + feeling", example: "Hier, je suis allé au cinéma. J'ai vu un film intéressant. J'ai beaucoup aimé." },
   { title: "Opinion pattern", structure: "Opinion + reason", example: "Je pense que ce livre est bon parce qu'il est facile à comprendre." },
   { title: "Comparison pattern", structure: "Thing A + comparison + thing B", example: "Ce restaurant est meilleur que l'autre." },
 ];
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make in longer sentences.
+ *
+ * Common errors:
+ * - Missing que after Je pense
+ * - Missing que in comparisons
+ * - Missing connectors between clauses
+ * - Incorrect use of parce que
+ *
+ * Each mistake shows wrong form, correct form, and explanation.
+ */
 export const commonMistakes = [
   { wrong: "Je pense ce film est intéressant.", correct: "Je pense que ce film est intéressant.", explanation: "Use que after Je pense." },
   { wrong: "Paris est plus grand Lyon.", correct: "Paris est plus grand que Lyon.", explanation: "Use que in comparisons." },
@@ -54,6 +183,29 @@ export const commonMistakes = [
   { wrong: "Je préfère café parce je aime.", correct: "Je préfère le café parce que je l'aime.", explanation: "Use parce que correctly." },
 ];
 
+// =============================================================================
+// PRACTICE QUESTIONS - 15 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for Lesson 15 (final A2 lesson).
+ *
+ * Topics covered:
+ * - opinion (1-4): Expressing opinions correctly
+ * - comparison (5-7): Using comparative structures
+ * - storytelling (8-9): Linking events with connectors
+ * - connectors (10-12): Choosing the right connector
+ * - patterns (13-14): Following communication patterns
+ * - mixed (15): Combining multiple skills
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   { id: 1, topic: "opinion", prompt: "Choose the correct sentence.", options: ["Je pense que ce film est intéressant.", "Je pense ce film est intéressant.", "Je pense film est intéressant."], correct: 0, explanation: "Use que after Je pense." },
   { id: 2, topic: "opinion", prompt: "Which phrase means 'In my opinion'?", options: ["À mon avis", "Je pense", "Je trouve"], correct: 0, explanation: "À mon avis means 'in my opinion'." },
@@ -72,6 +224,22 @@ export const practiceQuestions = [
   { id: 15, topic: "mixed", prompt: "Choose the most complete and correct sentence.", options: ["À mon avis, ce restaurant est meilleur que l'autre parce que la nourriture est bonne.", "Ce restaurant meilleur.", "Je pense restaurant bon."], correct: 0, explanation: "This combines opinion, comparison, and reason." },
 ];
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-6/15: "Good effort" - suggests focus on connectors and patterns
+ * - 7-11/15: "Nice progress" - encourages continued learning
+ * - 12-15/15: "Great job" - celebrates readiness for B1
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 6) {
     return { title: "Good effort", message: "Building longer sentences takes practice. Focus on using connectors and simple patterns. You can retake the practice or continue the lesson.", emoji: "📚", color: "blue" };

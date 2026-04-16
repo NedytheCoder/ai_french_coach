@@ -1,22 +1,75 @@
+/**
+ * A1 Lesson 6 - French Verb Groups Page
+ * ======================================
+ *
+ * This page implements A1 Lesson 6, teaching French verb groups and conjugation patterns.
+ * The lesson covers the three French verb groups (-er, -ir, irregular) and their
+ * conjugation patterns, helping learners understand how verbs are classified and conjugated.
+ *
+ * Page Structure:
+ * ---------------
+ * 1. Header with back navigation and lesson title
+ * 2. Progress bar showing lesson completion (sticky)
+ * 3. Eight collapsible content sections:
+ *    - What Are Verb Groups? (Introduction)
+ *    - First Group (-er verbs)
+ *    - Second Group (-ir verbs)
+ *    - Third Group (irregular verbs)
+ *    - Regular vs Irregular
+ *    - Conjugation Examples
+ *    - Pattern Summary
+ *    - Interactive Practice (12 questions)
+ * 4. Completion section with score display
+ *
+ * State Management:
+ * -----------------
+ * - reviewedSections: Array of section IDs marked as reviewed
+ * - practiceAnswers: User's answers with correctness tracking
+ * - practiceCompleted: Whether practice section is complete
+ * - lessonCompleted: Whether entire lesson is marked complete
+ * - isClient: Hydration flag for localStorage access
+ *
+ * Key Features:
+ * -------------
+ * - LocalStorage persistence for progress across sessions
+ * - Collapsible sections that auto-mark as reviewed when opened
+ * - Interactive practice quiz with randomized feedback
+ * - Sticky progress bar showing completion status
+ * - Conjugation tables with audio examples
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and lifecycle
 import { useState, useEffect } from 'react'
+
+// Framer Motion for smooth animations
 import { motion, AnimatePresence } from 'framer-motion'
+
+// Font Awesome icons for UI elements
 import {
-  FaHome,
-  FaCheck,
-  FaChevronRight,
-  FaArrowRight,
-  FaBookOpen,
-  FaGraduationCap,
-  FaLightbulb,
-  FaTimes,
-  FaRedo,
-  FaChevronDown,
-  FaChevronUp,
-  FaVolumeUp
+  FaHome,         // Back to lessons link
+  FaCheck,        // Completion checkmarks
+  FaChevronRight, // Navigation arrows
+  FaArrowRight,   // Action buttons
+  FaBookOpen,     // Content sections
+  FaGraduationCap, // Lesson header
+  FaLightbulb,    // Tips and hints
+  FaTimes,        // Close/incorrect indicators
+  FaRedo,         // Retake practice
+  FaChevronDown,  // Expand section
+  FaChevronUp,    // Collapse section
+  FaVolumeUp      // Audio playback
 } from 'react-icons/fa'
+
+// Next.js navigation
 import Link from 'next/link'
+
+// Lesson data imports
 import {
   firstGroupVerbs,
   secondGroupVerbs,
@@ -28,6 +81,15 @@ import {
   conjugationExamples
 } from './data'
 
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
+
+/**
+ * LessonProgress Interface
+ * ------------------------
+ * Structure for saving/loading lesson progress from localStorage.
+ */
 interface LessonProgress {
   reviewedSections: SectionId[]
   practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[]
@@ -35,23 +97,88 @@ interface LessonProgress {
   lessonCompleted: boolean
 }
 
+// =============================================================================
+// FEEDBACK MESSAGES
+// =============================================================================
+
+/**
+ * Randomized feedback messages for practice quiz responses.
+ * Shows encouraging messages for both correct and incorrect answers.
+ */
 const feedbackMessages = {
   correct: ['Nice 😏', 'Good catch', "That's right", "You're getting it", 'Well done!', 'Perfect!'],
   incorrect: ['Careful now…', 'Almost there', 'Keep trying', 'Not quite', 'Review the pattern']
 }
 
+/**
+ * getRandomFeedback - Returns a random feedback message.
+ * @param isCorrect - Whether the answer was correct
+ * @returns Random message string from appropriate category
+ */
 function getRandomFeedback(isCorrect: boolean) {
   const messages = isCorrect ? feedbackMessages.correct : feedbackMessages.incorrect
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+/**
+ * A1Lesson6Page - Main component for A1 Lesson 6: French Verb Groups
+ *
+ * This component manages the complete lesson flow including:
+ * - 8 collapsible content sections
+ * - LocalStorage-based progress persistence
+ * - Interactive practice quiz with 12 questions
+ * - Lesson completion tracking
+ */
 export default function A1Lesson6Page() {
+  // ===========================================================================
+  // STATE: Section Review Tracking
+  // ===========================================================================
+
+  /**
+   * reviewedSections - Array of section IDs the user has opened/reviewed.
+   * All 8 sections must be reviewed to enable lesson completion.
+   */
   const [reviewedSections, setReviewedSections] = useState<SectionId[]>([])
+
+  // ===========================================================================
+  // STATE: Practice Quiz
+  // ===========================================================================
+
+  /**
+   * practiceAnswers - Array of user's answers to practice questions.
+   * Each answer stores the question ID, selected option, and correctness.
+   */
   const [practiceAnswers, setPracticeAnswers] = useState<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>([])
+
+  /**
+   * practiceCompleted - Whether the user has finished the practice section.
+   */
   const [practiceCompleted, setPracticeCompleted] = useState(false)
+
+  // ===========================================================================
+  // STATE: Lesson Completion
+  // ===========================================================================
+
+  /**
+   * lessonCompleted - Whether the entire lesson is marked as complete.
+   * Requires all sections reviewed and practice completed.
+   */
   const [lessonCompleted, setLessonCompleted] = useState(false)
+
+  /**
+   * isClient - Flag to prevent hydration mismatch with localStorage.
+   * Set to true after component mounts on client side.
+   */
   const [isClient, setIsClient] = useState(false)
 
+  // ===========================================================================
+  // EFFECT: Load Progress from LocalStorage
+  // ===========================================================================
+
+  /**
+   * On mount: Load saved progress from localStorage if available.
+   * LocalStorage key: 'a1Lesson6Progress'
+   */
   useEffect(() => {
     setIsClient(true)
     const saved = localStorage.getItem('a1Lesson6Progress')
@@ -64,6 +191,14 @@ export default function A1Lesson6Page() {
     }
   }, [])
 
+  // ===========================================================================
+  // EFFECT: Save Progress to LocalStorage
+  // ===========================================================================
+
+  /**
+   * Auto-save progress to localStorage whenever state changes.
+   * Only runs on client side (after isClient is true).
+   */
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('a1Lesson6Progress', JSON.stringify({
@@ -75,21 +210,49 @@ export default function A1Lesson6Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, lessonCompleted, isClient])
 
+  // ===========================================================================
+  // HANDLERS: Section Review
+  // ===========================================================================
+
+  /**
+   * markSectionReviewed - Adds a section ID to the reviewed sections list.
+   * Called automatically when a section is expanded.
+   *
+   * @param sectionId - The section identifier to mark as reviewed
+   */
   const markSectionReviewed = (sectionId: SectionId) => {
     if (!reviewedSections.includes(sectionId)) {
       setReviewedSections(prev => [...prev, sectionId])
     }
   }
 
+  // ===========================================================================
+  // COMPUTED: Progress and Scores
+  // ===========================================================================
+
+  /** True when all 8 sections have been reviewed */
   const allSectionsReviewed = sectionIds.every(id => reviewedSections.includes(id))
+
+  /** Count of correct answers from the practice quiz */
   const practiceScore = practiceAnswers.filter(a => a.isCorrect).length
 
+  // ===========================================================================
+  // HANDLER: Lesson Completion
+  // ===========================================================================
+
+  /**
+   * completeLesson - Marks the lesson as complete if all conditions met.
+   * Requires all sections reviewed and practice completed.
+   */
   const completeLesson = () => {
     if (allSectionsReviewed && practiceCompleted) {
       setLessonCompleted(true)
     }
   }
 
+  // ===========================================================================
+  // RENDER: Main Page Layout
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100 pb-24">
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -104,13 +267,20 @@ export default function A1Lesson6Page() {
           </Link>
         </div>
 
-        {/* Lesson Header */}
+        {/* ---------------------------------------------------------------
+            HEADER: Lesson title and description
+            --------------------------------------------------------------- */}
         <LessonHeader />
 
-        {/* Progress Bar */}
+        {/* ---------------------------------------------------------------
+            PROGRESS BAR: Visual progress indicator (sticky)
+            Shows section review count and completion status
+            --------------------------------------------------------------- */}
         <ProgressBar reviewedSections={reviewedSections} practiceCompleted={practiceCompleted} />
 
-        {/* Sections */}
+        {/* ---------------------------------------------------------------
+            CONTENT SECTIONS: 8 collapsible lesson sections
+            --------------------------------------------------------------- */}
         <div className="space-y-6">
           <VerbGroupsIntroSection
             isReviewed={reviewedSections.includes('verb-groups-intro')}
@@ -155,7 +325,10 @@ export default function A1Lesson6Page() {
             onComplete={() => setPracticeCompleted(true)}
           />
 
-          {/* Completion Section */}
+          {/* ---------------------------------------------------------------
+              COMPLETION SECTION: Final celebration and summary
+              Shows when user completes all sections and practice
+              --------------------------------------------------------------- */}
           <CompletionSection
             isComplete={lessonCompleted}
             canComplete={allSectionsReviewed && practiceCompleted}
@@ -169,6 +342,14 @@ export default function A1Lesson6Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ * Features a gradient banner with lesson info and a helper tip.
+ */
 function LessonHeader() {
   return (
     <motion.div
@@ -201,6 +382,19 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual progress indicator for lesson completion.
+ *
+ * Props:
+ * - reviewedSections: Array of reviewed section IDs
+ * - practiceCompleted: Whether practice section is complete
+ *
+ * Features sticky positioning at top of viewport.
+ */
 function ProgressBar({ reviewedSections, practiceCompleted }: { reviewedSections: SectionId[]; practiceCompleted: boolean }) {
   const totalSections = sectionIds.length
   const completedSections = reviewedSections.length
@@ -229,6 +423,27 @@ interface SectionProps {
   onMarkReviewed: () => void
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Reusable collapsible card wrapper for lesson sections.
+ *
+ * Props:
+ * - id: Section identifier
+ * - title: Section title
+ * - icon: Font Awesome icon component
+ * - isReviewed: Whether section has been reviewed
+ * - onMarkReviewed: Callback when section is marked as reviewed
+ * - children: Section content
+ * - defaultOpen: Whether section starts expanded
+ *
+ * Features:
+ * - Auto-marks as reviewed when expanded
+ * - Animated expand/collapse
+ * - Visual review status indicator
+ */
 function SectionCard({
   id,
   title,
@@ -304,6 +519,14 @@ function SectionCard({
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: VerbGroupsIntroSection
+// =============================================================================
+
+/**
+ * VerbGroupsIntroSection - Introduction to the three French verb groups.
+ * Explains how verbs are classified by their infinitive endings.
+ */
 function VerbGroupsIntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -367,6 +590,14 @@ function VerbGroupsIntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: FirstGroupSection
+// =============================================================================
+
+/**
+ * FirstGroupSection - First group verbs (-er ending).
+ * The largest group of French verbs, mostly regular.
+ */
 function FirstGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -411,6 +642,14 @@ function FirstGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: SecondGroupSection
+// =============================================================================
+
+/**
+ * SecondGroupSection - Second group verbs (-ir ending).
+ * Regular verbs with -iss- infix in plural forms.
+ */
 function SecondGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -455,6 +694,14 @@ function SecondGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: ThirdGroupSection
+// =============================================================================
+
+/**
+ * ThirdGroupSection - Third group verbs (irregular).
+ * Includes the most common and important French verbs.
+ */
 function ThirdGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -499,6 +746,14 @@ function ThirdGroupSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: RegularVsIrregularSection
+// =============================================================================
+
+/**
+ * RegularVsIrregularSection - Explains the difference between regular
+ * and irregular verbs, with examples from each group.
+ */
 function RegularVsIrregularSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -558,6 +813,14 @@ function RegularVsIrregularSection({ isReviewed, onMarkReviewed }: SectionProps)
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: ConjugationExamplesSection
+// =============================================================================
+
+/**
+ * ConjugationExamplesSection - Present tense conjugation tables
+ * for one verb from each group (parler, finir, être).
+ */
 function ConjugationExamplesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -658,6 +921,14 @@ function ConjugationExamplesSection({ isReviewed, onMarkReviewed }: SectionProps
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: PatternSummarySection
+// =============================================================================
+
+/**
+ * PatternSummarySection - Summary table comparing the three verb groups.
+ * Quick reference for endings and patterns.
+ */
 function PatternSummarySection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -719,26 +990,47 @@ function PatternSummarySection({ isReviewed, onMarkReviewed }: SectionProps) {
         </div>
       </div>
     </SectionCard>
-  )
+  );
 }
 
+// =============================================================================
+// SECTION COMPONENT: PracticeSection
+// =============================================================================
+
+/**
+ * PracticeSection - Interactive 12-question quiz.
+ *
+ * Props:
+ * - isReviewed: Whether practice section has been opened
+ * - onMarkReviewed: Callback when section is reviewed
+ * - practiceAnswers: User's answer history
+ * - setPracticeAnswers: State setter for answers
+ * - onComplete: Callback when all questions answered
+ *
+ * Features:
+ * - Multiple choice questions by topic
+ * - Immediate feedback with randomized messages
+ * - Score tracking and progress display
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
   practiceAnswers,
   setPracticeAnswers,
-  onComplete
+  onComplete,
 }: SectionProps & {
-  practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[]
-  setPracticeAnswers: React.Dispatch<React.SetStateAction<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>>
-  onComplete: () => void
+  practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[];
+  setPracticeAnswers: React.Dispatch<React.SetStateAction<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>>;
+  onComplete: () => void;
 }) {
+  // State for current question tracking
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [showResults, setShowResults] = useState(false)
 
+  // Derived values for current question and progress
   const currentQuestion = practiceQuestions[currentQuestionIndex]
   const isLastQuestion = currentQuestionIndex === practiceQuestions.length - 1
   const score = practiceAnswers.filter(a => a.isCorrect).length
@@ -1021,6 +1313,22 @@ function PracticeSection({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: CompletionSection
+// =============================================================================
+
+/**
+ * CompletionSection - Final celebration card with lesson summary.
+ *
+ * Props:
+ * - isComplete: Whether lesson is marked complete
+ * - canComplete: Whether completion requirements are met
+ * - score: Number of correct practice answers
+ * - total: Total number of practice questions
+ * - onComplete: Callback to mark lesson as complete
+ *
+ * Shows score, feedback, and completion button when ready.
+ */
 function CompletionSection({
   isComplete,
   canComplete,

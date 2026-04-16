@@ -1,3 +1,35 @@
+/**
+ * A0 Lesson 3 - French Greetings Data
+ * ====================================
+ *
+ * This file contains the data for A0 Lesson 3: French Greetings.
+ * It defines the greeting vocabulary, pronunciations, and section groupings
+ * used in the lesson page.
+ *
+ * Data Structure:
+ * ---------------
+ * - Greeting interface: Type definition for greeting objects
+ * - greetings array: All 16 greetings with French, English, phonetic, and audio
+ * - Section interface: Type for grouping greetings into categories
+ * - sections array: Defines the 3 sections (Basic Hellos, Farewells, Polite Conversation)
+ *
+ * Audio Files:
+ * ------------
+ * All audio files are stored in /public/audio/greetings/
+ * Files are named according to the greeting id (e.g., bonjour.mp3)
+ */
+
+/**
+ * Greeting Interface
+ * ------------------
+ * Defines the structure for a French greeting entry.
+ *
+ * @property id - Unique identifier (used for keys and audio file names)
+ * @property french - The French greeting phrase
+ * @property english - English translation/meaning
+ * @property phonetic - Phonetic pronunciation guide
+ * @property audioSrc - Path to the audio file
+ */
 export interface Greeting {
   id: string
   french: string
@@ -6,7 +38,14 @@ export interface Greeting {
   audioSrc: string
 }
 
+/**
+ * Greetings Data Array
+ * --------------------
+ * Contains all 16 greetings taught in A0 Lesson 3.
+ * Organized by category: Hellos (0-3), Farewells (4-10), Polite Conversation (11-15)
+ */
 export const greetings: Greeting[] = [
+  // ===== BASIC HELLOS (indices 0-3) =====
   {
     id: "bonjour",
     french: "Bonjour",
@@ -35,6 +74,8 @@ export const greetings: Greeting[] = [
     phonetic: "koo-koo",
     audioSrc: "/audio/greetings/coucou.mp3"
   },
+
+  // ===== FAREWELLS (indices 4-10) =====
   {
     id: "au-revoir",
     french: "Au revoir",
@@ -84,6 +125,8 @@ export const greetings: Greeting[] = [
     phonetic: "bun swah-ray",
     audioSrc: "/audio/greetings/bonne-soiree.mp3"
   },
+
+  // ===== POLITE CONVERSATION (indices 11-15) =====
   {
     id: "comment-ca-va",
     french: "Comment ça va ?",
@@ -121,14 +164,29 @@ export const greetings: Greeting[] = [
   }
 ]
 
+/**
+ * Section Interface
+ * -----------------
+ * Defines a grouping of greetings for visual organization in the lesson.
+ *
+ * @property name - Display name for the section
+ * @property start - Starting index in the greetings array (inclusive)
+ * @property end - Ending index in the greetings array (exclusive)
+ */
 export interface Section {
   name: string
   start: number
   end: number
 }
 
+/**
+ * Sections Data Array
+ * -------------------
+ * Defines how greetings are grouped into visual sections on the lesson page.
+ * These groupings help learners organize greetings by function/purpose.
+ */
 export const sections: Section[] = [
-  { name: "Basic Hellos", start: 0, end: 4 },
-  { name: "Farewells", start: 4, end: 11 },
-  { name: "Polite Conversation", start: 11, end: 16 }
+  { name: "Basic Hellos", start: 0, end: 4 },      // First 4 greetings
+  { name: "Farewells", start: 4, end: 11 },       // Next 7 greetings
+  { name: "Polite Conversation", start: 11, end: 16 }  // Last 5 greetings
 ]

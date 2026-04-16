@@ -1,28 +1,103 @@
+/**
+ * A1 Lesson 2 - French Nouns and Articles Page
+ * =============================================
+ *
+ * This page implements A1 Lesson 2 covering French noun gender and articles:
+ * - Masculine nouns with "le" (blue theme)
+ * - Feminine nouns with "la" (pink theme)
+ * - Vowel/silent H nouns with "l'" (amber theme)
+ * - Article usage rules summary
+ * - 10 practice questions with feedback
+ *
+ * Features:
+ * ---------
+ * - Interactive audio playback for pronunciation
+ * - Color-coded noun cards by gender (blue/pink/amber)
+ * - Section review tracking with visual indicators
+ * - Progress persistence using localStorage
+ * - Multiple-choice practice with immediate feedback
+ * - Article patterns summary reference
+ *
+ * State Management:
+ * ---------------
+ * - playCounts: Tracks audio play frequency per noun
+ * - currentlyPlaying: Currently active audio element ID
+ * - reviewedSections: Which sections have been marked as reviewed
+ * - currentPracticeIndex: Current question in practice sequence
+ * - practiceAnswers: User's answer history with correctness
+ * - selectedOption: Currently selected answer option
+ * - showFeedback: Whether to show answer feedback
+ * - isClient: Hydration flag for Next.js
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import { useState, useRef, useEffect } from 'react'
+
+// Framer Motion for smooth animations
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaPlay, FaCheck, FaArrowRight, FaHome, FaChevronRight, FaBook, FaLightbulb } from 'react-icons/fa'
+
+// React Icons for visual elements
+import { FaPlay, FaCheck, FaArrowRight, FaHome, FaChevronRight } from 'react-icons/fa'
+
+// Next.js Link for client-side navigation
 import Link from 'next/link'
+
+// Lesson data: nouns organized by gender, article rules, and practice questions
 import { masculineNouns, feminineNouns, vowelOrSilentHNouns, practiceQuestions, articleRules, Noun } from './data'
 
+// =============================================================================
+// INTERFACES
+// =============================================================================
+
+/**
+ * SectionReview Interface
+ * -----------------------
+ * Tracks which lesson sections have been reviewed by the user.
+ * All 5 sections must be reviewed before completing the lesson.
+ */
 interface SectionReview {
-  intro: boolean
-  masculine: boolean
-  feminine: boolean
-  vowel: boolean
-  summary: boolean
+  intro: boolean       // Introduction: What is a noun?
+  masculine: boolean   // Masculine nouns with "le"
+  feminine: boolean    // Feminine nouns with "la"
+  vowel: boolean      // Vowel/silent H nouns with "l'"
+  summary: boolean     // Article patterns summary
 }
 
+/**
+ * PracticeAnswer Interface
+ * ------------------------
+ * Records a user's answer to a practice question.
+ */
 interface PracticeAnswer {
-  questionId: number
-  selectedOption: number
-  isCorrect: boolean
+  questionId: number      // ID of the question answered
+  selectedOption: number  // Index of selected answer (0, 1, or 2)
+  isCorrect: boolean      // Whether the answer was correct
 }
 
+/**
+ * A1Lesson2Page Component
+ * -----------------------
+ * Main lesson page component for A1 Lesson 2.
+ * Manages noun vocabulary learning with gender-based color coding.
+ */
 export default function A1Lesson2Page() {
+  // ============================================================================
+  // STATE MANAGEMENT
+  // ============================================================================
+
+  // playCounts: Maps noun IDs to number of times audio has been played
   const [playCounts, setPlayCounts] = useState<{[key: string]: number}>({})
+
+  // currentlyPlaying: ID of the currently playing audio noun (null if none)
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
+
+  // reviewedSections: Tracks which of the 5 content sections user has reviewed
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
     intro: false,
     masculine: false,
@@ -30,13 +105,33 @@ export default function A1Lesson2Page() {
     vowel: false,
     summary: false
   })
+
+  // currentPracticeIndex: Current question number in practice sequence (0-indexed)
   const [currentPracticeIndex, setCurrentPracticeIndex] = useState(0)
+
+  // practiceAnswers: Array of user's answers to practice questions
   const [practiceAnswers, setPracticeAnswers] = useState<PracticeAnswer[]>([])
+
+  // selectedOption: Currently selected answer option index (null = none selected)
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
+
+  // showFeedback: Whether to show answer feedback (true after submitting)
   const [showFeedback, setShowFeedback] = useState(false)
+
+  // isClient: Prevents hydration mismatch in Next.js
   const [isClient, setIsClient] = useState(false)
+
+  // audioRef: Reference to the currently playing audio element for cleanup
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+
+  /**
+   * Load saved progress from localStorage on component mount.
+   * Restores user's previous progress if they return to the lesson.
+   */
   useEffect(() => {
     setIsClient(true)
     const saved = localStorage.getItem('a1Lesson2Progress')
@@ -48,6 +143,10 @@ export default function A1Lesson2Page() {
     }
   }, [])
 
+  /**
+   * Save progress to localStorage whenever state changes.
+   * Only runs on client side to prevent SSR issues.
+   */
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('a1Lesson2Progress', JSON.stringify({
@@ -58,20 +157,33 @@ export default function A1Lesson2Page() {
     }
   }, [reviewedSections, practiceAnswers, currentPracticeIndex, isClient])
 
+  // ============================================================================
+  // HELPER FUNCTIONS
+  // ============================================================================
+
+  /**
+   * playAudio - Plays pronunciation audio for a noun
+   * @param audioSrc - URL path to the audio file
+   * @param id - Unique identifier for the noun being played
+   */
   const playAudio = (audioSrc: string, id: string) => {
+    // Stop any existing audio before starting new one
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current = null
     }
 
+    // Create and play new audio element
     const audio = new Audio(audioSrc)
     audioRef.current = audio
     setCurrentlyPlaying(id)
 
+    // Handle playback errors gracefully
     audio.play().catch(() => {
       console.log('Audio playback failed for:', id)
     })
 
+    // When audio ends: clear playing state and increment play count
     audio.onended = () => {
       setCurrentlyPlaying(null)
       setPlayCounts(prev => ({
@@ -81,44 +193,76 @@ export default function A1Lesson2Page() {
     }
   }
 
+  /**
+   * markSectionReviewed - Marks a lesson section as reviewed
+   * @param section - Key of the section to mark
+   */
   const markSectionReviewed = (section: keyof SectionReview) => {
     setReviewedSections(prev => ({ ...prev, [section]: true }))
   }
 
+  /**
+   * handlePracticeAnswer - Handles user selecting an answer option
+   * @param optionIndex - Index of the selected option
+   */
   const handlePracticeAnswer = (optionIndex: number) => {
-    if (showFeedback) return
+    if (showFeedback) return  // Prevent changing answer after submission
     setSelectedOption(optionIndex)
   }
 
+  /**
+   * submitAnswer - Submits the selected answer and shows feedback
+   */
   const submitAnswer = () => {
-    if (selectedOption === null) return
-    
+    if (selectedOption === null) return  // Require selection before submitting
+
     const currentQuestion = practiceQuestions[currentPracticeIndex]
     const isCorrect = selectedOption === currentQuestion.correct
-    
+
+    // Record the answer in practice history
     setPracticeAnswers(prev => [...prev, {
       questionId: currentQuestion.id,
       selectedOption,
       isCorrect
     }])
-    setShowFeedback(true)
+    setShowFeedback(true)  // Show correct/incorrect feedback
   }
 
+  /**
+   * nextQuestion - Advances to the next practice question
+   */
   const nextQuestion = () => {
     setSelectedOption(null)
     setShowFeedback(false)
     setCurrentPracticeIndex(prev => prev + 1)
   }
 
+  // ============================================================================
+  // DERIVED STATE
+  // ============================================================================
+
+  // Check if all 5 content sections have been reviewed
   const allSectionsReviewed = Object.values(reviewedSections).every(v => v)
+
+  // Check if all 10 practice questions have been answered
   const practiceComplete = practiceAnswers.length === practiceQuestions.length
+
+  // Count of correctly answered practice questions
   const correctAnswers = practiceAnswers.filter(a => a.isCorrect).length
+
+  // Lesson is complete only when all sections reviewed AND all practice done
   const lessonComplete = allSectionsReviewed && practiceComplete
+
+  // ============================================================================
+  // RENDER - JSX STRUCTURE
+  // ============================================================================
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Back to home link */}
+        {/* ----------------------------------------------------------
+            NAVIGATION: Back link to A1 lessons page
+            ---------------------------------------------------------- */}
         <div className="mb-6">
           <Link
             href="/classes/A1"
@@ -129,17 +273,25 @@ export default function A1Lesson2Page() {
           </Link>
         </div>
 
-        {/* Lesson Header */}
+        {/* ----------------------------------------------------------
+            HEADER: Lesson title and description
+            ---------------------------------------------------------- */}
         <LessonHeader />
 
-        {/* Progress Overview */}
+        {/* ----------------------------------------------------------
+            PROGRESS BAR: Visual progress indicator
+            ---------------------------------------------------------- */}
         <ProgressBar 
           reviewedSections={reviewedSections}
           practiceProgress={practiceAnswers.length}
           totalPractice={practiceQuestions.length}
         />
 
-        {/* Section 1: Quick Explanation */}
+        {/* ----------------------------------------------------------
+            SECTION 1: Introduction - What is a Noun?
+            - Explains basic noun concepts
+            - Shows article examples with color coding
+            ---------------------------------------------------------- */}
         <SectionCard
           title="What is a Noun?"
           subtitle="Understanding French nouns and articles"
@@ -167,6 +319,7 @@ export default function A1Lesson2Page() {
                 <span>Before a vowel or silent h, <strong>le</strong> or <strong>la</strong> often become <strong>l'</strong>.</span>
               </li>
             </ul>
+            {/* Example badges with color coding */}
             <div className="mt-4 flex flex-wrap gap-3">
               <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">le livre</span>
               <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">la table</span>
@@ -175,7 +328,10 @@ export default function A1Lesson2Page() {
           </div>
         </SectionCard>
 
-        {/* Section 2: Masculine Nouns */}
+        {/* ----------------------------------------------------------
+            SECTION 2: Masculine Nouns (le)
+            - 5 masculine nouns with blue theme
+            ---------------------------------------------------------- */}
         <SectionCard
           title="Masculine Nouns"
           subtitle="Use 'le' with these nouns"
@@ -199,7 +355,10 @@ export default function A1Lesson2Page() {
           </div>
         </SectionCard>
 
-        {/* Section 3: Feminine Nouns */}
+        {/* ----------------------------------------------------------
+            SECTION 3: Feminine Nouns (la)
+            - 5 feminine nouns with pink theme
+            ---------------------------------------------------------- */}
         <SectionCard
           title="Feminine Nouns"
           subtitle="Use 'la' with these nouns"
@@ -223,7 +382,10 @@ export default function A1Lesson2Page() {
           </div>
         </SectionCard>
 
-        {/* Section 4: Vowel or Silent H Nouns */}
+        {/* ----------------------------------------------------------
+            SECTION 4: Vowel/Silent H Nouns (l')
+            - 5 nouns using contracted article with amber theme
+            ---------------------------------------------------------- */}
         <SectionCard
           title="Nouns Starting with a Vowel or Silent H"
           subtitle="Use 'l' with these nouns"
@@ -232,6 +394,7 @@ export default function A1Lesson2Page() {
           onMarkReviewed={() => markSectionReviewed('vowel')}
           index={3}
         >
+          {/* Tip box explaining l' usage */}
           <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 mb-4">
             <p className="text-amber-800 text-sm">
               <strong>💡 Tip:</strong> Before a vowel or silent h, French often uses <strong>l'</strong> instead of <strong>le</strong> or <strong>la</strong>. This makes pronunciation smoother.
@@ -252,7 +415,10 @@ export default function A1Lesson2Page() {
           </div>
         </SectionCard>
 
-        {/* Section 5: Article Patterns Summary */}
+        {/* ----------------------------------------------------------
+            SECTION 5: Article Patterns Summary
+            - Quick reference cards for all 3 article rules
+            ---------------------------------------------------------- */}
         <SectionCard
           title="Article Patterns Summary"
           subtitle="Quick reference for noun articles"
@@ -288,7 +454,10 @@ export default function A1Lesson2Page() {
           </div>
         </SectionCard>
 
-        {/* Section 6: Practice */}
+        {/* ----------------------------------------------------------
+            SECTION 6: Practice Questions
+            - 10 multiple-choice questions
+            ---------------------------------------------------------- */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -385,6 +554,12 @@ export default function A1Lesson2Page() {
   )
 }
 
+/**
+ * LessonHeader Component
+ * ---------------------
+ * Displays the lesson title, badge, and description.
+ * Explains the focus on noun gender and articles.
+ */
 function LessonHeader() {
   return (
     <motion.div
@@ -392,15 +567,19 @@ function LessonHeader() {
       animate={{ opacity: 1, y: 0 }}
       className="text-center mb-10"
     >
+      {/* Level badge with gradient background */}
       <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white text-sm font-medium mb-4">
         <span>A1 Lesson 2</span>
       </div>
+      {/* Main lesson title */}
       <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">
         French Nouns and Articles
       </h1>
+      {/* Lesson description */}
       <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-2">
         Learn how noun gender works in French and how articles change with masculine, feminine, and vowel-starting words.
       </p>
+      {/* Instructions */}
       <p className="text-sm text-slate-500">
         Read the examples, listen to the words, and complete the practice before moving on.
       </p>
@@ -408,6 +587,17 @@ function LessonHeader() {
   )
 }
 
+/**
+ * ProgressBar Component
+ * ---------------------
+ * Displays overall lesson progress including:
+ * - Number of reviewed sections (5 total)
+ * - Number of completed practice questions (10 total)
+ * - Animated progress bar showing percentage complete
+ *
+ * Progress calculation: (reviewedSections + practiceProgress) / 6 * 100
+ * (5 sections + 1 practice section = 6 total progress units)
+ */
 function ProgressBar({ 
   reviewedSections, 
   practiceProgress, 
@@ -417,16 +607,21 @@ function ProgressBar({
   practiceProgress: number
   totalPractice: number
 }) {
+  // List of section keys for counting completed sections
   const sections = ['intro', 'masculine', 'feminine', 'vowel', 'summary'] as const
   const completedSections = sections.filter(s => reviewedSections[s]).length
+  
+  // Calculate total progress percentage (5 sections + 1 practice = 6 units)
   const totalProgress = ((completedSections + practiceProgress / totalPractice) / 6) * 100
 
   return (
     <div className="mb-8 bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+      {/* Header: Label and percentage */}
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-slate-600">Lesson Progress</span>
         <span className="text-sm font-medium text-purple-600">{Math.round(totalProgress)}%</span>
       </div>
+      {/* Animated progress bar */}
       <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-gradient-to-r from-purple-500 to-blue-500"
@@ -435,6 +630,7 @@ function ProgressBar({
           transition={{ duration: 0.5 }}
         />
       </div>
+      {/* Footer: Detailed counts */}
       <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
         <span>{completedSections}/5 sections reviewed</span>
         <span>•</span>
@@ -444,6 +640,16 @@ function ProgressBar({
   )
 }
 
+/**
+ * SectionCard Component
+ * ---------------------
+ * Container component for lesson content sections.
+ * Features:
+ * - Color-coded header based on section index (5 different colors)
+ * - "Mark as Reviewed" toggle button
+ * - Animated entrance with stagger delay
+ * - White card with border styling
+ */
 function SectionCard({ 
   title, 
   subtitle, 
@@ -461,25 +667,28 @@ function SectionCard({
   index: number
   children: React.ReactNode
 }) {
+  // Gradient colors for each section index
   const colors = [
-    'from-purple-500 to-pink-500',
-    'from-blue-500 to-cyan-500',
-    'from-pink-500 to-rose-500',
-    'from-amber-500 to-orange-500',
-    'from-emerald-500 to-teal-500'
+    'from-purple-500 to-pink-500',    // Section 0: Intro
+    'from-blue-500 to-cyan-500',      // Section 1: Masculine
+    'from-pink-500 to-rose-500',      // Section 2: Feminine
+    'from-amber-500 to-orange-500',     // Section 3: Vowel/Silent H
+    'from-emerald-500 to-teal-500'    // Section 4: Summary
   ]
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+      transition={{ delay: index * 0.1 }}  // Stagger animation by index
       className="mb-8"
     >
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Section Header: Icon, title, subtitle, and review button */}
         <div className="p-6 border-b border-slate-100">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
+              {/* Gradient icon container */}
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center text-white shadow-md`}>
                 <span className="text-2xl">{icon}</span>
               </div>
@@ -488,6 +697,7 @@ function SectionCard({
                 <p className="text-sm text-slate-600">{subtitle}</p>
               </div>
             </div>
+            {/* Review toggle button */}
             <button
               onClick={onMarkReviewed}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -504,6 +714,7 @@ function SectionCard({
             </button>
           </div>
         </div>
+        {/* Section Content: Render children (noun cards, rules, etc.) */}
         <div className="p-6">
           {children}
         </div>
@@ -512,6 +723,16 @@ function SectionCard({
   )
 }
 
+/**
+ * NounCard Component
+ * ----------------
+ * Card displaying a French noun with gender-based color coding.
+ * Features:
+ * - Color-coded by gender (blue=masculine, pink=feminine, amber=vowel)
+ * - Gender badge for vowel nouns (since l' doesn't indicate gender)
+ * - Audio play button with loading state
+ * - Example sentence with translation
+ */
 function NounCard({ noun, type, playCount, isPlaying, onPlay, index }: {
   noun: Noun
   type: 'masculine' | 'feminine' | 'vowel'
@@ -520,18 +741,22 @@ function NounCard({ noun, type, playCount, isPlaying, onPlay, index }: {
   onPlay: () => void
   index: number
 }) {
+  // Border color based on noun gender type
   const borderColor = type === 'masculine' ? 'border-blue-200 hover:border-blue-300' :
                       type === 'feminine' ? 'border-pink-200 hover:border-pink-300' :
                       'border-amber-200 hover:border-amber-300'
   
+  // Background color based on noun gender type
   const bgColor = type === 'masculine' ? 'bg-blue-50' :
                   type === 'feminine' ? 'bg-pink-50' :
                   'bg-amber-50'
 
+  // Accent color for the noun text
   const accentColor = type === 'masculine' ? 'text-blue-600' :
                       type === 'feminine' ? 'text-pink-600' :
                       'text-amber-600'
 
+  // Gender label and color for vowel nouns (l' doesn't show gender)
   const genderLabel = noun.gender === 'masculine' ? 'masculine' : 
                       noun.gender === 'feminine' ? 'feminine' : null
   const genderColor = noun.gender === 'masculine' ? 'bg-blue-100 text-blue-700' :
@@ -541,13 +766,16 @@ function NounCard({ noun, type, playCount, isPlaying, onPlay, index }: {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
+      transition={{ delay: index * 0.05 }}  // Stagger animation
       className={`${bgColor} rounded-xl p-4 border-2 ${borderColor} transition-all hover:shadow-md`}
     >
+      {/* Header: Noun with article, phonetic, and play button */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Full noun with article (e.g., "le livre") */}
             <h3 className={`text-2xl font-bold ${accentColor}`}>{noun.full}</h3>
+            {/* Gender badge for vowel nouns */}
             {genderLabel && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${genderColor}`}>
                 {genderLabel}
@@ -556,6 +784,7 @@ function NounCard({ noun, type, playCount, isPlaying, onPlay, index }: {
           </div>
           <p className="text-sm text-slate-500">/{noun.phonetic}/</p>
         </div>
+        {/* Audio play button */}
         <button
           onClick={onPlay}
           disabled={isPlaying}
@@ -569,7 +798,9 @@ function NounCard({ noun, type, playCount, isPlaying, onPlay, index }: {
           <FaPlay size={14} />
         </button>
       </div>
+      {/* English translation */}
       <p className="text-sm text-slate-600 mb-2">{noun.english}</p>
+      {/* Example sentence with translation */}
       <div className="text-sm text-slate-500 bg-white rounded-lg p-2 border border-slate-100">
         <span className="font-medium text-slate-700">{noun.example}</span>
         <span className="text-slate-400"> — {noun.exampleEnglish}</span>
@@ -589,6 +820,17 @@ interface PracticeCardProps {
   onNext: () => void
 }
 
+/**
+ * PracticeCard Component
+ * ----------------------
+ * Interactive multiple-choice question card for practice section.
+ * Features:
+ * - Question number and topic badge with gender-based color coding
+ * - 3 answer options with visual selection state
+ * - Immediate feedback with correct/incorrect highlighting
+ * - Random positive feedback messages for correct answers
+ * - Detailed explanation after answering
+ */
 function PracticeCard({
   question,
   questionNumber,
@@ -599,7 +841,10 @@ function PracticeCard({
   onSubmit,
   onNext
 }: PracticeCardProps) {
+  // Check if user's selected answer matches correct answer
   const isCorrect = selectedOption === question.correct
+
+  // Array of positive feedback messages for correct answers (randomly selected)
   const feedbackMessages = [
     "Nice 😏",
     "Good catch",
@@ -609,6 +854,7 @@ function PracticeCard({
   ]
   const randomMessage = feedbackMessages[Math.floor(Math.random() * feedbackMessages.length)]
 
+  // Get color class based on question topic (masculine/blue, feminine/pink, vowel/amber)
   const getTopicColor = () => {
     if (question.topic === 'masculine') return 'bg-blue-100 text-blue-700'
     if (question.topic === 'feminine') return 'bg-pink-100 text-pink-700'
@@ -622,36 +868,41 @@ function PracticeCard({
       animate={{ opacity: 1, y: 0 }}
       className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"
     >
+      {/* Header: Question number and topic badge */}
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm font-medium text-slate-500">
           Question {questionNumber} of {totalQuestions}
         </span>
+        {/* Topic badge with gender-based color */}
         <span className={`text-xs px-2 py-1 rounded-full font-medium ${getTopicColor()}`}>
           {question.topic}
         </span>
       </div>
 
+      {/* Question prompt text */}
       <h3 className="text-lg font-medium text-slate-800 mb-6">{question.prompt}</h3>
 
+      {/* Answer options with visual selection and feedback states */}
       <div className="space-y-3 mb-6">
         {question.options.map((option, idx) => (
           <button
             key={idx}
             onClick={() => onSelectOption(idx)}
-            disabled={showFeedback}
+            disabled={showFeedback}  // Prevent changing answer after submission
             className={`w-full p-4 rounded-xl border-2 text-left font-medium transition-all ${
               showFeedback
                 ? idx === question.correct
-                  ? 'border-green-400 bg-green-50 text-green-800'
+                  ? 'border-green-400 bg-green-50 text-green-800'    // Correct answer (green)
                   : selectedOption === idx
-                  ? 'border-red-400 bg-red-50 text-red-800'
-                  : 'border-slate-200 text-slate-400'
+                  ? 'border-red-400 bg-red-50 text-red-800'        // Wrong selection (red)
+                  : 'border-slate-200 text-slate-400'              // Unselected options
                 : selectedOption === idx
-                ? 'border-purple-500 bg-purple-50 text-purple-800'
-                : 'border-slate-200 hover:border-purple-300 text-slate-700'
+                ? 'border-purple-500 bg-purple-50 text-purple-800' // Selected but not submitted
+                : 'border-slate-200 hover:border-purple-300 text-slate-700' // Unselected
             }`}
           >
             <div className="flex items-center gap-3">
+              {/* Selection indicator circle */}
               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                 showFeedback
                   ? idx === question.correct
@@ -673,6 +924,7 @@ function PracticeCard({
         ))}
       </div>
 
+      {/* Feedback section (shown after submitting answer) */}
       {showFeedback && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -688,6 +940,7 @@ function PracticeCard({
         </motion.div>
       )}
 
+      {/* Action button: Submit (before feedback) or Next (after feedback) */}
       {!showFeedback ? (
         <button
           onClick={onSubmit}
@@ -713,8 +966,21 @@ function PracticeCard({
   )
 }
 
+/**
+ * PracticeCompleteCard Component
+ * ------------------------------
+ * Completion card shown after all practice questions are answered.
+ * Features:
+ * - Score display (e.g., "You scored 8 out of 10")
+ * - Percentage progress bar
+ * - Emoji celebration (🎉 for good, 👍 for okay)
+ * - Encouragement message based on performance
+ * - Color coding: green for 70%+ score, amber for below
+ */
 function PracticeCompleteCard({ score, total }: { score: number; total: number }) {
+  // Calculate percentage score
   const percentage = (score / total) * 100
+  // Consider 70% or higher as a good score
   const isGood = percentage >= 70
 
   return (
@@ -723,21 +989,26 @@ function PracticeCompleteCard({ score, total }: { score: number; total: number }
       animate={{ opacity: 1, scale: 1 }}
       className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center"
     >
+      {/* Celebration emoji with colored background */}
       <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
         isGood ? 'bg-green-100' : 'bg-amber-100'
       }`}>
         <span className="text-3xl">{isGood ? '🎉' : '👍'}</span>
       </div>
+      {/* Completion title */}
       <h3 className="text-xl font-bold text-slate-800 mb-2">Practice Complete!</h3>
+      {/* Score display */}
       <p className="text-slate-600 mb-4">
         You scored {score} out of {total}
       </p>
+      {/* Progress bar showing percentage */}
       <div className="h-2 bg-slate-200 rounded-full overflow-hidden max-w-xs mx-auto mb-4">
         <div 
           className={`h-full ${isGood ? 'bg-green-500' : 'bg-amber-500'}`}
           style={{ width: `${percentage}%` }}
         />
       </div>
+      {/* Encouragement message based on performance */}
       <p className={`text-sm font-medium ${isGood ? 'text-green-600' : 'text-amber-600'}`}>
         {isGood 
           ? "Great job! You're ready to move on." 

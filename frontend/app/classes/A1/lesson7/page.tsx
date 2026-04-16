@@ -1,24 +1,76 @@
+/**
+ * A1 Lesson 7 - French Pronunciation Patterns Page
+ * =================================================
+ *
+ * This page implements A1 Lesson 7, teaching French pronunciation patterns
+ * and spelling-to-sound rules. The lesson covers 16 core pronunciation
+ * patterns that help learners predict how French words should sound based
+ * on their spelling.
+ *
+ * Page Structure:
+ * ---------------
+ * 1. Header with back navigation and lesson title
+ * 2. Progress bar showing lesson completion (sticky)
+ * 3. Five collapsible content sections:
+ *    - Introduction to French Pronunciation
+ *    - Core Pronunciation Patterns (16 patterns with audio)
+ *    - Sound Comparisons (side-by-side contrasts)
+ *    - Guided Examples (full phrases with audio)
+ *    - Interactive Practice (16 questions)
+ * 4. Completion section with score display
+ *
+ * State Management:
+ * -----------------
+ * - reviewedSections: Array of section IDs marked as reviewed
+ * - practiceAnswers: User's answers with correctness tracking
+ * - practiceCompleted: Whether practice section is complete
+ * - lessonCompleted: Whether entire lesson is marked complete
+ * - isClient: Hydration flag for localStorage access
+ *
+ * Key Features:
+ * -------------
+ * - LocalStorage persistence for progress across sessions
+ * - Audio playback for pronunciation examples
+ * - Collapsible sections that auto-mark as reviewed when opened
+ * - Interactive practice quiz with randomized feedback
+ * - Sticky progress bar showing completion status
+ * - Side-by-side sound comparison visualizations
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and lifecycle
 import { useState, useEffect, useRef } from 'react'
+
+// Framer Motion for smooth animations
 import { motion, AnimatePresence } from 'framer-motion'
+
+// Font Awesome icons for UI elements
 import {
-  FaHome,
-  FaCheck,
-  FaChevronRight,
-  FaArrowRight,
-  FaBookOpen,
-  FaGraduationCap,
-  FaLightbulb,
-  FaTimes,
-  FaRedo,
-  FaChevronDown,
-  FaChevronUp,
-  FaVolumeUp,
-  FaPlay,
-  FaPause
+  FaHome,         // Back to lessons link
+  FaCheck,        // Completion checkmarks
+  FaChevronRight, // Navigation arrows
+  FaArrowRight,   // Action buttons
+  FaBookOpen,     // Content sections
+  FaGraduationCap, // Lesson header
+  FaLightbulb,    // Tips and hints
+  FaTimes,        // Close/incorrect indicators
+  FaRedo,         // Retake practice
+  FaChevronDown,  // Expand section
+  FaChevronUp,    // Collapse section
+  FaVolumeUp,     // Audio playback
+  FaPlay,         // Play button
+  FaPause         // Pause button
 } from 'react-icons/fa'
+
+// Next.js navigation
 import Link from 'next/link'
+
+// Lesson data imports
 import {
   pronunciationPatterns,
   soundComparisons,
@@ -32,6 +84,15 @@ import {
   GuidedExample
 } from './data'
 
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
+
+/**
+ * LessonProgress Interface
+ * ------------------------
+ * Structure for saving/loading lesson progress from localStorage.
+ */
 interface LessonProgress {
   reviewedSections: SectionId[]
   practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[]
@@ -39,23 +100,88 @@ interface LessonProgress {
   lessonCompleted: boolean
 }
 
+// =============================================================================
+// FEEDBACK MESSAGES
+// =============================================================================
+
+/**
+ * Randomized feedback messages for practice quiz responses.
+ * Shows encouraging messages for both correct and incorrect answers.
+ */
 const feedbackMessages = {
   correct: ['Nice 😏', 'Good catch', "That's right", "You're hearing the pattern", 'Well done!', 'Perfect!'],
   incorrect: ['Careful now…', 'Almost there', 'Keep trying', 'Not quite', 'Review the pattern']
 }
 
+/**
+ * getRandomFeedback - Returns a random feedback message.
+ * @param isCorrect - Whether the answer was correct
+ * @returns Random message string from appropriate category
+ */
 function getRandomFeedback(isCorrect: boolean) {
   const messages = isCorrect ? feedbackMessages.correct : feedbackMessages.incorrect
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+/**
+ * A1Lesson7Page - Main component for A1 Lesson 7: French Pronunciation Patterns
+ *
+ * This component manages the complete lesson flow including:
+ * - 5 collapsible content sections
+ * - LocalStorage-based progress persistence
+ * - Interactive practice quiz with 16 questions
+ * - Lesson completion tracking
+ */
 export default function A1Lesson7Page() {
+  // ===========================================================================
+  // STATE: Section Review Tracking
+  // ===========================================================================
+
+  /**
+   * reviewedSections - Array of section IDs the user has opened/reviewed.
+   * All 5 sections must be reviewed to enable lesson completion.
+   */
   const [reviewedSections, setReviewedSections] = useState<SectionId[]>([])
+
+  // ===========================================================================
+  // STATE: Practice Quiz
+  // ===========================================================================
+
+  /**
+   * practiceAnswers - Array of user's answers to practice questions.
+   * Each answer stores the question ID, selected option, and correctness.
+   */
   const [practiceAnswers, setPracticeAnswers] = useState<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>([])
+
+  /**
+   * practiceCompleted - Whether the user has finished the practice section.
+   */
   const [practiceCompleted, setPracticeCompleted] = useState(false)
+
+  // ===========================================================================
+  // STATE: Lesson Completion
+  // ===========================================================================
+
+  /**
+   * lessonCompleted - Whether the entire lesson is marked as complete.
+   * Requires all sections reviewed and practice completed.
+   */
   const [lessonCompleted, setLessonCompleted] = useState(false)
+
+  /**
+   * isClient - Flag to prevent hydration mismatch with localStorage.
+   * Set to true after component mounts on client side.
+   */
   const [isClient, setIsClient] = useState(false)
 
+  // ===========================================================================
+  // EFFECT: Load Progress from LocalStorage
+  // ===========================================================================
+
+  /**
+   * On mount: Load saved progress from localStorage if available.
+   * LocalStorage key: 'a1Lesson7Progress'
+   */
   useEffect(() => {
     setIsClient(true)
     const saved = localStorage.getItem('a1Lesson7Progress')
@@ -68,6 +194,14 @@ export default function A1Lesson7Page() {
     }
   }, [])
 
+  // ===========================================================================
+  // EFFECT: Save Progress to LocalStorage
+  // ===========================================================================
+
+  /**
+   * Auto-save progress to localStorage whenever state changes.
+   * Only runs on client side (after isClient is true).
+   */
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('a1Lesson7Progress', JSON.stringify({
@@ -79,21 +213,49 @@ export default function A1Lesson7Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, lessonCompleted, isClient])
 
+  // ===========================================================================
+  // HANDLERS: Section Review
+  // ===========================================================================
+
+  /**
+   * markSectionReviewed - Adds a section ID to the reviewed sections list.
+   * Called automatically when a section is expanded.
+   *
+   * @param sectionId - The section identifier to mark as reviewed
+   */
   const markSectionReviewed = (sectionId: SectionId) => {
     if (!reviewedSections.includes(sectionId)) {
       setReviewedSections(prev => [...prev, sectionId])
     }
   }
 
+  // ===========================================================================
+  // COMPUTED: Progress and Scores
+  // ===========================================================================
+
+  /** True when all 5 sections have been reviewed */
   const allSectionsReviewed = sectionIds.every(id => reviewedSections.includes(id))
+
+  /** Count of correct answers from the practice quiz */
   const practiceScore = practiceAnswers.filter(a => a.isCorrect).length
 
+  // ===========================================================================
+  // HANDLER: Lesson Completion
+  // ===========================================================================
+
+  /**
+   * completeLesson - Marks the lesson as complete if all conditions met.
+   * Requires all sections reviewed and practice completed.
+   */
   const completeLesson = () => {
     if (allSectionsReviewed && practiceCompleted) {
       setLessonCompleted(true)
     }
   }
 
+  // ===========================================================================
+  // RENDER: Main Page Layout
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100 pb-24">
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -108,13 +270,20 @@ export default function A1Lesson7Page() {
           </Link>
         </div>
 
-        {/* Lesson Header */}
+        {/* ---------------------------------------------------------------
+            HEADER: Lesson title and description
+            --------------------------------------------------------------- */}
         <LessonHeader />
 
-        {/* Progress Bar */}
+        {/* ---------------------------------------------------------------
+            PROGRESS BAR: Visual progress indicator (sticky)
+            Shows section review count and completion status
+            --------------------------------------------------------------- */}
         <ProgressBar reviewedSections={reviewedSections} />
 
-        {/* Sections */}
+        {/* ---------------------------------------------------------------
+            CONTENT SECTIONS: 5 collapsible lesson sections
+            --------------------------------------------------------------- */}
         <div className="space-y-6">
           <IntroSection
             isReviewed={reviewedSections.includes('intro')}
@@ -144,7 +313,10 @@ export default function A1Lesson7Page() {
             onComplete={() => setPracticeCompleted(true)}
           />
 
-          {/* Completion Section */}
+          {/* ---------------------------------------------------------------
+              COMPLETION SECTION: Final celebration and summary
+              Shows when user completes all sections and practice
+              --------------------------------------------------------------- */}
           <CompletionSection
             isComplete={lessonCompleted}
             canComplete={allSectionsReviewed && practiceCompleted}
@@ -158,6 +330,14 @@ export default function A1Lesson7Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ * Features a gradient banner with lesson info and a helper tip.
+ */
 function LessonHeader() {
   return (
     <motion.div
@@ -190,6 +370,18 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual progress indicator for lesson completion.
+ *
+ * Props:
+ * - reviewedSections: Array of reviewed section IDs
+ *
+ * Features sticky positioning at top of viewport.
+ */
 function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   const totalSections = sectionIds.length
   const completedSections = reviewedSections.length
@@ -218,6 +410,27 @@ interface SectionProps {
   onMarkReviewed: () => void
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Reusable collapsible card wrapper for lesson sections.
+ *
+ * Props:
+ * - id: Section identifier
+ * - title: Section title
+ * - icon: Font Awesome icon component
+ * - isReviewed: Whether section has been reviewed
+ * - onMarkReviewed: Callback when section is marked as reviewed
+ * - children: Section content
+ * - defaultOpen: Whether section starts expanded
+ *
+ * Features:
+ * - Auto-marks as reviewed when expanded
+ * - Animated expand/collapse
+ * - Visual review status indicator
+ */
 function SectionCard({
   id,
   title,
@@ -293,6 +506,14 @@ function SectionCard({
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: IntroSection
+// =============================================================================
+
+/**
+ * IntroSection - Introduction to French pronunciation.
+ * Sets expectations for the lesson and explains why patterns matter.
+ */
 function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -340,7 +561,22 @@ function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-// Audio Player Component
+// =============================================================================
+// HELPER COMPONENT: AudioPlayButton
+// =============================================================================
+
+/**
+ * AudioPlayButton - Audio playback button with play/pause toggle.
+ *
+ * Props:
+ * - audioSrc: URL to the audio file
+ * - label: Optional accessible label for the button
+ *
+ * Features:
+ * - Play/pause toggle functionality
+ * - Visual feedback during playback
+ * - Accessible button with aria-label
+ */
 function AudioPlayButton({ audioSrc, label }: { audioSrc: string; label?: string }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -377,7 +613,23 @@ function AudioPlayButton({ audioSrc, label }: { audioSrc: string; label?: string
   )
 }
 
-// Pattern Card Component
+// =============================================================================
+// HELPER COMPONENT: PatternCard
+// =============================================================================
+
+/**
+ * PatternCard - Individual pronunciation pattern display card.
+ *
+ * Props:
+ * - pattern: PronunciationPattern data object
+ * - index: Index for color cycling (0-4)
+ *
+ * Features:
+ * - Color-coded by pattern index
+ * - Rule explanation and examples
+ * - Common mistake warnings
+ * - Audio playback for examples
+ */
 function PatternCard({ pattern, index }: { pattern: PronunciationPattern; index: number }) {
   const colors = [
     { border: 'border-blue-200', bg: 'bg-blue-50', text: 'text-blue-700', badge: 'bg-blue-200 text-blue-800' },
@@ -433,6 +685,14 @@ function PatternCard({ pattern, index }: { pattern: PronunciationPattern; index:
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: CorePatternsSection
+// =============================================================================
+
+/**
+ * CorePatternsSection - Displays all 16 pronunciation patterns.
+ * Each pattern includes rule, explanation, examples, and audio.
+ */
 function CorePatternsSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -473,7 +733,22 @@ function CorePatternsSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-// Sound Comparison Card
+// =============================================================================
+// HELPER COMPONENT: SoundComparisonCard
+// =============================================================================
+
+/**
+ * SoundComparisonCard - Side-by-side comparison of two French sounds.
+ *
+ * Props:
+ * - comparison: SoundComparison data object (left/right sounds with examples)
+ * - index: Index for color cycling
+ *
+ * Features:
+ * - Visual side-by-side sound comparison
+ * - Phonetic guides for each sound
+ * - Explanatory note about the difference
+ */
 function SoundComparisonCard({ comparison, index }: { comparison: SoundComparison; index: number }) {
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden">
@@ -508,6 +783,14 @@ function SoundComparisonCard({ comparison, index }: { comparison: SoundCompariso
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: SoundComparisonsSection
+// =============================================================================
+
+/**
+ * SoundComparisonsSection - Side-by-side sound contrasts.
+ * Shows visual comparison of similar but distinct French sounds.
+ */
 function SoundComparisonsSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -532,7 +815,22 @@ function SoundComparisonsSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-// Guided Example Card
+// =============================================================================
+// HELPER COMPONENT: GuidedExampleCard
+// =============================================================================
+
+/**
+ * GuidedExampleCard - Individual guided example display with audio.
+ *
+ * Props:
+ * - example: GuidedExample data object (French, English, phonetic, audio)
+ * - index: Index for alternating background colors
+ *
+ * Features:
+ * - French phrase with English translation
+ * - Phonetic pronunciation guide
+ * - Audio playback button
+ */
 function GuidedExampleCard({ example, index }: { example: GuidedExample; index: number }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5">
@@ -550,6 +848,14 @@ function GuidedExampleCard({ example, index }: { example: GuidedExample; index: 
   )
 }
 
+// =============================================================================
+// SECTION COMPONENT: GuidedExamplesSection
+// =============================================================================
+
+/**
+ * GuidedExamplesSection - Full phrases with audio playback.
+ * Demonstrates multiple patterns in context.
+ */
 function GuidedExamplesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard
@@ -581,7 +887,25 @@ function GuidedExamplesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
-// Practice Section
+// =============================================================================
+// SECTION COMPONENT: PracticeSection
+// =============================================================================
+
+/**
+ * PracticeSection - Interactive 16-question quiz.
+ *
+ * Props:
+ * - isReviewed: Whether practice section has been opened
+ * - onMarkReviewed: Callback when section is reviewed
+ * - practiceAnswers: User's answer history
+ * - setPracticeAnswers: State setter for answers
+ * - onComplete: Callback when all questions answered
+ *
+ * Features:
+ * - Multiple choice questions by topic
+ * - Immediate feedback with randomized messages
+ * - Score tracking and progress display
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -849,7 +1173,22 @@ function PracticeSection({
   )
 }
 
-// Completion Section
+// =============================================================================
+// SUB-COMPONENT: CompletionSection
+// =============================================================================
+
+/**
+ * CompletionSection - Final celebration card with lesson summary.
+ *
+ * Props:
+ * - isComplete: Whether lesson is marked complete
+ * - canComplete: Whether completion requirements are met
+ * - score: Number of correct practice answers
+ * - total: Total number of practice questions
+ * - onComplete: Callback to mark lesson as complete
+ *
+ * Shows score, feedback, and completion button when ready.
+ */
 function CompletionSection({
   isComplete,
   canComplete,

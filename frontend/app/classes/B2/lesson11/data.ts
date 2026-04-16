@@ -1,12 +1,89 @@
-// B2 Lesson 11 — Complex Sentence Construction
+/**
+ * B2 Lesson 11 - Complex Sentence Construction
+ * ===============================================
+ *
+ * This file contains all lesson data for B2 Lesson 11, teaching advanced
+ * sentence construction techniques for sophisticated French prose.
+ *
+ * **Lesson Content:**
+ * - Introduction: Beyond simple sentences, syntactic sophistication
+ * - Clause embedding: Relative clauses, participial embedding, subordinate clauses
+ * - Participles: Present participles and past participle absolute
+ * - Subordination: Temporal, causal, conditional, concessive, final clauses
+ * - Coordination: Coordinating conjunctions with nuance
+ * - Cleft sentences: Focus and emphasis constructions
+ * - Nominalization: Verbs as nouns for abstraction
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Embedding inserts one clause within another for density
+ * - Present participle (-ant): Actions simultaneous with main verb
+ * - Past participle absolute: Background circumstances, anterior events
+ * - Cleft sentences (phrases clivées): Foreground specific information
+ * - Nominalization: Converts verbs/actions to noun phrases
+ * - Subordination establishes logical, temporal, causal relationships
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. lessonMeta - Lesson metadata (title, subtitle, number)
+ * 3. introSections - Introduction to complex sentences
+ * 4. embeddingSection - Clause embedding techniques
+ * 5. participlesSection - Present and past participles
+ * 6. subordinationSection - Subordination strategies
+ * 7. coordinationSection - Coordination with nuance
+ * 8. cleftsSection - Cleft sentences
+ * 9. nominalizationSection - Nominalization patterns
+ * 10. practiceQuestions - 15 quiz questions
+ * 11. getPerformanceMessage - Score-based feedback
+ */
+
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to complex sentence construction
+ * 2. embedding - Clause embedding techniques
+ * 3. participles - Present and past participles
+ * 4. subordination - Subordination strategies
+ * 5. coordination - Coordination with nuance
+ * 6. clefts - Cleft sentences
+ * 7. nominalization - Nominalization patterns
+ * 8. practice - Interactive quiz
+ * 9. completion - Lesson completion
+ */
 export const sectionIds = ["intro", "embedding", "participles", "subordination", "coordination", "clefts", "nominalization", "practice", "completion"];
 
+// =============================================================================
+// LESSON METADATA
+// =============================================================================
+
+/**
+ * lessonMeta - Lesson metadata for display in headers and navigation.
+ */
 export const lessonMeta = {
+  /** Lesson title */
   title: "Complex Sentence Construction",
+  /** Brief description of lesson content */
   subtitle: "Build sophisticated sentences using embedding, participles, cleft constructions, and nominalization for advanced French prose.",
+  /** Lesson number in B2 series */
   lessonNumber: 11,
 };
 
+// =============================================================================
+// INTRODUCTION SECTIONS
+// =============================================================================
+
+/**
+ * introSections - Introduction to complex sentence construction.
+ *
+ * Content:
+ * - Beyond Simple Sentences: Constructing multi-layered sentences
+ * - Syntactic Sophistication: Managing temporal layers, embedding, foregrounding
+ */
 export const introSections = [
   {
     title: "Beyond Simple Sentences",
@@ -18,6 +95,20 @@ export const introSections = [
   },
 ];
 
+// =============================================================================
+// EMBEDDING SECTION
+// =============================================================================
+
+/**
+ * embeddingSection - Clause embedding techniques.
+ *
+ * Embedding inserts one clause within another to create density and efficiency.
+ *
+ * Techniques:
+ * - Relative clause embedding: J'ai lu un livre qui était fascinant
+ * - Participial embedding: Souriant, il entra dans la pièce
+ * - Subordinate clause embedding: Avant de partir, il a dit au revoir
+ */
 export const embeddingSection = {
   title: "Clause Embedding",
   explanation: "Embedding inserts one clause within another to create density and efficiency.",
@@ -28,6 +119,25 @@ export const embeddingSection = {
   ],
 };
 
+// =============================================================================
+// PARTICIPLES SECTION
+// =============================================================================
+
+/**
+ * participlesSection - Participles: Verbal adjectives.
+ *
+ * Participles allow incorporating secondary actions with elegant economy.
+ *
+ * Present Participle (-ant):
+ * - Formation: Verb root + -ant (marcher → marchant)
+ * - Usage: Actions simultaneous with main verb, manner, circumstance
+ * - Examples: Méditant sur la vie, il marchait dans le parc
+ *
+ * Past Participle Absolute:
+ * - Formation: Past participle with avoir/être subjects
+ * - Usage: Background circumstances, anterior events
+ * - Examples: Les devoirs finis, les enfants sont sortis jouer
+ */
 export const participlesSection = {
   title: "Participles: Verbal Adjectives",
   explanation: "Participles allow you to incorporate secondary actions with elegant economy.",
@@ -49,6 +159,22 @@ export const participlesSection = {
   },
 };
 
+// =============================================================================
+// SUBORDINATION SECTION
+// =============================================================================
+
+/**
+ * subordinationSection - Subordination strategies.
+ *
+ * Subordinate clauses establish logical, temporal, and causal relationships.
+ *
+ * Types:
+ * - Temporal: quand, lorsque, dès que, aussitôt que, avant que
+ * - Causal: parce que, puisque, étant donné que
+ * - Conditional: si, à condition que, pourvu que
+ * - Concessive: bien que, quoique, même si
+ * - Final (purpose): pour que, afin que, de peur que
+ */
 export const subordinationSection = {
   title: "Subordination Strategies",
   explanation: "Subordinate clauses establish logical, temporal, and causal relationships.",
@@ -61,6 +187,24 @@ export const subordinationSection = {
   ],
 };
 
+// =============================================================================
+// COORDINATION SECTION
+// =============================================================================
+
+/**
+ * coordinationSection - Coordination with nuance.
+ *
+ * Coordinating conjunctions link independent clauses with specific
+ * logical relationships.
+ *
+ * Conjunctions:
+ * - et: Addition (Il est intelligent et travailleur)
+ * - mais: Contrast (Il est pauvre mais honnête)
+ * - ou: Alternative (Viens ou reste, mais décide-toi)
+ * - donc: Consequence (Il pleut, donc je reste)
+ * - ni...ni: Double negation (Il n'est ni riche ni pauvre)
+ * - or: Opposition/now (Il devait venir; or, il est malade)
+ */
 export const coordinationSection = {
   title: "Coordination with Nuance",
   explanation: "Coordinating conjunctions link independent clauses with specific logical relationships.",
@@ -74,6 +218,23 @@ export const coordinationSection = {
   ],
 };
 
+// =============================================================================
+// CLEFTS SECTION
+// =============================================================================
+
+/**
+ * cleftsSection - Cleft sentences: Focus and emphasis.
+ *
+ * Cleft constructions (phrases clivées) foreground specific information.
+ *
+ * Types:
+ * - Ce qui/que est... c'est: Focus on subject/thing
+ *   Example: Ce qui m'étonne, c'est sa réaction
+ * - C'est... qui/que: It's X who/that...
+ *   Examples: C'est Pierre qui a gagné (subject), C'est le prix que je veux (object)
+ * - Ce dont je... c'est: Focus on complement
+ *   Example: Ce dont je rêve, c'est voyager
+ */
 export const cleftsSection = {
   title: "Cleft Sentences: Focus and Emphasis",
   explanation: "Cleft constructions (phrases clivées) foreground specific information.",
@@ -84,6 +245,23 @@ export const cleftsSection = {
   ],
 };
 
+// =============================================================================
+// NOMINALIZATION SECTION
+// =============================================================================
+
+/**
+ * nominalizationSection - Nominalization: Verbs as nouns.
+ *
+ * Nominalization converts verbs/actions into noun phrases for abstraction
+ * and concision.
+ *
+ * Patterns:
+ * - Le + infinitive: Le faire est difficile (infinitive as subject)
+ * - Nominalized adjective: Les pauvres souffrent (adjective → noun group)
+ * - Action nouns (-tion, -ment, -age): La construction fut rapide
+ *
+ * Benefits: Creates abstract, formal register; avoids repetitive verb constructions.
+ */
 export const nominalizationSection = {
   title: "Nominalization: Verbs as Nouns",
   explanation: "Nominalization converts verbs/actions into noun phrases for abstraction and concision.",
@@ -95,6 +273,38 @@ export const nominalizationSection = {
   benefits: "Creates abstract, formal register. Avoids repetitive verb constructions.",
 };
 
+// =============================================================================
+// PRACTICE QUESTIONS - 15 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for B2 Lesson 11.
+ *
+ * Topics covered:
+ * - embedding (1): Participial embedding (simultaneous action)
+ * - present-participle (2): Present participle formation (-issant for -ir verbs)
+ * - absolute (3): Past participle absolute (completed action)
+ * - cleft (4): C'est... qui for subject focus
+ * - cleft-object (5): C'est... que for object focus
+ * - temporal (6): Dès que + future perfect
+ * - causal (7): Étant donné que (formal given that)
+ * - purpose (8): Pour que + subjunctive
+ * - nominalization (9): Infinitive as subject (le faire)
+ * - concessive (10): Bien que + subjunctive
+ * - ce-qui-focus (11): Ce qui = subject of verb
+ * - coordinating (12): Or = opposition/contrast
+ * - subjunctive-trigger (13): Pourvu que + subjunctive
+ * - manner (14): Participle for manner
+ * - ni (15): Ni...ni = neither...nor
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   { id: 1, topic: "embedding", prompt: "Combine: 'Il entra. Il souriait.' (participle)", options: ["Souriant, il entra.", "Il entra et il souriait.", "Entrant, il souriait."], correct: 0, explanation: "Present participle = simultaneous action" },
   { id: 2, topic: "present-participle", prompt: "Present participle of 'finir':", options: ["finissant", "fini", "finissant"], correct: 0, explanation: "-issant ending for -ir verbs" },
@@ -113,6 +323,24 @@ export const practiceQuestions = [
   { id: 15, topic: "ni", prompt: "'Ni...ni' means:", options: ["Neither...nor", "Either...or", "Not only...but also"], correct: 0, explanation: "Double negation: neither X nor Y" },
 ];
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/15: "Good effort" - suggests focusing on cleft constructions
+ *   and present participles for embedding
+ * - 8-11/15: "Nice progress" - encourages focusing on subjunctive triggers
+ *   and nominalization patterns
+ * - 12-15/15: "Excellent command" - celebrates complex sentence mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) return { title: "Good effort", message: "Complex sentences require practice. Focus on cleft constructions and present participles for embedding.", emoji: "📚", color: "blue" as const };
   if (score <= 11) return { title: "Nice progress", message: "You are building sophisticated sentences. Focus on subjunctive triggers and nominalization patterns.", emoji: "🎯", color: "yellow" as const };

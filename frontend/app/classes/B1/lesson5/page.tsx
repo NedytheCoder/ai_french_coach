@@ -1,9 +1,60 @@
+/**
+ * B1 Lesson 5 - Expressing Hypotheses (Les Hypothèses)
+ * =====================================================
+ *
+ * This page teaches B1 learners to express hypotheses and conditional situations
+ * using French si clauses with different tense patterns.
+ *
+ * **Lesson Structure:**
+ * 1. LessonHeader - Title and introduction using lessonMeta
+ * 2. WhatAreHypothesesSection - Three types of hypotheses overview
+ * 3. SiPatternsSection - The three si clause patterns
+ * 4. RealSection - Real/likely hypotheses (présent + futur)
+ * 5. UnrealPresentSection - Unreal present/wishes (imparfait + conditionnel)
+ * 6. UnrealPastSection - Unreal past/regrets (plus-que-parfait + conditionnel passé)
+ * 7. PitfallsSection - Common pitfalls to avoid
+ * 8. PracticeSection - Interactive quiz (15 questions)
+ * 9. CompletionSection - Lesson completion with recap
+ *
+ * **Key Concepts:**
+ * - Real: Si + présent → futur
+ * - Unreal present: Si + imparfait → conditionnel
+ * - Unreal past: Si + plus-que-parfait → conditionnel passé
+ * - Golden rule: Never use conditional after si
+ *
+ * **Features:**
+ * - Uses shared B1 components (SectionCard, ProgressBar, PracticeSection, etc.)
+ * - Cyan accent color theme
+ * - localStorage persistence for progress
+ * - 15-question interactive quiz
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations
 import { motion } from "framer-motion";
-import { FaCloud, FaListOl, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaLightbulb } from "react-icons/fa";
+
+// React Icons for UI elements
+import {
+  FaCloud,          // Hypotheses overview / Unreal present
+  FaListOl,         // Si patterns section
+  FaCheckCircle,    // Real hypotheses
+  FaTimesCircle,    // Unreal past (regrets)
+  FaExclamationTriangle, // Pitfalls section
+  FaLightbulb,      // Tips
+} from "react-icons/fa";
+
+// Shared B1 components
 import { SectionCard, ProgressBar, PracticeSection, CompletionSection, LessonNav } from "../components";
+
+// Lesson data imports
 import {
   sectionIds,
   lessonMeta,
@@ -17,6 +68,16 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Uses lessonMeta from data.ts for dynamic title and subtitle.
+ * Features cyan/blue gradient background.
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-cyan-500 to-blue-400 rounded-2xl p-8 text-white shadow-lg">
@@ -29,6 +90,14 @@ function LessonHeader() {
   );
 }
 
+/**
+ * WhatAreHypothesesSection - Overview of the three types of hypotheses.
+ *
+ * Content:
+ * - Real hypothesis: Possible, likely situations
+ * - Unreal present: Imaginary situations now
+ * - Unreal past: Regrets about the past
+ */
 function WhatAreHypothesesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="what-are-hypotheses" title="What are Hypotheses?" icon={FaCloud} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="cyan">
@@ -48,6 +117,15 @@ function WhatAreHypothesesSection({ isReviewed, onMarkReviewed }: { isReviewed: 
   );
 }
 
+/**
+ * SiPatternsSection - The three si clause tense patterns.
+ *
+ * Content:
+ * - Si + présent, futur: Real/likely hypotheses
+ * - Si + imparfait, conditionnel: Unreal present
+ * - Si + plus-que-parfait, conditionnel passé: Unreal past
+ * - Golden rule: Never use conditional after si
+ */
 function SiPatternsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="si-patterns" title="The Three Si Patterns" icon={FaListOl} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="cyan">
@@ -69,6 +147,14 @@ function SiPatternsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * RealSection - Real/likely hypotheses.
+ *
+ * Content:
+ * - Pattern: Si + présent → futur
+ * - Used for situations that are possible or likely to happen
+ * - Examples with explanations
+ */
 function RealSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="real-hypotheses" title="Real Hypotheses" icon={FaCheckCircle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="cyan">
@@ -90,6 +176,14 @@ function RealSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMa
   );
 }
 
+/**
+ * UnrealPresentSection - Unreal present hypotheses (wishes).
+ *
+ * Content:
+ * - Pattern: Si + imparfait → conditionnel
+ * - Used for imaginary situations contrary to present reality
+ * - Examples showing hypothetical scenarios
+ */
 function UnrealPresentSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="unreal-present" title="Unreal Present (Wishes)" icon={FaCloud} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="cyan">
@@ -111,6 +205,14 @@ function UnrealPresentSection({ isReviewed, onMarkReviewed }: { isReviewed: bool
   );
 }
 
+/**
+ * UnrealPastSection - Unreal past hypotheses (regrets).
+ *
+ * Content:
+ * - Pattern: Si + plus-que-parfait → conditionnel passé
+ * - Used for regrets about past situations that didn't happen
+ * - Examples showing missed opportunities
+ */
 function UnrealPastSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="unreal-past" title="Unreal Past (Regrets)" icon={FaTimesCircle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="cyan">
@@ -132,6 +234,14 @@ function UnrealPastSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * PitfallsSection - Common errors with hypotheses.
+ *
+ * Content:
+ * - Using conditional after si (never do this)
+ * - Using futur after si (use présent instead)
+ * - Mismatched time frames in condition and result
+ */
 function PitfallsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="common-pitfalls" title="Common Pitfalls" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="cyan">
@@ -150,12 +260,37 @@ function PitfallsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson5Page - Main component for B1 Lesson 5.
+ *
+ * Manages:
+ * - Section review state
+ * - Practice quiz score and completion
+ * - Progress persistence to localStorage
+ * - Uses shared B1 components with cyan accent color
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson5Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("b1Lesson5Progress");
@@ -165,34 +300,70 @@ export default function Lesson5Page() {
         setReviewedSections(parsed.reviewedSections || []);
         setPracticeScore(parsed.practiceScore || 0);
         setPracticeCompleted(parsed.practiceCompleted || false);
-      } catch {}
+      } catch {
+        // Invalid saved data, ignore
+      }
     }
   }, []);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("b1Lesson5Progress", JSON.stringify({ reviewedSections, practiceScore, practiceCompleted }));
     }
   }, [reviewedSections, practiceScore, practiceCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => { setReviewedSections((prev) => (prev.includes(id) ? prev : [...prev, id])); };
+
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => { setPracticeScore(score); setPracticeCompleted(true); };
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => Math.round((reviewedSections.length / sectionIds.length) * 100), [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) return <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-slate-50 flex items-center justify-center"><div className="text-cyan-600">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Navigation */}
         <LessonNav backPath="/classes/B1" />
+
+        {/* Lesson Header with title from lessonMeta */}
         <LessonHeader />
+
+        {/* Progress Bar */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100"><ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" accentColor="cyan" /></div>
+
+        {/* Lesson Sections - In Order of Instruction */}
         <WhatAreHypothesesSection isReviewed={reviewedSections.includes("what-are-hypotheses")} onMarkReviewed={handleMarkReviewed} />
         <SiPatternsSection isReviewed={reviewedSections.includes("si-patterns")} onMarkReviewed={handleMarkReviewed} />
         <RealSection isReviewed={reviewedSections.includes("real-hypotheses")} onMarkReviewed={handleMarkReviewed} />
         <UnrealPresentSection isReviewed={reviewedSections.includes("unreal-present")} onMarkReviewed={handleMarkReviewed} />
         <UnrealPastSection isReviewed={reviewedSections.includes("unreal-past")} onMarkReviewed={handleMarkReviewed} />
         <PitfallsSection isReviewed={reviewedSections.includes("common-pitfalls")} onMarkReviewed={handleMarkReviewed} />
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-cyan-50 to-white">
             <h2 className="text-xl font-semibold text-slate-800">Guided Interactive Practice</h2>
@@ -201,6 +372,8 @@ export default function Lesson5Page() {
             <PracticeSection questions={practiceQuestions} isReviewed={reviewedSections.includes("practice")} onMarkReviewed={handleMarkReviewed} onComplete={handlePracticeComplete} getPerformanceMessage={getPerformanceMessage} accentColor="cyan" />
           </div>
         </div>
+
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection lessonNumber={5} lessonTitle={lessonMeta.title} practiceScore={practiceScore} totalQuestions={practiceQuestions.length} nextLessonPath="/classes/B1/lesson6" recapItems={["Three si patterns", "Real hypotheses: présent + futur", "Unreal present: imparfait + conditionnel", "Unreal past: plus-que-parfait + conditionnel passé", "Never use conditional after si"]} accentColor="cyan" />
         )}

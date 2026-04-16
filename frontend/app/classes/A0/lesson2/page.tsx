@@ -1,9 +1,64 @@
+/**
+ * A0 Lesson 2 - French Numbers Pronunciation
+ * =============================================
+ *
+ * This is the second lesson for absolute beginners (A0 level).
+ * It teaches French numbers 1-100 with audio pronunciation,
+ * phonetic guides, and interactive play functionality.
+ *
+ * **Lesson Content:**
+ * - Numbers 1-30 (full sequence)
+ * - Tens: 40, 50, 60, 70, 80, 90
+ * - 100 (cent)
+ * - Phonetic pronunciation guides for each number
+ * - Grouped into sections for easier learning
+ *
+ * **Features:**
+ * - Interactive number cards with play button
+ * - Visual progress tracking
+ * - Audio playback with completion states
+ * - Section grouping (1-10, 11-20, 21-30, Tens & 100)
+ * - Sticky footer with navigation
+ * - Completion requirement: play every number at least 2 times
+ *
+ * **Components:**
+ * - LessonHeader - Title and instructions
+ * - ProgressBar - Visual progress indicator
+ * - NumberCard - Individual number with audio controls
+ * - SectionHeader - Visual divider for number groups
+ * - FooterActionBar - Sticky footer with next button
+ *
+ * **Audio Files:**
+ * - Located at /audio/numbers/[value].mp3
+ *
+ * **Note on French Numbers:**
+ * - 70 = soixante-dix (60 + 10)
+ * - 80 = quatre-vingts (4 × 20)
+ * - 90 = quatre-vingt-dix (4 × 20 + 10)
+ * - These are unique to French and differ from English pattern
+ */
+
 "use client"
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management, refs, and side effects
 import { useState, useRef, useEffect } from "react"
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion"
+
+// Next.js Link for navigation
 import Link from "next/link"
+
+// React Icons for UI elements
 import { FaPlay, FaCheck, FaArrowRight } from "react-icons/fa"
+
+// =============================================================================
+// TYPES & DATA
+// =============================================================================
 
 /**
  * Number data interface for numbers lesson
@@ -19,9 +74,26 @@ interface NumberItem {
   audioSrc: string
 }
 
+// =============================================================================
+// FRENCH NUMBERS DATA
+// =============================================================================
+
 /**
- * French numbers data with phonetic guides
- * Numbers 1-30, plus 40, 50, 60, 70, 80, 90, 100
+ * numbers - French numbers 1-100 with phonetic pronunciation guides.
+ *
+ * Includes:
+ * - Numbers 1-30 (complete sequence)
+ * - Tens: 40, 50, 60, 70, 80, 90
+ * - 100 (cent)
+ *
+ * Total: 37 numbers
+ *
+ * **French Number Peculiarities:**
+ * - 70 = soixante-dix (60 + 10), not "septante"
+ * - 80 = quatre-vingts (4 × 20), not "huitante"
+ * - 90 = quatre-vingt-dix (4 × 20 + 10), not "nonante"
+ * - These vigesimal (base-20) forms are standard in France
+ * - Belgian/Swiss French uses septante, huitante, nonante
  */
 const numbers: NumberItem[] = [
   { value: 1, word: "un", phonetic: "uh(n)", audioSrc: "/audio/numbers/1.mp3" },
@@ -63,8 +135,20 @@ const numbers: NumberItem[] = [
   { value: 100, word: "cent", phonetic: "son", audioSrc: "/audio/numbers/100.mp3" }
 ]
 
+// =============================================================================
+// SECTION GROUPINGS
+// =============================================================================
+
 /**
- * Section divider ranges for grouping numbers visually
+ * sections - Defines visual groupings for the numbers.
+ *
+ * Groups numbers into 4 sections for easier learning:
+ * 1. Numbers 1-10 (indices 0-9)
+ * 2. Numbers 11-20 (indices 10-19)
+ * 3. Numbers 21-30 (indices 20-29)
+ * 4. Tens & 100 (indices 30-36)
+ *
+ * Each section has a header displayed above its numbers.
  */
 const sections = [
   { name: "Numbers 1–10", start: 0, end: 10 },
@@ -73,9 +157,17 @@ const sections = [
   { name: "Tens & 100", start: 30, end: 37 }
 ]
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
 /**
- * LessonHeader Component
- * Displays lesson title and instructions
+ * LessonHeader - Displays lesson title and instructions.
+ *
+ * Features:
+ * - A0 Level / Lesson 2 badge
+ * - Main title: "French Numbers Pronunciation"
+ * - Instructions: Tap to hear, repeat out loud, play twice to continue
  */
 function LessonHeader() {
   return (
@@ -101,10 +193,9 @@ function LessonHeader() {
 }
 
 /**
- * ProgressBar Component
- * Shows overall lesson completion
- * @property completedCount - number of completed numbers
- * @property totalCount - total number of numbers
+ * ProgressBar - Shows lesson completion status.
+ * @param completedCount - Numbers played twice
+ * @param totalCount - Total numbers (37)
  */
 interface ProgressBarProps {
   completedCount: number
@@ -137,13 +228,12 @@ function ProgressBar({ completedCount, totalCount }: ProgressBarProps) {
 }
 
 /**
- * NumberCard Component
- * Individual number card with play button and progress
- * @property number - number data
- * @property playCount - number of times audio has been played
- * @property isCompleted - whether number is completed (playCount >= 2)
- * @property isPlaying - whether audio is currently playing
- * @property onPlay - callback when play button is clicked
+ * NumberCard - Individual number with audio controls.
+ * @param number - Number data (value, word, phonetic, audioSrc)
+ * @param playCount - Times played
+ * @param isCompleted - Played twice
+ * @param isPlaying - Audio playing
+ * @param onPlay - Play callback
  */
 interface NumberCardProps {
   number: NumberItem
@@ -235,9 +325,8 @@ function NumberCard({ number, playCount, isCompleted, isPlaying, onPlay }: Numbe
 }
 
 /**
- * SectionHeader Component
- * Displays section name for grouped numbers
- * @property name - section name
+ * SectionHeader - Visual divider for number groups.
+ * @param name - Section name (e.g., "Numbers 1-10")
  */
 function SectionHeader({ name }: { name: string }) {
   return (
@@ -252,12 +341,11 @@ function SectionHeader({ name }: { name: string }) {
 }
 
 /**
- * FooterActionBar Component
- * Sticky footer with next button and completion status
- * @property completedCount - number of completed numbers
- * @property totalCount - total number of numbers
- * @property canProceed - whether all numbers are completed
- * @property onNext - callback when next button is clicked
+ * FooterActionBar - Sticky footer with next button.
+ * @param completedCount - Completed numbers
+ * @param totalCount - Total (37)
+ * @param canProceed - All completed
+ * @param onNext - Next callback
  */
 interface FooterActionBarProps {
   completedCount: number
@@ -304,29 +392,35 @@ function FooterActionBar({ completedCount, totalCount, canProceed, onNext }: Foo
   )
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
 /**
- * Main Numbers Lesson Page Component
- * A0 Level Lesson 2: French Numbers Pronunciation
+ * NumbersLessonPage - Main component for A0 Lesson 2.
+ * @returns JSX.Element - The numbers lesson page
  */
 export default function NumbersLessonPage() {
-  // Track play count for each number
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
   const [playCounts, setPlayCounts] = useState<number[]>(Array(numbers.length).fill(0))
-  
-  // Track which number is currently playing audio
   const [playingIndex, setPlayingIndex] = useState<number | null>(null)
-  
-  // Ref for audio element
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Calculate completion stats
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
   const completedCount = playCounts.filter(count => count >= 2).length
   const totalCount = numbers.length
   const canProceed = completedCount === totalCount
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
   /**
-   * Handles playing audio for a specific number
-   * Increments play count and manages audio playback
-   * @param index - index of the number in the numbers array
+   * handlePlay - Plays audio for a number.
+   * @param index - Index in numbers array
    */
   const handlePlay = (index: number) => {
     if (playingIndex !== null) return
@@ -364,16 +458,17 @@ export default function NumbersLessonPage() {
   }
 
   /**
-   * Handles navigation to next topic
+   * handleNext - Navigates to Lesson 3.
    */
   const handleNext = () => {
     if (canProceed) {
-      // Navigate to next lesson/topic
       window.location.href = "/classes/A0/lesson3"
     }
   }
 
-  // Cleanup audio on unmount
+  // ---------------------------------------------------------------------------
+  // EFFECT: Cleanup Audio on Unmount
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -382,10 +477,13 @@ export default function NumbersLessonPage() {
     }
   }, [])
 
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-24">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Back to home link */}
+        {/* Back to Home Link */}
         <div className="mb-6">
           <Link 
             href="/home" 
@@ -395,13 +493,13 @@ export default function NumbersLessonPage() {
           </Link>
         </div>
 
-        {/* Lesson header */}
+        {/* Lesson Header - Title and Instructions */}
         <LessonHeader />
 
-        {/* Progress bar */}
+        {/* Progress Bar - Shows completion status */}
         <ProgressBar completedCount={completedCount} totalCount={totalCount} />
 
-        {/* Number cards grouped by sections */}
+        {/* Number Cards Grouped by Sections */}
         {sections.map((section) => (
           <div key={section.name}>
             <SectionHeader name={section.name} />
@@ -424,7 +522,7 @@ export default function NumbersLessonPage() {
         ))}
       </div>
 
-      {/* Sticky footer with next button */}
+      {/* Sticky Footer - Next button (enabled when all played twice) */}
       <FooterActionBar
         completedCount={completedCount}
         totalCount={totalCount}

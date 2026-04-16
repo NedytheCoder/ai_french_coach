@@ -1,16 +1,70 @@
+/**
+ * A1 Lesson 4 - French Prepositions Page
+ * =======================================
+ *
+ * This page implements A1 Lesson 4, teaching French prepositions and their usage.
+ * Prepositions are small words that connect parts of sentences and show relationships
+ * like location, movement, origin, and relationships between words.
+ *
+ * Page Structure:
+ * ---------------
+ * 1. Header with back navigation and lesson title
+ * 2. Progress bar showing lesson completion
+ * 3. Six content sections (all must be reviewed to complete lesson):
+ *    - What is a preposition? (Introduction)
+ *    - Core prepositions (8 prepositions with audio)
+ *    - Prepositions in context (Location, Movement, Origin, Relationship)
+ *    - Verb + preposition patterns (Common combinations)
+ *    - Contractions (à/de + le/les)
+ *    - Guided examples (Annotated sentences with audio)
+ * 4. Guided interactive practice (16 multiple-choice questions)
+ * 5. Results and completion cards
+ * 6. Sticky footer with lesson completion status
+ *
+ * State Management:
+ * -----------------
+ * - reviewedSections: Tracks which content sections user has marked as reviewed
+ * - currentlyPlaying: ID of currently playing audio
+ * - currentPracticeIndex: Current question index in practice section
+ * - practiceAnswers: User's answers with correctness tracking
+ * - selectedOption: Currently selected answer option
+ * - showFeedback/showResults/showCompletion: UI visibility flags
+ *
+ * Key Features:
+ * -------------
+ * - Audio playback for prepositions and example sentences
+ * - Section-by-section progress tracking
+ * - Interactive practice with immediate feedback
+ * - Score calculation and performance-based encouragement
+ * - Sticky footer with completion CTA
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management, memoization, and DOM refs
 import { useMemo, useRef, useState } from 'react'
+
+// Framer Motion for smooth animations and transitions
 import { motion, AnimatePresence } from 'framer-motion'
+
+// Font Awesome icons for UI elements
 import {
-  FaArrowRight,
-  FaCheck,
-  FaChevronRight,
-  FaHome,
-  FaPlay,
-  FaRedoAlt
+  FaArrowRight,   // Navigation arrows
+  FaCheck,        // Checkmarks for completion states
+  FaChevronRight, // Next question indicator
+  FaHome,         // Back to lessons link
+  FaPlay,         // Audio play button
+  FaRedoAlt       // Retake practice button
 } from 'react-icons/fa'
+
+// Next.js navigation for routing
 import Link from 'next/link'
+
+// Lesson data imports (prepositions, patterns, examples, practice questions)
 import {
   guidedExamples,
   practiceQuestions,
@@ -20,23 +74,58 @@ import {
   type PracticeTopic
 } from './data'
 
-type SectionKey =
-  | 'what'
-  | 'core'
-  | 'context'
-  | 'verbPatterns'
-  | 'contractions'
-  | 'guidedExamples'
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
 
+/**
+ * SectionKey - Union type for all lesson content section identifiers.
+ * Each key corresponds to a collapsible/reviewable content section.
+ */
+type SectionKey =
+  | 'what'           // Introduction: What is a preposition?
+  | 'core'           // Core prepositions with audio
+  | 'context'        // Prepositions in context (location/movement/origin/relationship)
+  | 'verbPatterns'   // Verb + preposition patterns
+  | 'contractions'   // à/de contractions with articles
+  | 'guidedExamples' // Annotated example sentences
+
+/**
+ * SectionReview - Record type tracking review status for each section.
+ * All sections must be marked reviewed to enable lesson completion.
+ */
 type SectionReview = Record<SectionKey, boolean>
 
+/**
+ * PracticeAnswer - Tracks a user's answer to a practice question.
+ * - questionId: Links to the question
+ * - selectedOption: Index of chosen answer (0-3)
+ * - isCorrect: Whether the answer was correct
+ */
 type PracticeAnswer = {
   questionId: number
   selectedOption: number
   isCorrect: boolean
 }
 
+/**
+ * A1Lesson4Page - Main component for A1 Lesson 4: French Prepositions
+ *
+ * This component manages the complete lesson flow including:
+ * - Content section review tracking
+ * - Audio playback for prepositions and examples
+ * - Interactive practice quiz with 16 questions
+ * - Score calculation and completion tracking
+ */
 export default function A1Lesson4Page() {
+  // ===========================================================================
+  // STATE: Section Review Tracking
+  // ===========================================================================
+
+  /**
+   * reviewedSections - Tracks which content sections the user has marked as reviewed.
+   * All 6 sections must be marked true before the lesson can be completed.
+   */
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
     what: false,
     core: false,
@@ -46,22 +135,90 @@ export default function A1Lesson4Page() {
     guidedExamples: false
   })
 
+  // ===========================================================================
+  // STATE: Audio Playback
+  // ===========================================================================
+
+  /**
+   * currentlyPlaying - ID of the audio currently playing (e.g., "prep-à", "ex-1").
+   * Used to show playing state on audio buttons.
+   */
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
+
+  /**
+   * audioRef - Ref to the currently playing HTMLAudioElement.
+   * Used to pause previous audio when new audio starts.
+   */
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // ===========================================================================
+  // STATE: Practice Quiz
+  // ===========================================================================
+
+  /**
+   * currentPracticeIndex - Index of the current practice question (0-15).
+   * Increments as user progresses through the quiz.
+   */
   const [currentPracticeIndex, setCurrentPracticeIndex] = useState(0)
+
+  /**
+   * practiceAnswers - Array of user's answers to practice questions.
+   * Each answer stores the question ID, selected option, and correctness.
+   */
   const [practiceAnswers, setPracticeAnswers] = useState<PracticeAnswer[]>([])
+
+  /**
+   * selectedOption - Index of the currently selected answer option (0-3).
+   * Null when no option is selected. Reset between questions.
+   */
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
+
+  /**
+   * showFeedback - Controls visibility of the answer feedback panel.
+   * True after user submits an answer.
+   */
   const [showFeedback, setShowFeedback] = useState(false)
 
+  // ===========================================================================
+  // STATE: Results and Completion
+  // ===========================================================================
+
+  /**
+   * showResults - Controls visibility of the practice results card.
+   * Shown after all questions are answered.
+   */
   const [showResults, setShowResults] = useState(false)
+
+  /**
+   * showCompletion - Controls visibility of the lesson completion celebration.
+   * Shown when user clicks Continue from results.
+   */
   const [showCompletion, setShowCompletion] = useState(false)
 
+  // ===========================================================================
+  // COMPUTED VALUES: Progress and Completion
+  // ===========================================================================
+
+  /** True when all 6 content sections have been marked as reviewed */
   const allSectionsReviewed = Object.values(reviewedSections).every(Boolean)
+
+  /** True when user has answered all 16 practice questions */
   const practiceComplete = practiceAnswers.length === practiceQuestions.length
+
+  /** Count of correct answers from the practice quiz */
   const correctAnswers = practiceAnswers.filter(a => a.isCorrect).length
+
+  /** Practice score as a percentage (0-100) */
   const percentage = Math.round((correctAnswers / practiceQuestions.length) * 100)
 
+  // ===========================================================================
+  // COMPUTED VALUES: Topic Distribution
+  // ===========================================================================
+
+  /**
+   * topicLabel - Aggregated count of answered questions by topic.
+   * Used to display practice progress breakdown (Meaning, Completion, etc.)
+   */
   const topicLabel = useMemo(() => {
     const counts = practiceAnswers.reduce<Record<PracticeTopic, number>>(
       (acc, a) => {
@@ -75,57 +232,117 @@ export default function A1Lesson4Page() {
     return counts
   }, [practiceAnswers])
 
+  // ===========================================================================
+  // HANDLERS: Audio Playback
+  // ===========================================================================
+
+  /**
+   * playAudio - Plays pronunciation audio for prepositions or examples.
+   * - Pauses any currently playing audio
+   * - Creates new Audio instance and plays it
+   * - Updates currentlyPlaying state for UI feedback
+   * - Resets state when audio finishes or errors
+   *
+   * @param audioSrc - Path to the audio file
+   * @param id - Unique identifier for this audio (used for playing state)
+   */
   const playAudio = (audioSrc: string, id: string) => {
+    // Pause any existing audio playback
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current = null
     }
 
+    // Create and play new audio
     const audio = new Audio(audioSrc)
     audioRef.current = audio
     setCurrentlyPlaying(id)
 
+    // Handle play errors (e.g., file not found)
     audio.play().catch(() => {
       setCurrentlyPlaying(null)
     })
 
+    // Reset playing state when audio finishes
     audio.onended = () => {
       setCurrentlyPlaying(null)
     }
   }
 
+  // ===========================================================================
+  // HANDLERS: Section Review
+  // ===========================================================================
+
+  /**
+   * markSectionReviewed - Marks a content section as reviewed.
+   * Called when user clicks "Mark as Reviewed" button in a section.
+   *
+   * @param section - The section key to mark as reviewed
+   */
   const markSectionReviewed = (section: SectionKey) => {
     setReviewedSections(prev => ({ ...prev, [section]: true }))
   }
 
+  // ===========================================================================
+  // HANDLERS: Practice Quiz Answer Selection
+  // ===========================================================================
+
+  /**
+   * handlePracticeAnswer - Called when user selects an answer option.
+   * Does nothing if feedback is already showing (prevents changing answer).
+   *
+   * @param optionIndex - Index of selected option (0-3)
+   */
   const handlePracticeAnswer = (optionIndex: number) => {
-    if (showFeedback) return
+    if (showFeedback) return  // Prevent changing answer after submission
     setSelectedOption(optionIndex)
   }
 
+  // ===========================================================================
+  // HANDLERS: Practice Quiz Submission
+  // ===========================================================================
+
+  /**
+   * submitAnswer - Validates the selected answer and shows feedback.
+   * Records the answer with correctness in practiceAnswers array.
+   */
   const submitAnswer = () => {
-    if (selectedOption === null) return
+    if (selectedOption === null) return  // Require selection
     const currentQuestion = practiceQuestions[currentPracticeIndex]
     const isCorrect = selectedOption === currentQuestion.correct
 
+    // Record the answer
     setPracticeAnswers(prev => [
       ...prev,
       { questionId: currentQuestion.id, selectedOption, isCorrect }
     ])
-    setShowFeedback(true)
+    setShowFeedback(true)  // Show correct/incorrect feedback
   }
 
+  /**
+   * nextQuestion - Advances to next question or shows results if complete.
+   * Resets selection and feedback state for the new question.
+   */
   const nextQuestion = () => {
     const nextIndex = currentPracticeIndex + 1
     setSelectedOption(null)
     setShowFeedback(false)
     setCurrentPracticeIndex(nextIndex)
 
+    // Show results when all questions answered
     if (nextIndex >= practiceQuestions.length) {
       setShowResults(true)
     }
   }
 
+  // ===========================================================================
+  // HANDLERS: Practice Reset and Completion
+  // ===========================================================================
+
+  /**
+   * retakePractice - Resets the practice quiz to initial state.
+   * Clears all answers and returns to question 1.
+   */
   const retakePractice = () => {
     setCurrentPracticeIndex(0)
     setPracticeAnswers([])
@@ -135,16 +352,32 @@ export default function A1Lesson4Page() {
     setShowCompletion(false)
   }
 
+  /**
+   * continueFromResults - Transitions from results to completion screen.
+   */
   const continueFromResults = () => {
     setShowResults(false)
     setShowCompletion(true)
   }
 
+  // ===========================================================================
+  // COMPUTED: Lesson Completion Status
+  // ===========================================================================
+
+  /** True when all conditions met: sections reviewed, practice complete, completion shown */
   const lessonComplete = allSectionsReviewed && practiceComplete && showCompletion
 
+  // ===========================================================================
+  // RENDER: Main Page Layout
+  // ===========================================================================
   return (
+    // Main container with gradient background and bottom padding for sticky footer
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
       <div className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* ---------------------------------------------------------------
+            NAVIGATION: Back to A1 lessons link
+            --------------------------------------------------------------- */}
         <div className="mb-6">
           <Link
             href="/classes/A1"
@@ -155,14 +388,25 @@ export default function A1Lesson4Page() {
           </Link>
         </div>
 
+        {/* ---------------------------------------------------------------
+            HEADER: Lesson title and description
+            --------------------------------------------------------------- */}
         <LessonHeader />
 
+        {/* ---------------------------------------------------------------
+            PROGRESS BAR: Visual progress indicator
+            Shows section review count and practice question progress
+            --------------------------------------------------------------- */}
         <ProgressBar
           reviewedSections={reviewedSections}
           practiceProgress={practiceAnswers.length}
           totalPractice={practiceQuestions.length}
         />
 
+        {/* ---------------------------------------------------------------
+            SECTION 1: What is a preposition?
+            Introduction to prepositions concept
+            --------------------------------------------------------------- */}
         <SectionCard
           title="What is a preposition?"
           subtitle="Small word, big meaning"
@@ -201,6 +445,10 @@ export default function A1Lesson4Page() {
           </div>
         </SectionCard>
 
+        {/* ---------------------------------------------------------------
+            SECTION 2: Core prepositions
+            Grid of 8 prepositions with pronunciation audio
+            --------------------------------------------------------------- */}
         <SectionCard
           title="Core prepositions"
           subtitle="Learn them through patterns + examples"
@@ -228,6 +476,10 @@ export default function A1Lesson4Page() {
           </div>
         </SectionCard>
 
+        {/* ---------------------------------------------------------------
+            SECTION 3: Prepositions in context
+            Four context groups: Location, Movement, Origin, Relationship
+            --------------------------------------------------------------- */}
         <SectionCard
           title="Prepositions in context"
           subtitle="Location, movement, origin, relationship"
@@ -276,6 +528,10 @@ export default function A1Lesson4Page() {
           </div>
         </SectionCard>
 
+        {/* ---------------------------------------------------------------
+            SECTION 4: Verb + preposition patterns
+            8 common verb-preposition combinations
+            --------------------------------------------------------------- */}
         <SectionCard
           title="Verb + preposition patterns"
           subtitle="Learn the verb together with the preposition"
@@ -305,6 +561,10 @@ export default function A1Lesson4Page() {
           </div>
         </SectionCard>
 
+        {/* ---------------------------------------------------------------
+            SECTION 5: Contractions
+            à/de + le/les → au, aux, du, des
+            --------------------------------------------------------------- */}
         <SectionCard
           title="Important combinations to remember"
           subtitle="Common contractions with à and de"
@@ -324,6 +584,10 @@ export default function A1Lesson4Page() {
           </div>
         </SectionCard>
 
+        {/* ---------------------------------------------------------------
+            SECTION 6: Guided examples
+            8 annotated example sentences with audio
+            --------------------------------------------------------------- */}
         <SectionCard
           title="Guided examples"
           subtitle="Read, notice patterns, then copy the structure"
@@ -350,7 +614,10 @@ export default function A1Lesson4Page() {
           </div>
         </SectionCard>
 
-        {/* Guided interactive practice */}
+        {/* ---------------------------------------------------------------
+            PRACTICE SECTION: Interactive quiz
+            16 multiple-choice questions with progress tracking
+            --------------------------------------------------------------- */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -462,7 +729,10 @@ export default function A1Lesson4Page() {
         </AnimatePresence>
       </div>
 
-      {/* Sticky footer */}
+      {/* ---------------------------------------------------------------
+          STICKY FOOTER: Fixed position footer with progress status
+          Shows current lesson state and Continue button
+          --------------------------------------------------------------- */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
@@ -509,6 +779,14 @@ export default function A1Lesson4Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ * Uses Framer Motion for fade-in animation on page load.
+ */
 function LessonHeader() {
   return (
     <motion.div
@@ -533,6 +811,20 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual progress indicator for lesson completion.
+ *
+ * Props:
+ * - reviewedSections: Object tracking which sections are reviewed
+ * - practiceProgress: Number of practice questions answered
+ * - totalPractice: Total number of practice questions
+ *
+ * Calculates total progress from 6 sections + practice (divided by 7).
+ */
 function ProgressBar({
   reviewedSections,
   practiceProgress,
@@ -542,8 +834,10 @@ function ProgressBar({
   practiceProgress: number
   totalPractice: number
 }) {
+  // Array of section keys for calculating progress
   const sections = ['what', 'core', 'context', 'verbPatterns', 'contractions', 'guidedExamples'] as const
   const completedSections = sections.filter(s => reviewedSections[s]).length
+  // Calculate percentage: (sections + practice progress) / 7 total items
   const totalProgress = ((completedSections + practiceProgress / totalPractice) / 7) * 100
 
   return (
@@ -569,6 +863,27 @@ function ProgressBar({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Reusable card wrapper for lesson content sections.
+ *
+ * Props:
+ * - title: Section title
+ * - subtitle: Section subtitle/description
+ * - icon: Emoji icon for visual identification
+ * - isReviewed: Whether section has been marked as reviewed
+ * - onMarkReviewed: Callback when user marks section as reviewed
+ * - index: Section index (0-5) for color theming and animation delay
+ * - children: Section content
+ *
+ * Features:
+ * - Gradient color theming based on index
+ * - Staggered animation delay based on index
+ * - "Mark as Reviewed" button with visual state change
+ */
 function SectionCard({
   title,
   subtitle,
@@ -586,6 +901,7 @@ function SectionCard({
   index: number
   children: React.ReactNode
 }) {
+  // Gradient color pairs for section icons based on index
   const colors = [
     'from-purple-500 to-pink-500',
     'from-blue-500 to-cyan-500',
@@ -635,6 +951,22 @@ function SectionCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: PrepositionCard
+// =============================================================================
+
+/**
+ * PrepositionCard - Displays a single preposition with audio playback.
+ *
+ * Props:
+ * - prep: The French preposition (e.g., "à", "de")
+ * - english: English translation
+ * - example: Example sentence using the preposition
+ * - phonetic: IPA-like pronunciation guide
+ * - isPlaying: Whether this preposition's audio is currently playing
+ * - onPlay: Callback to play pronunciation audio
+ * - index: Index for staggered animation
+ */
 function PrepositionCard({
   prep,
   english,
@@ -687,6 +1019,21 @@ function PrepositionCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ContextGroup
+// =============================================================================
+
+/**
+ * ContextGroup - Displays a themed group of preposition examples by context.
+ *
+ * Props:
+ * - title: Context category (e.g., "Location", "Movement")
+ * - subtitle: Brief description of the context
+ * - color: Theme color for the group (blue, emerald, amber, purple)
+ * - items: Array of preposition examples with labels
+ *
+ * Used in Section 3 to group prepositions by usage context.
+ */
 function ContextGroup({
   title,
   subtitle,
@@ -698,6 +1045,7 @@ function ContextGroup({
   color: 'blue' | 'emerald' | 'amber' | 'purple'
   items: { label: string; example: string }[]
 }) {
+  // Dynamic Tailwind classes based on color theme
   const styles =
     color === 'blue'
       ? { bg: 'bg-blue-50', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700' }
@@ -728,6 +1076,21 @@ function ContextGroup({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: VerbPatternCard
+// =============================================================================
+
+/**
+ * VerbPatternCard - Displays a verb + preposition combination.
+ *
+ * Props:
+ * - verb: The French verb with preposition (e.g., "parler à")
+ * - english: English translation
+ * - example: Example sentence
+ * - index: Index for staggered animation
+ *
+ * Used in Section 4 to teach common verb-preposition patterns.
+ */
 function VerbPatternCard({
   verb,
   english,
@@ -762,6 +1125,20 @@ function VerbPatternCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ContractionCard
+// =============================================================================
+
+/**
+ * ContractionCard - Displays a preposition + article contraction.
+ *
+ * Props:
+ * - left: The preposition + article combination (e.g., "à + le")
+ * - right: The contraction result (e.g., "au")
+ * - example: Example sentence using the contraction
+ *
+ * Used in Section 5 to teach à/de + le/les contractions.
+ */
 function ContractionCard({ left, right, example }: { left: string; right: string; example: string }) {
   return (
     <div className="bg-white rounded-2xl p-5 border border-slate-200">
@@ -776,6 +1153,23 @@ function ContractionCard({ left, right, example }: { left: string; right: string
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: GuidedExampleCard
+// =============================================================================
+
+/**
+ * GuidedExampleCard - Displays an annotated example sentence with audio.
+ *
+ * Props:
+ * - french: French sentence
+ * - english: English translation
+ * - focus: Learning focus note (e.g., "à + le → au")
+ * - isPlaying: Whether audio is currently playing
+ * - onPlay: Callback to play audio
+ * - index: Index for staggered animation
+ *
+ * Used in Section 6 for guided example sentences.
+ */
 function GuidedExampleCard({
   french,
   english,
@@ -823,6 +1217,20 @@ function GuidedExampleCard({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: PracticeMetaRow
+// =============================================================================
+
+/**
+ * PracticeMetaRow - Displays practice quiz progress and topic breakdown.
+ *
+ * Props:
+ * - answered: Number of questions answered
+ * - total: Total number of questions
+ * - counts: Record of answered questions by topic
+ *
+ * Shows topic chips for Meaning, Completion, Verb patterns, and Contractions.
+ */
 function PracticeMetaRow({
   answered,
   total,
@@ -847,6 +1255,18 @@ function PracticeMetaRow({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: Chip
+// =============================================================================
+
+/**
+ * Chip - Small badge component for displaying topic labels.
+ *
+ * Props:
+ * - label: Text to display in the chip
+ *
+ * Used in PracticeMetaRow to show question topic counts.
+ */
 function Chip({ label }: { label: string }) {
   return (
     <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">
@@ -855,6 +1275,30 @@ function Chip({ label }: { label: string }) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: PracticeCard
+// =============================================================================
+
+/**
+ * PracticeCard - Interactive multiple-choice question card.
+ *
+ * Props:
+ * - question: Current PracticeQuestion data
+ * - questionNumber: Current question number (1-16)
+ * - totalQuestions: Total number of questions (16)
+ * - selectedOption: Index of selected answer option
+ * - showFeedback: Whether to show correct/incorrect feedback
+ * - onSelectOption: Callback when user selects an option
+ * - onSubmit: Callback to submit the answer
+ * - onNext: Callback to advance to next question
+ *
+ * Features:
+ * - Topic-colored badge (blue, emerald, purple, amber)
+ * - Visual selection states with radio-like indicators
+ * - Correct/incorrect feedback with color coding
+ * - Animated feedback panel with explanation
+ * - Submit/Next button state transitions
+ */
 function PracticeCard({
   question,
   questionNumber,
@@ -996,8 +1440,10 @@ function ResultsCard({
   onRetake: () => void
   onContinue: () => void
 }) {
+  // Calculate percentage score
   const percentage = Math.round((score / total) * 100)
 
+  // Performance-based feedback with three tiers
   const feedback =
     score <= 6
       ? {
@@ -1007,13 +1453,14 @@ function ResultsCard({
       : score <= 12
       ? {
           title: "Nice progress — you're starting to see patterns.",
-          detail: "You’re building strong intuition. Try another run to make it automatic."
+          detail: "You're building strong intuition. Try another run to make it automatic."
         }
       : {
           title: "Great job — you understand prepositions well.",
           detail: "You can recognize patterns and apply them in simple sentences."
         }
 
+  // Render the results card with score, feedback, and actions
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}

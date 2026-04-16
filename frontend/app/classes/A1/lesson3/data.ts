@@ -1,3 +1,38 @@
+/**
+ * A1 Lesson 3 - French Verbs and Present Tense Data
+ * =================================================
+ *
+ * This file contains all lesson data for A1 Lesson 3 covering essential
+ * French verbs and their present tense conjugations. The content includes:
+ *
+ * - 10 essential French verbs with audio pronunciations and example sentences
+ *   • 3 core verbs (être, avoir, aller) marked as high importance
+ *   • 7 regular -er verbs for everyday communication
+ * - Complete present tense conjugation tables for all 10 verbs (6 forms each)
+ * - Subject pronoun reference guide (je, tu, il/elle/on, nous, vous, ils/elles)
+ * - 12 practice questions testing verb meanings, conjugations, and patterns
+ *
+ * Key Concepts:
+ * - Regular -er verbs follow predictable conjugation patterns
+ * - Irregular verbs (être, avoir, aller, faire) have unique forms
+ * - Manger has a special nous form (mangeons) to preserve soft 'g' sound
+ */
+
+/**
+ * Verb Interface
+ * --------------
+ * Represents a French verb with its infinitive form, translation,
+ * pronunciation guide, example usage, and importance level.
+ *
+ * @property id - Unique identifier for the verb (used for audio lookup)
+ * @property infinitive - The base form of the verb (e.g., "parler")
+ * @property english - English translation(s)
+ * @property phonetic - Phonetic pronunciation guide
+ * @property audioSrc - Path to pronunciation audio file
+ * @property example - Example sentence in French
+ * @property exampleEnglish - Translation of example sentence
+ * @property importance - 'high' for core verbs (être, avoir, aller), 'normal' for others
+ */
 export interface Verb {
   id: string
   infinitive: string
@@ -9,7 +44,33 @@ export interface Verb {
   importance: 'high' | 'normal'
 }
 
+// =============================================================================
+// VERBS DATA
+// =============================================================================
+
+/**
+ * verbs Array
+ * -----------
+ * Collection of 10 essential French verbs for A1 learners.
+ *
+ * Structure:
+ * - First 3 verbs (être, avoir, aller): Core verbs marked as 'high' importance
+ *   These are used constantly at all French levels and form foundation for many expressions
+ * - Remaining 7 verbs: Regular -er verbs marked as 'normal' importance
+ *   These follow predictable conjugation patterns
+ *
+ * Each verb includes:
+ * - Infinitive form (dictionary form ending in -er, -ir, or -re)
+ * - English translation with common meanings
+ * - Phonetic guide for pronunciation
+ * - Audio file path for listening practice
+ * - Example sentence showing verb in context
+ */
 export const verbs: Verb[] = [
+  // ---------------------------------------------------------------------------
+  // CORE VERBS (High Importance) - Essential at all French levels
+  // These verbs appear frequently in both beginner and advanced French
+  // ---------------------------------------------------------------------------
   {
     id: "etre",
     infinitive: "être",
@@ -40,6 +101,11 @@ export const verbs: Verb[] = [
     exampleEnglish: "We are going to the market.",
     importance: "high"
   },
+
+  // ---------------------------------------------------------------------------
+  // REGULAR -ER VERBS (Normal Importance) - Follow predictable patterns
+  // These verbs all end in -er and follow similar conjugation rules
+  // ---------------------------------------------------------------------------
   {
     id: "parler",
     infinitive: "parler",
@@ -79,6 +145,7 @@ export const verbs: Verb[] = [
     example: "Nous mangeons à midi.",
     exampleEnglish: "We eat at noon.",
     importance: "normal"
+    // Note: Special nous form "mangeons" keeps soft 'g' sound (vs "mangons")
   },
   {
     id: "travailler",
@@ -109,9 +176,30 @@ export const verbs: Verb[] = [
     example: "Je fais mes devoirs.",
     exampleEnglish: "I do my homework.",
     importance: "normal"
+    // Note: Faire is irregular despite ending in -re
   }
 ]
 
+// =============================================================================
+// CONJUGATION DATA
+// =============================================================================
+
+/**
+ * Conjugation Interface
+ * ---------------------
+ * Represents the complete present tense conjugation of a French verb
+ * across all 6 subject pronouns.
+ *
+ * @property verb - The infinitive form of the verb being conjugated
+ * @property english - English translation of the infinitive
+ * @property forms - Object containing conjugated forms for each subject pronoun:
+ *   - je: First person singular (I)
+ *   - tu: Second person singular informal (you)
+ *   - ilElleOn: Third person singular (he/she/one)
+ *   - nous: First person plural (we)
+ *   - vous: Second person plural or formal (you all/you formal)
+ *   - ilsElles: Third person plural (they)
+ */
 export interface Conjugation {
   verb: string
   english: string
@@ -125,43 +213,65 @@ export interface Conjugation {
   }
 }
 
+/**
+ * conjugations Array
+ * ------------------
+ * Complete present tense conjugation tables for all 10 verbs.
+ * Each entry shows how the verb changes for all 6 subject pronouns.
+ *
+ * Conjugation Patterns:
+ * - Regular -er verbs: Follow pattern e, es, e, ons, ez, ent
+ *   (parler → parle, parles, parle, parlons, parlez, parlent)
+ * - Irregular verbs: Unique forms that must be memorized
+ *   (être, avoir, aller, faire)
+ * - Manger exception: nous mangeons (keeps soft 'g' sound)
+ */
 export const conjugations: Conjugation[] = [
+  // ---------------------------------------------------------------------------
+  // IRREGULAR VERBS - Core verbs with unique conjugation patterns
+  // These must be memorized as they don't follow regular rules
+  // ---------------------------------------------------------------------------
   {
     verb: "être",
     english: "to be",
     forms: {
-      je: "suis",
-      tu: "es",
-      ilElleOn: "est",
-      nous: "sommes",
-      vous: "êtes",
-      ilsElles: "sont"
+      je: "suis",       // I am
+      tu: "es",         // You are (informal)
+      ilElleOn: "est",  // He/She/One is
+      nous: "sommes",   // We are
+      vous: "êtes",     // You are (plural/formal)
+      ilsElles: "sont"  // They are
     }
   },
   {
     verb: "avoir",
     english: "to have",
     forms: {
-      je: "ai",
-      tu: "as",
-      ilElleOn: "a",
-      nous: "avons",
-      vous: "avez",
-      ilsElles: "ont"
+      je: "ai",         // I have
+      tu: "as",         // You have (informal)
+      ilElleOn: "a",    // He/She/One has
+      nous: "avons",    // We have
+      vous: "avez",     // You have (plural/formal)
+      ilsElles: "ont"   // They have
     }
   },
   {
     verb: "aller",
     english: "to go",
     forms: {
-      je: "vais",
-      tu: "vas",
-      ilElleOn: "va",
-      nous: "allons",
-      vous: "allez",
-      ilsElles: "vont"
+      je: "vais",       // I go
+      tu: "vas",        // You go (informal)
+      ilElleOn: "va",   // He/She/One goes
+      nous: "allons",   // We go
+      vous: "allez",    // You go (plural/formal)
+      ilsElles: "vont"  // They go
     }
   },
+
+  // ---------------------------------------------------------------------------
+  // REGULAR -ER VERBS - Follow predictable conjugation patterns
+  // Pattern: Remove -er, add endings e, es, e, ons, ez, ent
+  // ---------------------------------------------------------------------------
   {
     verb: "parler",
     english: "to speak",
@@ -205,7 +315,7 @@ export const conjugations: Conjugation[] = [
       je: "mange",
       tu: "manges",
       ilElleOn: "mange",
-      nous: "mangeons",
+      nous: "mangeons",  // Special form: adds 'e' to keep soft 'g' sound (zh)
       vous: "mangez",
       ilsElles: "mangent"
     }
@@ -234,6 +344,10 @@ export const conjugations: Conjugation[] = [
       ilsElles: "étudient"
     }
   },
+
+  // ---------------------------------------------------------------------------
+  // IRREGULAR -RE VERB - Faire is irregular despite -re ending
+  // ---------------------------------------------------------------------------
   {
     verb: "faire",
     english: "to do / make",
@@ -248,11 +362,37 @@ export const conjugations: Conjugation[] = [
   }
 ]
 
+// =============================================================================
+// SUBJECT PRONOUNS REFERENCE
+// =============================================================================
+
+/**
+ * SubjectPronoun Interface
+ * ------------------------
+ * Represents a French subject pronoun with its English equivalent.
+ *
+ * @property french - The French subject pronoun (je, tu, il, etc.)
+ * @property english - English translation with usage notes
+ */
 export interface SubjectPronoun {
   french: string
   english: string
 }
 
+/**
+ * subjectPronouns Array
+ * ---------------------
+ * Reference list of all 6 French subject pronouns used in conjugation.
+ * These are the "subjects" that determine how verbs are conjugated.
+ *
+ * Order matches standard French conjugation tables:
+ * 1. je (I) - First person singular
+ * 2. tu (you) - Second person singular informal
+ * 3. il/elle/on (he/she/one) - Third person singular
+ * 4. nous (we) - First person plural
+ * 5. vous (you) - Second person plural or formal singular
+ * 6. ils/elles (they) - Third person plural
+ */
 export const subjectPronouns: SubjectPronoun[] = [
   { french: "je", english: "I" },
   { french: "tu", english: "you (informal singular)" },
@@ -262,6 +402,23 @@ export const subjectPronouns: SubjectPronoun[] = [
   { french: "ils / elles", english: "they" }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion Interface
+ * --------------------------
+ * Represents a multiple-choice practice question for verb learning.
+ *
+ * @property id - Unique question identifier (1-12)
+ * @property type - Question format, always "multiple-choice"
+ * @property topic - Category: 'meaning', 'conjugation', 'patterns', or 'core-verbs'
+ * @property prompt - The question text shown to the user
+ * @property options - Array of 3 answer choices
+ * @property correct - Index (0-2) of the correct answer in options array
+ * @property explanation - Explanation shown after answering
+ */
 export interface PracticeQuestion {
   id: number
   type: string
@@ -272,7 +429,27 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * practiceQuestions Array
+ * -----------------------
+ * 12 multiple-choice questions testing verb knowledge.
+ *
+ * Question Distribution:
+ * - Questions 1-4: Verb meanings (translation recognition)
+ * - Questions 5-8: Conjugation practice (choosing correct verb forms)
+ * - Questions 9-10: Pattern recognition (regular vs irregular, special cases)
+ * - Questions 11-12: Core verb importance (understanding why être/avoir/aller matter)
+ *
+ * Topics:
+ * - 'meaning': Tests English translation knowledge
+ * - 'conjugation': Tests proper verb form for given subject pronoun
+ * - 'patterns': Tests recognition of conjugation patterns and exceptions
+ * - 'core-verbs': Tests understanding of which verbs are most important
+ */
 export const practiceQuestions: PracticeQuestion[] = [
+  // ---------------------------------------------------------------------------
+  // MEANING QUESTIONS (1-4) - Test English translations
+  // ---------------------------------------------------------------------------
   {
     id: 1,
     type: "multiple-choice",
@@ -309,6 +486,10 @@ export const practiceQuestions: PracticeQuestion[] = [
     correct: 0,
     explanation: '"Parler" means "to speak".'
   },
+
+  // ---------------------------------------------------------------------------
+  // CONJUGATION QUESTIONS (5-8) - Test correct verb form selection
+  // ---------------------------------------------------------------------------
   {
     id: 5,
     type: "multiple-choice",
@@ -345,6 +526,10 @@ export const practiceQuestions: PracticeQuestion[] = [
     correct: 0,
     explanation: 'With "tu", the correct form is "as".'
   },
+
+  // ---------------------------------------------------------------------------
+  // PATTERN QUESTIONS (9-10) - Test recognition of verb patterns
+  // ---------------------------------------------------------------------------
   {
     id: 9,
     type: "multiple-choice",
@@ -363,6 +548,10 @@ export const practiceQuestions: PracticeQuestion[] = [
     correct: 0,
     explanation: '"Manger" keeps the soft g sound in "nous mangeons".'
   },
+
+  // ---------------------------------------------------------------------------
+  // CORE VERB QUESTIONS (11-12) - Test understanding of importance
+  // ---------------------------------------------------------------------------
   {
     id: 11,
     type: "multiple-choice",

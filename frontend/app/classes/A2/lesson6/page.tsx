@@ -1,28 +1,75 @@
+/**
+ * A2 Lesson 6 - Direct Object Pronouns (Pronoms Compléments d'Objet Direct)
+ * ===========================================================================
+ *
+ * This page teaches A2 learners how to use direct object pronouns in French,
+ * including le, la, les, me, te, nous, vous.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to direct object pronouns
+ * 2. WhatIsDirectObjectSection - Identifying direct objects (what? who?)
+ * 3. PronounsTableSection - Chart of all direct object pronouns
+ * 4. ReplacementSection - Replacing nouns with pronouns
+ * 5. PositionSection - Pronoun placement before the verb
+ * 6. NegationSection - Using pronouns with negation (ne...pas)
+ * 7. PasseComposeSection - Agreement rules in passé composé
+ * 8. ExamplesSection - Guided example sentences
+ * 9. MistakesSection - Common errors to avoid
+ * 10. PracticeSection - Interactive quiz (15 questions)
+ * 11. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Direct object = answers "what?" or "who?" after the verb
+ * - Pronouns: me, te, le/la, nous, vous, les
+ * - Placement: before the conjugated verb (or auxiliary in passé composé)
+ * - Agreement: past participle agrees with preceding direct object pronoun
+ * - Le/la → l' before vowels (elision)
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 15-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import { useState, useEffect } from 'react'
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from 'framer-motion'
+
+// React Icons for UI elements
 import {
-  FaHome,
-  FaCheck,
-  FaChevronRight,
-  FaArrowRight,
-  FaBookOpen,
-  FaGraduationCap,
-  FaLightbulb,
-  FaTimes,
-  FaRedo,
-  FaChevronDown,
-  FaChevronUp,
-  FaExclamationTriangle,
-  FaArrowUp,
-  FaExchangeAlt,
-  FaList,
-  FaBan,
-  FaClock,
-  FaStar
+  FaHome,               // Back navigation
+  FaCheck,              // Reviewed status, correct answer
+  FaChevronRight,       // Next button
+  FaArrowRight,         // Continue button
+  FaBookOpen,           // Lesson content
+  FaGraduationCap,      // Lesson header
+  FaLightbulb,          // Tips and intro
+  FaTimes,              // Incorrect answer
+  FaRedo,               // Retake practice
+  FaChevronDown,        // Expand section
+  FaChevronUp,          // Collapse section
+  FaExclamationTriangle, // Mistakes section
+  FaArrowUp,            // Position/Placement
+  FaExchangeAlt,        // Replacement examples
+  FaList,               // Pronouns table
+  FaBan,                // Negation
+  FaClock,              // Passé composé/timing
+  FaStar                // Agreement/important
 } from 'react-icons/fa'
+
+// Next.js Link for navigation
 import Link from 'next/link'
+
+// Lesson data imports
 import {
   directObjectExamples,
   directObjectPronouns,
@@ -38,6 +85,13 @@ import {
   getPerformanceMessage
 } from './data'
 
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * LessonProgress - Shape of persisted lesson progress in localStorage.
+ */
 interface LessonProgress {
   reviewedSections: SectionId[]
   practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[]
@@ -45,23 +99,63 @@ interface LessonProgress {
   lessonCompleted: boolean
 }
 
+// =============================================================================
+// FEEDBACK MESSAGES
+// =============================================================================
+
+/**
+ * feedbackMessages - Random encouraging messages for quiz feedback.
+ */
 const feedbackMessages = {
   correct: ['Nice 😏', 'Good catch', "That's right", "You're getting it", 'Well done!', 'Perfect!'],
   incorrect: ['Careful now…', 'Almost there', 'Keep trying', 'Not quite', 'Review the pattern']
 }
 
+/**
+ * getRandomFeedback - Returns a random feedback message.
+ * @param isCorrect - Whether the answer was correct
+ * @returns Random message string
+ */
 function getRandomFeedback(isCorrect: boolean) {
   const messages = isCorrect ? feedbackMessages.correct : feedbackMessages.incorrect
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+/**
+ * A2Lesson6Page - Main component for the direct object pronouns lesson.
+ *
+ * Manages lesson state, persists progress to localStorage, and renders
+ * all lesson sections with collapsible cards.
+ */
 export default function A2Lesson6Page() {
+  // ---------------------------------------------------------------------------
+  // STATE: Section Review Tracking
+  // ---------------------------------------------------------------------------
   const [reviewedSections, setReviewedSections] = useState<SectionId[]>([])
+
+  // ---------------------------------------------------------------------------
+  // STATE: Practice Quiz
+  // ---------------------------------------------------------------------------
   const [practiceAnswers, setPracticeAnswers] = useState<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>([])
   const [practiceCompleted, setPracticeCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Lesson Completion
+  // ---------------------------------------------------------------------------
   const [lessonCompleted, setLessonCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Hydration Check
+  // ---------------------------------------------------------------------------
   const [isClient, setIsClient] = useState(false)
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true)
     const saved = localStorage.getItem('a2Lesson6Progress')
@@ -74,6 +168,9 @@ export default function A2Lesson6Page() {
     }
   }, [])
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('a2Lesson6Progress', JSON.stringify({
@@ -85,21 +182,33 @@ export default function A2Lesson6Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, lessonCompleted, isClient])
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Mark Section Reviewed
+  // ---------------------------------------------------------------------------
   const markSectionReviewed = (sectionId: SectionId) => {
     if (!reviewedSections.includes(sectionId)) {
       setReviewedSections(prev => [...prev, sectionId])
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
   const allSectionsReviewed = sectionIds.every(id => reviewedSections.includes(id))
   const practiceScore = practiceAnswers.filter(a => a.isCorrect).length
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Complete Lesson
+  // ---------------------------------------------------------------------------
   const completeLesson = () => {
     if (allSectionsReviewed && practiceCompleted) {
       setLessonCompleted(true)
     }
   }
 
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-slate-100 pb-24">
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -167,6 +276,20 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual indicator of lesson progress.
+ *
+ * Displays:
+ * - Number of completed sections out of total (11)
+ * - Animated progress bar with gradient fill
+ * - Percentage completion
+ *
+ * @param reviewedSections - Array of section IDs that have been reviewed
+ */
 function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   const totalSections = sectionIds.length
   const completedSections = reviewedSections.length
@@ -185,11 +308,40 @@ function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionProps Interface
+// =============================================================================
+
+/**
+ * SectionProps - Common props for all lesson section components.
+ */
 interface SectionProps {
   isReviewed: boolean
   onMarkReviewed: () => void
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Clickable header to expand/collapse content
+ * - Auto-mark-as-reviewed when opened
+ * - Icon showing review status (checkmark when reviewed)
+ * - Animated expand/collapse with AnimatePresence
+ * - Color-coded header (cyan when pending, green when reviewed)
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ * @param children - Section content to display when expanded
+ * @param defaultOpen - Whether section starts expanded
+ */
 function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, children, defaultOpen = false }: {
   id: string
   title: string
@@ -230,6 +382,19 @@ function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, childr
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: IntroSection
+// =============================================================================
+
+/**
+ * IntroSection - Introduction to direct object pronouns.
+ *
+ * Content:
+ * - Explanation of what direct object pronouns do (avoid repetition)
+ * - English comparison showing "it" replacing a noun
+ * - Learning objectives checklist
+ * - Opens by default to engage learners immediately
+ */
 function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="intro" title="Introduction" icon={FaLightbulb} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} defaultOpen={true}>

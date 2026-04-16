@@ -1,3 +1,45 @@
+/**
+ * A2 Lesson 4 - The Simple Future (Futur Simple) Data
+ * =====================================================
+ *
+ * This file contains all lesson data for A2 Lesson 4, focusing on the futur simple
+ * tense in French, used for expressing future actions and predictions.
+ *
+ * **Lesson Content:**
+ * - Uses of the futur simple (future actions, plans, predictions, promises)
+ * - Formation: infinitive + future endings (-ai, -as, -a, -ons, -ez, -ont)
+ * - Regular verbs in -er, -ir, -re
+ * - Irregular verb stems (être → ser-, avoir → aur-, etc.)
+ * - Futur simple vs near future (futur proche) comparison
+ * - Common mistakes to avoid
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Futur simple = formal future tense for distant or uncertain future
+ * - Near future (aller + infinitive) = informal, immediate plans
+ * - Many verbs have irregular stems in futur simple
+ * - Endings are consistent across all verbs (regular and irregular)
+ *
+ * **Data Categories:**
+ * 1. FuturSimpleUse / futurSimpleUses - Four main uses
+ * 2. FutureEnding / futureEndings - Conjugation endings
+ * 3. RegularFutureVerb / regularFutureVerbs - Regular conjugations
+ * 4. IrregularFutureVerb / irregularFutureVerbs - Irregular stems
+ * 5. TenseComparison / tenseComparisons - Futur simple vs near future
+ * 6. GuidedExample / guidedExamples - Full example sentences
+ * 7. CommonMistake / commonMistakes - Error corrections
+ * 8. PracticeQuestion / practiceQuestions - 15 quiz questions
+ * 9. sectionIds / SectionId - Lesson sections
+ * 10. getPerformanceMessage - Score-based feedback
+ */
+
+// =============================================================================
+// FUTUR SIMPLE USES
+// =============================================================================
+
+/**
+ * FuturSimpleUse - Describes a specific use case for the futur simple.
+ */
 export interface FuturSimpleUse {
   title: string
   explanation: string
@@ -5,6 +47,14 @@ export interface FuturSimpleUse {
   english: string
 }
 
+/**
+ * futurSimpleUses - The four main uses of the futur simple tense.
+ *
+ * 1. Future actions - What will happen
+ * 2. Plans or intentions - What someone plans to do
+ * 3. Predictions - What will likely happen
+ * 4. Promises - Commitments about the future
+ */
 export const futurSimpleUses: FuturSimpleUse[] = [
   {
     title: "Future actions",
@@ -32,6 +82,16 @@ export const futurSimpleUses: FuturSimpleUse[] = [
   }
 ]
 
+// =============================================================================
+// FUTURE ENDINGS
+// =============================================================================
+
+/**
+ * FutureEnding - A single futur simple conjugation ending.
+ *
+ * These endings are the same for ALL verbs (regular and irregular).
+ * Pattern: -ai, -as, -a, -ons, -ez, -ont
+ */
 export interface FutureEnding {
   pronoun: string
   ending: string
@@ -46,6 +106,15 @@ export const futureEndings: FutureEnding[] = [
   { pronoun: "ils / elles", ending: "-ont" }
 ]
 
+// =============================================================================
+// REGULAR FUTURE VERBS
+// =============================================================================
+
+/**
+ * RegularFutureVerb - Regular verb conjugated in futur simple.
+ *
+ * For regular verbs: Keep infinitive, add future endings.
+ */
 export interface RegularFutureVerb {
   infinitive: string
   je: string
@@ -63,6 +132,16 @@ export const regularFutureVerbs: RegularFutureVerb[] = [
   { infinitive: "attendre", je: "j'attendrai", english: "I will wait" }
 ]
 
+// =============================================================================
+// IRREGULAR FUTURE VERBS
+// =============================================================================
+
+/**
+ * IrregularFutureVerb - Verb with irregular stem in futur simple.
+ *
+ * Common irregulars: être (ser-), avoir (aur-), aller (ir-), faire (fer-),
+ * venir (viendr-), voir (verr-), vouloir (voudr-), pouvoir (pourr-), etc.
+ */
 export interface IrregularFutureVerb {
   infinitive: string
   stem: string
@@ -83,6 +162,15 @@ export const irregularFutureVerbs: IrregularFutureVerb[] = [
   { infinitive: "savoir", stem: "saur-", sample: "je saurai", english: "I will know" }
 ]
 
+// =============================================================================
+// FUTURE TENSE COMPARISON
+// =============================================================================
+
+/**
+ * FutureComparison - Compares futur proche and futur simple.
+ *
+ * Shows when to use near future (aller + infinitive) vs formal future.
+ */
 export interface FutureComparison {
   futurProche: string
   futurSimple: string
@@ -115,6 +203,13 @@ export const futureComparisons: FutureComparison[] = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * GuidedExample - Full sentences in futur simple.
+ */
 export interface GuidedExample {
   french: string
   english: string
@@ -129,6 +224,13 @@ export const guidedExamples: GuidedExample[] = [
   { french: "Je ferai mes devoirs après le dîner.", english: "I will do my homework after dinner." }
 ]
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * CommonMistake - Incorrect vs correct futur simple usage.
+ */
 export interface CommonMistake {
   wrong: string
   correct: string
@@ -142,6 +244,13 @@ export const commonMistakes: CommonMistake[] = [
   { wrong: "Je fairai mes devoirs.", correct: "Je ferai mes devoirs.", explanation: "Faire is irregular and uses the stem fer-." }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion - Multiple-choice question for the quiz.
+ */
 export interface PracticeQuestion {
   id: number
   topic: string
@@ -151,6 +260,16 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * practiceQuestions - 15 questions testing futur simple knowledge.
+ *
+ * Topic distribution:
+ * - usage (4): When to use futur simple
+ * - regular (4): Regular verb conjugation
+ * - irregular (3): Irregular verb stems
+ * - comparison (2): Futur proche vs futur simple
+ * - correction (2): Error identification
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,
@@ -274,6 +393,24 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections in order:
+ * 1. intro - Introduction to futur simple
+ * 2. uses - Four main uses of futur simple
+ * 3. formation - How to form the tense
+ * 4. regular-verbs - Regular verb conjugations
+ * 5. irregular-verbs - Irregular verb stems
+ * 6. comparison - Futur proche vs futur simple
+ * 7. examples - Guided example sentences
+ * 8. mistakes - Common errors
+ * 9. practice - Interactive quiz
+ */
 export const sectionIds = [
   'intro',
   'uses',
@@ -288,6 +425,13 @@ export const sectionIds = [
 
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * PerformanceMessage - Feedback message based on quiz performance.
+ */
 export interface PerformanceMessage {
   title: string
   message: string
@@ -295,6 +439,18 @@ export interface PerformanceMessage {
   color: 'green' | 'blue' | 'amber'
 }
 
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score thresholds:
+ * - ≥80% (12/15): "Great job!" - green, high tone
+ * - 47-79% (7-11/15): "Nice progress" - blue, medium tone
+ * - <47% (<7/15): "Good effort" - amber, low tone
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns PerformanceMessage with title, message, tone, and color
+ */
 export function getPerformanceMessage(score: number, total: number): PerformanceMessage {
   const percentage = (score / total) * 100
   

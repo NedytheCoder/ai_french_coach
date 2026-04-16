@@ -1,3 +1,46 @@
+/**
+ * A1 Lesson 8 - French Adjectives and Adverbs Data
+ * =================================================
+ *
+ * This file contains all lesson data for A1 Lesson 8, focusing on French
+ * adjectives and adverbs. The lesson covers:
+ * - Common adjectives with masculine/feminine forms
+ * - Adjective agreement rules (gender and number)
+ * - Adjective placement (before vs after nouns)
+ * - Common adverbs and their usage
+ * - Distinguishing adjectives from adverbs
+ *
+ * Data Categories:
+ * ----------------
+ * 1. Adjectives (10 items) - With masculine and feminine forms
+ * 2. Placement Examples (4 items) - Before/after noun patterns
+ * 3. Adverbs (10 items) - Common French adverbs
+ * 4. Guided Examples (8 items) - Sentences showing usage in context
+ * 5. Practice Questions (16 items) - Recognition and usage quiz
+ *
+ * Key Concepts:
+ * -------------
+ * - Adjectives describe nouns and must agree in gender/number
+ * - Many adjectives add 'e' for feminine form
+ * - Some adjectives go before nouns, others after
+ * - Adverbs modify verbs, adjectives, or other adverbs
+ * - Adverbs don't change form (invariable)
+ */
+
+// =============================================================================
+// ADJECTIVES
+// =============================================================================
+
+/**
+ * Common A1 Adjectives with Masculine/Feminine Forms
+ *
+ * Note: Some adjectives change form for feminine (add 'e'),
+ * while others are already the same in both genders.
+ *
+ * Special cases:
+ * - beau → belle (irregular stem change)
+ * - vieux → vieille (irregular with 'x' → 'ill')
+ */
 export const adjectives = [
   { word: "grand", english: "big / tall", feminine: "grande" },
   { word: "petit", english: "small", feminine: "petite" },
@@ -11,6 +54,17 @@ export const adjectives = [
   { word: "facile", english: "easy", feminine: "facile" }
 ]
 
+// =============================================================================
+// PLACEMENT EXAMPLES
+// =============================================================================
+
+/**
+ * Adjective Placement Examples
+ *
+ * French adjectives can go before or after the noun:
+ * - Most descriptive adjectives go AFTER (rouge, intéressant)
+ * - Common short adjectives go BEFORE (petit, grand, beau)
+ */
 export const placementExamples = [
   { french: "une voiture rouge", english: "a red car" },
   { french: "un livre intéressant", english: "an interesting book" },
@@ -18,6 +72,22 @@ export const placementExamples = [
   { french: "une grande maison", english: "a big house" }
 ]
 
+// =============================================================================
+// ADVERBS
+// =============================================================================
+
+/**
+ * Common A1 Adverbs
+ *
+ * Adverbs modify verbs, adjectives, or other adverbs.
+ * Unlike adjectives, adverbs are invariable (don't change form).
+ *
+ * Categories:
+ * - Manner: bien, mal, vite, lentement
+ * - Frequency: souvent, toujours, parfois
+ * - Place: ici, là
+ * - Intensity: très
+ */
 export const adverbs = [
   { word: "bien", english: "well" },
   { word: "mal", english: "badly" },
@@ -31,6 +101,15 @@ export const adverbs = [
   { word: "très", english: "very" }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * GuidedExample Type
+ * ------------------
+ * Example sentence with focus point explaining the grammar concept.
+ */
 export type GuidedExample = {
   id: string
   french: string
@@ -38,6 +117,16 @@ export type GuidedExample = {
   focus: string
 }
 
+/**
+ * Guided Examples - 8 sentences demonstrating adjective and adverb usage.
+ *
+ * Examples cover:
+ * - Adjectives describing nouns
+ * - Agreement (masculine → feminine)
+ * - Adverbs modifying verbs
+ * - Adjective vs adverb distinction
+ * - Adjective placement (before/after noun)
+ */
 export const guidedExamples: GuidedExample[] = [
   {
     id: "ex-1",
@@ -89,8 +178,26 @@ export const guidedExamples: GuidedExample[] = [
   }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * Practice Topic Types
+ * --------------------
+ * Categorization for practice questions:
+ * - adj-recognition: Identifying adjectives
+ * - agreement: Gender/number agreement
+ * - adverb-usage: Using adverbs correctly
+ * - adj-vs-adv: Distinguishing adjectives from adverbs
+ */
 export type PracticeTopic = "adj-recognition" | "agreement" | "adverb-usage" | "adj-vs-adv"
 
+/**
+ * PracticeQuestion Type
+ * ---------------------
+ * Multiple-choice question with topic categorization.
+ */
 export type PracticeQuestion = {
   id: number
   topic: PracticeTopic
@@ -100,6 +207,15 @@ export type PracticeQuestion = {
   explanation: string
 }
 
+/**
+ * Practice Questions - 16 questions testing adjective and adverb knowledge.
+ *
+ * Question distribution:
+ * - IDs 1-6: Adjective recognition (identifying adjectives in sentences)
+ * - IDs 7-10: Agreement (feminine forms, plural agreement)
+ * - IDs 11-14: Adverb usage (choosing correct adverbs)
+ * - IDs 15-16: Adjective vs adverb distinction
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   // 6 adjective recognition
   {

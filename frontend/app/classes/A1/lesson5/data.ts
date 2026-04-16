@@ -1,3 +1,41 @@
+/**
+ * A1 Lesson 5 - French Sentence Structure Data
+ * ============================================
+ *
+ * This file contains all lesson data for A1 Lesson 5, focusing on French sentence
+ * structure and construction. The lesson covers basic sentence patterns, affirmative
+ * and negative forms, questions, and common mistakes.
+ *
+ * Data Categories:
+ * ----------------
+ * 1. Sentence Parts Examples (4 items) - Breakdown of sentences into subject, verb, complement
+ * 2. Affirmative Examples (6 items) - Simple positive statements
+ * 3. Adjective Placement Examples (4 items) - Adjective position (before/after noun)
+ * 4. Negative Examples (4 items) - Affirmative vs negative form comparisons
+ * 5. Question Examples (4 items) - Intonation and est-ce-que question forms
+ * 6. Common Mistakes (4 items) - Typical beginner errors with corrections
+ * 7. Sentence Patterns (4 items) - Structural formulas for sentence types
+ * 8. Practice Questions (14 items) - Multiple choice questions by topic
+ *
+ * Practice Topics:
+ * ----------------
+ * - sentence-order: Basic Subject + Verb + Complement patterns
+ * - affirmative: Positive statement construction
+ * - negative: Negation with ne...pas
+ * - questions: Question formation techniques
+ * - correction: Identifying and fixing common errors
+ */
+
+// =============================================================================
+// SENTENCE PARTS EXAMPLES
+// =============================================================================
+
+/**
+ * SentencePartExample Interface
+ * -----------------------------
+ * Defines the structure for breaking down French sentences into their
+ * constituent parts (subject, verb, complement) for analysis.
+ */
 export interface SentencePartExample {
   id: number
   sentence: string
@@ -7,6 +45,10 @@ export interface SentencePartExample {
   english: string
 }
 
+/**
+ * Sentence Parts Examples - 4 sentences broken down into components.
+ * Used to teach the Subject + Verb + Complement structure.
+ */
 export const sentencePartsExamples: SentencePartExample[] = [
   {
     id: 1,
@@ -42,12 +84,25 @@ export const sentencePartsExamples: SentencePartExample[] = [
   }
 ]
 
+// =============================================================================
+// AFFIRMATIVE EXAMPLES
+// =============================================================================
+
+/**
+ * AffirmativeExample Interface
+ * ----------------------------
+ * Simple positive statement with French and English versions.
+ */
 export interface AffirmativeExample {
   id: number
   french: string
   english: string
 }
 
+/**
+ * Affirmative Examples - 6 simple positive statements.
+ * Demonstrates Subject + Verb + Complement pattern in affirmative form.
+ */
 export const affirmativeExamples: AffirmativeExample[] = [
   {
     id: 1,
@@ -81,6 +136,17 @@ export const affirmativeExamples: AffirmativeExample[] = [
   }
 ]
 
+// =============================================================================
+// ADJECTIVE PLACEMENT EXAMPLES
+// =============================================================================
+
+/**
+ * AdjectivePlacementExample Interface
+ * -----------------------------------
+ * Demonstrates French adjective placement rules.
+ * Most adjectives come after the noun, but some common ones (petit, grand,
+ * bon, etc.) can come before.
+ */
 export interface AdjectivePlacementExample {
   id: number
   french: string
@@ -88,6 +154,11 @@ export interface AdjectivePlacementExample {
   note: string
 }
 
+/**
+ * Adjective Placement Examples - 4 examples showing adjective position.
+ * - Examples 1-2: Adjectives after noun (typical French pattern)
+ * - Examples 3-4: Common adjectives before noun (exceptional cases)
+ */
 export const adjectivePlacementExamples: AdjectivePlacementExample[] = [
   {
     id: 1,
@@ -115,6 +186,15 @@ export const adjectivePlacementExamples: AdjectivePlacementExample[] = [
   }
 ]
 
+// =============================================================================
+// NEGATIVE EXAMPLES
+// =============================================================================
+
+/**
+ * NegativeExample Interface
+ * -------------------------
+ * Shows affirmative sentences transformed to negative form using ne...pas.
+ */
 export interface NegativeExample {
   id: number
   affirmative: string
@@ -122,6 +202,10 @@ export interface NegativeExample {
   english: string
 }
 
+/**
+ * Negative Examples - 4 pairs showing affirmative vs negative forms.
+ * Pattern: ne/n' + verb + pas (wraps around the verb)
+ */
 export const negativeExamples: NegativeExample[] = [
   {
     id: 1,
@@ -149,6 +233,17 @@ export const negativeExamples: NegativeExample[] = [
   }
 ]
 
+// =============================================================================
+// QUESTION EXAMPLES
+// =============================================================================
+
+/**
+ * QuestionExample Interface
+ * -------------------------
+ * Demonstrates two simple question formation methods for A1 level:
+ * - intonation: Rising tone at end of statement
+ * - est-ce-que: Question marker placed before statement
+ */
 export interface QuestionExample {
   id: number
   type: 'intonation' | 'est-ce-que'
@@ -156,6 +251,11 @@ export interface QuestionExample {
   english: string
 }
 
+/**
+ * Question Examples - 4 examples showing question formation.
+ * - Examples 1-2: Intonation questions (simplest A1 method)
+ * - Examples 3-4: Est-ce-que questions (slightly more formal)
+ */
 export const questionExamples: QuestionExample[] = [
   {
     id: 1,
@@ -183,6 +283,15 @@ export const questionExamples: QuestionExample[] = [
   }
 ]
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * CommonMistake Interface
+ * -----------------------
+ * Documents typical beginner errors with corrections and explanations.
+ */
 export interface CommonMistake {
   id: number
   wrong: string
@@ -190,6 +299,13 @@ export interface CommonMistake {
   explanation: string
 }
 
+/**
+ * Common Mistakes - 4 typical beginner errors to avoid.
+ * - Word order errors (subject-verb placement)
+ * - Negation errors (wrong placement of pas)
+ * - Question formation errors (inversion at A1 level)
+ * - Adjective placement errors (wrong side of noun)
+ */
 export const commonMistakes: CommonMistake[] = [
   {
     id: 1,
@@ -217,6 +333,15 @@ export const commonMistakes: CommonMistake[] = [
   }
 ]
 
+// =============================================================================
+// SENTENCE PATTERNS
+// =============================================================================
+
+/**
+ * SentencePattern Interface
+ * -------------------------
+ * Structural formulas showing how to construct different sentence types.
+ */
 export interface SentencePattern {
   id: number
   label: string
@@ -224,6 +349,13 @@ export interface SentencePattern {
   example: string
 }
 
+/**
+ * Sentence Patterns - 4 structural formulas for sentence construction.
+ * - Basic statement: Subject + Verb + Complement
+ * - Negative sentence: Subject + ne/n' + Verb + pas + Complement
+ * - Intonation question: Statement + ?
+ * - Est-ce-que question: Est-ce que + Subject + Verb + Complement ?
+ */
 export const sentencePatterns: SentencePattern[] = [
   {
     id: 1,
@@ -251,6 +383,15 @@ export const sentencePatterns: SentencePattern[] = [
   }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion Interface
+ * --------------------------
+ * Multiple-choice questions for testing sentence structure knowledge.
+ */
 export interface PracticeQuestion {
   id: number
   type: 'multiple-choice'
@@ -261,7 +402,20 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * Practice Questions - 14 multiple-choice questions organized by topic.
+ *
+ * Distribution:
+ * - 4 sentence-order questions (IDs 1-4): Word order patterns
+ * - 3 affirmative questions (IDs 5-7): Positive statements
+ * - 3 negative questions (IDs 8-10): Negation patterns
+ * - 2 questions questions (IDs 11-12): Question formation
+ * - 2 correction questions (IDs 13-14): Error identification
+ */
 export const practiceQuestions: PracticeQuestion[] = [
+  // --------------------------------------------------
+  // 4 SENTENCE-ORDER QUESTIONS: Test S+V+C pattern
+  // --------------------------------------------------
   {
     id: 1,
     type: "multiple-choice",
@@ -314,6 +468,10 @@ export const practiceQuestions: PracticeQuestion[] = [
     correct: 0,
     explanation: "Simple affirmative sentences usually follow Subject + Verb + Complement."
   },
+
+  // --------------------------------------------------
+  // 3 AFFIRMATIVE QUESTIONS: Test positive statements
+  // --------------------------------------------------
   {
     id: 5,
     type: "multiple-choice",
@@ -353,6 +511,10 @@ export const practiceQuestions: PracticeQuestion[] = [
     correct: 0,
     explanation: "This is a positive statement."
   },
+
+  // --------------------------------------------------
+  // 3 NEGATIVE QUESTIONS: Test negation patterns (ne...pas)
+  // --------------------------------------------------
   {
     id: 8,
     type: "multiple-choice",
@@ -392,6 +554,10 @@ export const practiceQuestions: PracticeQuestion[] = [
     correct: 1,
     explanation: "The correct beginner negative form is 'Nous n'avons pas de chien.'"
   },
+
+  // --------------------------------------------------
+  // 2 QUESTIONS: Test question formation techniques
+  // --------------------------------------------------
   {
     id: 11,
     type: "multiple-choice",
@@ -418,6 +584,10 @@ export const practiceQuestions: PracticeQuestion[] = [
     correct: 0,
     explanation: "Use est-ce que + subject + verb + complement."
   },
+
+  // --------------------------------------------------
+  // 2 CORRECTION QUESTIONS: Test error identification
+  // --------------------------------------------------
   {
     id: 13,
     type: "multiple-choice",
@@ -446,17 +616,29 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * Section IDs Array - Ordered list of all lesson section identifiers.
+ * Used for progress tracking and determining completion status.
+ */
 export const sectionIds = [
-  'what-is-sentence',
-  'basic-order',
-  'sentence-parts',
-  'affirmative',
-  'adjectives',
-  'negatives',
-  'questions',
-  'mistakes',
-  'patterns',
-  'practice'
+  'what-is-sentence',   // Introduction: What is a sentence?
+  'basic-order',        // Basic French sentence order
+  'sentence-parts',     // Subject, verb, complement breakdown
+  'affirmative',        // Affirmative sentence examples
+  'adjectives',         // Adjective placement rules
+  'negatives',          // Negative sentence formation
+  'questions',          // Question formation techniques
+  'mistakes',           // Common mistakes to avoid
+  'patterns',           // Sentence pattern formulas
+  'practice'            // Interactive practice section
 ] as const
 
+/**
+ * SectionId Type - Union type derived from sectionIds array.
+ * Ensures type safety when referencing section identifiers.
+ */
 export type SectionId = typeof sectionIds[number]

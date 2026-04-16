@@ -1,26 +1,71 @@
+/**
+ * A2 Lesson 14 - Adverbs of Frequency, Quantity, and Manner
+ * =============================================================
+ *
+ * This page teaches A2 learners how to use French adverbs to add detail and
+ * precision to sentences, covering frequency, quantity, and manner adverbs.
+ *
+ * **Lesson Structure:**
+ * 1. WhatIsAdverbSection - Introduction to adverbs
+ * 2. FrequencySection - Adverbs of frequency (toujours, souvent, jamais)
+ * 3. QuantitySection - Adverbs of quantity (très, beaucoup, assez)
+ * 4. MannerSection - Adverbs of manner (lentement, bien, mal)
+ * 5. PositionSection - Where to place adverbs in sentences
+ * 6. AdjectiveVsAdverbSection - Difference between adjectives and adverbs
+ * 7. GuidedExamplesSection - Full example sentences
+ * 8. MistakesSection - Common errors to avoid
+ * 9. PracticeSection - Interactive quiz (18 questions)
+ * 10. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Adverbs modify verbs, adjectives, or other adverbs
+ * - Many French adverbs end in -ment
+ * - Position: usually after the verb they modify
+ * - Adjectives describe nouns, adverbs describe actions
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 18-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaBookOpen,
-  FaClock,
-  FaBalanceScale,
-  FaRuler,
-  FaRunning,
-  FaList,
-  FaExchangeAlt,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaRedo,
-  FaArrowAltCircleRight,
-  FaInfoCircle,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaBookOpen,               // Lesson content/introduction
+  FaClock,                  // Frequency/time
+  FaBalanceScale,           // Comparison
+  FaRuler,                  // Quantity/measurement
+  FaRunning,                // Manner/action
+  FaList,                   // Position/patterns
+  FaExchangeAlt,            // Adjective vs adverb comparison
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
+  FaInfoCircle,             // Additional info
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   frequencyAdverbs,
@@ -34,6 +79,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -43,6 +95,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -112,6 +184,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 14 badge
+ * - Main title: "Adverbs of Frequency, Quantity, and Manner"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-cyan-500 to-teal-400 rounded-2xl p-8 text-white shadow-lg">
@@ -125,6 +206,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({ current, total, label }: { current: number; total: number; label: string }) {
   const percentage = Math.round((current / total) * 100);
   return (
@@ -145,6 +233,15 @@ function ProgressBar({ current, total, label }: { current: number; total: number
   );
 }
 
+/**
+ * WhatIsAdverbSection - Introduction to adverbs.
+ *
+ * Content:
+ * - Definition of adverbs
+ * - What adverbs modify (verbs, adjectives, sentences)
+ * - Questions adverbs answer (how, how often, how much)
+ * - Simple examples showing adverbs in action
+ */
 function WhatIsAdverbSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="what-is-adverb" title="What is an Adverb?" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -177,6 +274,16 @@ function WhatIsAdverbSection({ isReviewed, onMarkReviewed }: { isReviewed: boole
   );
 }
 
+/**
+ * FrequencySection - Adverbs expressing how often something happens.
+ *
+ * Content:
+ * - toujours (always)
+ * - souvent (often)
+ * - parfois/quelquefois (sometimes)
+ * - rarement (rarely)
+ * - jamais (never)
+ */
 function FrequencySection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="frequency" title="Adverbs of Frequency" icon={FaClock} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -204,6 +311,18 @@ function FrequencySection({ isReviewed, onMarkReviewed }: { isReviewed: boolean;
   );
 }
 
+/**
+ * QuantitySection - Adverbs expressing amount or degree.
+ *
+ * Content:
+ * - très (very)
+ * - trop (too much)
+ * - beaucoup (a lot)
+ * - assez (enough)
+ * - peu (little)
+ * - presque (almost)
+ * - environ (about/approximately)
+ */
 function QuantitySection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="quantity" title="Adverbs of Quantity" icon={FaRuler} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -233,6 +352,17 @@ function QuantitySection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+/**
+ * MannerSection - Adverbs expressing how something is done.
+ *
+ * Content:
+ * - lentement (slowly)
+ * - rapidement (quickly)
+ * - facilement (easily)
+ * - heureusement/malheureusement (fortunately/unfortunately)
+ * - bien (well)
+ * - mal (badly)
+ */
 function MannerSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="manner" title="Adverbs of Manner" icon={FaRunning} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -260,6 +390,15 @@ function MannerSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; on
   );
 }
 
+/**
+ * PositionSection - Where to place adverbs in French sentences.
+ *
+ * Content:
+ * - After simple verbs
+ * - Near the verb for frequency adverbs
+ * - Très + adjective/adverb
+ * - Between auxiliary and participle in compound tenses
+ */
 function PositionSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="position" title="Sentence Position Patterns" icon={FaList} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -282,6 +421,15 @@ function PositionSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+/**
+ * AdjectiveVsAdverbSection - Difference between adjectives and adverbs.
+ *
+ * Content:
+ * - Adjectives describe nouns (agree in gender/number)
+ * - Adverbs describe verbs/actions (invariable)
+ * - Examples showing rapide vs rapidement
+ * - Formation of -ment adverbs from adjectives
+ */
 function AdjectiveVsAdverbSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="adjective-vs-adverb" title="Adjective vs Adverb" icon={FaExchangeAlt} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -318,6 +466,12 @@ function AdjectiveVsAdverbSection({ isReviewed, onMarkReviewed }: { isReviewed: 
   );
 }
 
+/**
+ * GuidedExamplesSection - Collection of example sentences for study.
+ *
+ * Various contexts showing adverbs in everyday French sentences,
+ * combining different types of adverbs.
+ */
 function GuidedExamplesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="guided-examples" title="Guided Examples" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -336,6 +490,15 @@ function GuidedExamplesSection({ isReviewed, onMarkReviewed }: { isReviewed: boo
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Using adjective instead of adverb (bon vs bien)
+ * - Incorrect position of adverbs
+ * - Stacking adverbs incorrectly
+ * - Wrong placement in compound tenses
+ */
 function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="mistakes" title="Common Beginner Mistakes" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -367,6 +530,23 @@ function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for Lesson 14.
+ *
+ * Features:
+ * - 18 questions testing adverb knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-17)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({ isReviewed, onMarkReviewed, onComplete }: { isReviewed: boolean; onMarkReviewed: (id: string) => void; onComplete: (score: number) => void }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -488,6 +668,17 @@ function PracticeSection({ isReviewed, onMarkReviewed, onComplete }: { isReviewe
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to B1 lessons (next level)
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({ practiceScore }: { practiceScore: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-gradient-to-br from-cyan-500 to-teal-400 rounded-2xl p-8 text-white shadow-lg">
@@ -511,12 +702,37 @@ function CompletionSection({ practiceScore }: { practiceScore: number }) {
   );
 }
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson14Page - Main component for A2 Lesson 14.
+ *
+ * Manages:
+ * - Section review state (which sections have been reviewed)
+ * - Practice quiz answers and score
+ * - Lesson completion status
+ * - Progress persistence to localStorage
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson14Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson14Progress");
@@ -526,30 +742,65 @@ export default function Lesson14Page() {
         setReviewedSections(parsed.reviewedSections || []);
         setPracticeScore(parsed.practiceScore || 0);
         setPracticeCompleted(parsed.practiceCompleted || false);
-      } catch {}
+      } catch {
+        // Invalid saved data, ignore
+      }
     }
   }, []);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("a2Lesson14Progress", JSON.stringify({ reviewedSections, practiceScore, practiceCompleted }));
     }
   }, [reviewedSections, practiceScore, practiceCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => { setReviewedSections((prev) => (prev.includes(id) ? prev : [...prev, id])); };
+
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => { setPracticeScore(score); setPracticeCompleted(true); };
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => Math.round((reviewedSections.length / sectionIds.length) * 100), [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) return <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-slate-50 flex items-center justify-center"><div className="text-cyan-600">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Back Navigation */}
         <div className="flex items-center gap-4">
           <Link href="/classes/A2" className="flex items-center gap-2 text-slate-600 hover:text-cyan-600 transition-colors"><FaArrowLeft size={18} /><span>Back to A2 Lessons</span></Link>
         </div>
+
+        {/* Lesson Header */}
         <LessonHeader />
+
+        {/* Progress Bar - Section Review Progress */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100"><ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" /></div>
+
+        {/* Lesson Sections - In Order of Instruction */}
         <WhatIsAdverbSection isReviewed={reviewedSections.includes("what-is-adverb")} onMarkReviewed={handleMarkReviewed} />
         <FrequencySection isReviewed={reviewedSections.includes("frequency")} onMarkReviewed={handleMarkReviewed} />
         <QuantitySection isReviewed={reviewedSections.includes("quantity")} onMarkReviewed={handleMarkReviewed} />
@@ -558,6 +809,7 @@ export default function Lesson14Page() {
         <AdjectiveVsAdverbSection isReviewed={reviewedSections.includes("adjective-vs-adverb")} onMarkReviewed={handleMarkReviewed} />
         <GuidedExamplesSection isReviewed={reviewedSections.includes("guided-examples")} onMarkReviewed={handleMarkReviewed} />
         <MistakesSection isReviewed={reviewedSections.includes("mistakes")} onMarkReviewed={handleMarkReviewed} />
+        {/* Practice Section - 18 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-cyan-50 to-white">
             <div className="flex items-center gap-4">
@@ -569,6 +821,8 @@ export default function Lesson14Page() {
             <PracticeSection isReviewed={reviewedSections.includes("practice")} onMarkReviewed={handleMarkReviewed} onComplete={handlePracticeComplete} />
           </div>
         </div>
+
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && <CompletionSection practiceScore={practiceScore} />}
       </div>
     </div>

@@ -1,6 +1,61 @@
-// A2 Lesson 11 — Y and En
-// Data and content for the lesson
+/**
+ * A2 Lesson 11 - Y and En (Pronoms Adverbiaux)
+ * =============================================
+ *
+ * This file contains all lesson data for A2 Lesson 11, focusing on the
+ * French adverbial pronouns Y and En and their proper usage.
+ *
+ * **Lesson Content:**
+ * - Understanding Y (replaces à + place/thing, not people)
+ * - Understanding En (replaces de + thing, quantities, partitive)
+ * - Y vs En comparison and when to use each
+ * - Position of Y and En in sentences
+ * - Usage in different tenses (present, passé composé, near future)
+ * - Common mistakes to avoid
+ * - 18 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Y replaces à + place/thing (Je vais à Paris → J'y vais)
+ * - En replaces de + thing (Je parle de ça → J'en parle)
+ * - En replaces quantities (J'ai trois livres → J'en ai trois)
+ * - Neither is typically used for people (use stressed pronouns instead)
+ * - Both go before the verb (or auxiliary in passé composé)
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. yUses - When and how to use Y
+ * 3. commonYVerbs - Verbs commonly used with Y
+ * 4. enUses - When and how to use En
+ * 5. commonEnVerbs - Verbs commonly used with En
+ * 6. yVsEnComparisons - Side-by-side Y vs En comparison
+ * 7. positionExamples - Position in sentences
+ * 8. tenseExamples - Usage in different tenses
+ * 9. guidedExamples - Example sentences for study
+ * 10. commonMistakes - Common errors to avoid
+ * 11. practiceQuestions - 18 quiz questions
+ * 12. getPerformanceMessage - Score-based feedback
+ */
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to Y and En
+ * 2. what-are-y-en - Understanding these pronouns
+ * 3. understanding-y - How to use Y
+ * 4. understanding-en - How to use En
+ * 5. y-vs-en - Comparing Y and En
+ * 6. position - Where to place them
+ * 7. tenses - Usage in different tenses
+ * 8. guided-examples - Example sentences
+ * 9. mistakes - Common errors
+ * 10. practice - Interactive quiz
+ * 11. completion - Lesson completion
+ */
 export const sectionIds = [
   "intro",
   "what-are-y-en",
@@ -15,7 +70,19 @@ export const sectionIds = [
   "completion",
 ];
 
-// Section 2 — Understanding Y
+// =============================================================================
+// UNDERSTANDING Y (Section 2)
+// =============================================================================
+
+/**
+ * yUses - When and how to use the pronoun Y.
+ *
+ * Y replaces:
+ * - à + place (Je vais à Paris → J'y vais)
+ * - à + thing/idea (Tu penses à ton travail → Tu y penses)
+ *
+ * Y is NOT used for people after à (use stressed pronouns like à elle)
+ */
 export const yUses = [
   {
     title: "Y replaces a place",
@@ -43,6 +110,12 @@ export const yUses = [
   },
 ];
 
+/**
+ * commonYVerbs - Common expressions that use Y.
+ *
+ * These verbs/expressions are typically followed by à,
+ * making them candidates for Y replacement.
+ */
 export const commonYVerbs = [
   { expression: "aller à", english: "to go to" },
   { expression: "penser à", english: "to think about" },
@@ -51,7 +124,18 @@ export const commonYVerbs = [
   { expression: "assister à", english: "to attend" },
 ];
 
-// Section 3 — Understanding En
+// =============================================================================
+// UNDERSTANDING EN (Section 3)
+// =============================================================================
+
+/**
+ * enUses - When and how to use the pronoun En.
+ *
+ * En replaces:
+ * - de + thing (Je parle de ce livre → J'en parle)
+ * - Quantities (J'ai trois frères → J'en ai trois)
+ * - Partitive articles (Tu veux du pain → J'en veux)
+ */
 export const enUses = [
   {
     title: "En replaces de + thing",
@@ -79,6 +163,12 @@ export const enUses = [
   },
 ];
 
+/**
+ * commonEnVerbs - Common expressions that use En.
+ *
+ * These verbs/expressions are typically followed by de,
+ * making them candidates for En replacement.
+ */
 export const commonEnVerbs = [
   { expression: "parler de", english: "to talk about" },
   { expression: "avoir besoin de", english: "to need" },
@@ -87,7 +177,16 @@ export const commonEnVerbs = [
   { expression: "vouloir de", english: "to want some / some of it (in quantity contexts)" },
 ];
 
-// Section 4 — Y vs En Comparison
+// =============================================================================
+// Y VS EN COMPARISON (Section 4)
+// =============================================================================
+
+/**
+ * yVsEnComparisons - Side-by-side comparison of Y and En usage.
+ *
+ * Shows how the same context uses different pronouns
+ * depending on the preposition (à vs de).
+ */
 export const yVsEnComparisons = [
   {
     withY: "Je vais à Paris. → J'y vais.",
@@ -106,7 +205,18 @@ export const yVsEnComparisons = [
   },
 ];
 
-// Section 5 — Sentence Position
+// =============================================================================
+// SENTENCE POSITION (Section 5)
+// =============================================================================
+
+/**
+ * positionExamples - Where Y and En go in sentences.
+ *
+ * Both pronouns go before the conjugated verb:
+ * - Present: J'y vais, J'en parle
+ * - Passé composé: J'y ai pensé, J'en ai acheté
+ * - Near future: Je vais y aller, Je vais en acheter
+ */
 export const positionExamples = [
   {
     french: "J'y vais.",
@@ -126,7 +236,21 @@ export const positionExamples = [
   },
 ];
 
-// Section 6 — Y and En in Different Tenses
+// =============================================================================
+// Y AND EN IN DIFFERENT TENSES (Section 6)
+// =============================================================================
+
+/**
+ * tenseExamples - Usage of Y and En across different tenses.
+ *
+ * Covers:
+ * - Present tense
+ * - Negation
+ * - Near future (aller + infinitive)
+ * - Passé composé
+ *
+ * Shows both Y and En examples for each context.
+ */
 export const tenseExamples = [
   {
     category: "present",
@@ -170,7 +294,16 @@ export const tenseExamples = [
   },
 ];
 
-// Section 7 — Guided Examples
+// =============================================================================
+// GUIDED EXAMPLES (Section 7)
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing Y and En in everyday French,
+ * including both Y and En usage in natural conversations.
+ */
 export const guidedExamples = [
   {
     french: "Je vais à la bibliothèque. J'y vais après le déjeuner.",
@@ -198,7 +331,20 @@ export const guidedExamples = [
   },
 ];
 
-// Section 8 — Common Mistakes
+// =============================================================================
+// COMMON MISTAKES (Section 8)
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Common errors:
+ * - Using wrong pronoun (Y vs En confusion)
+ * - Using Y/En for people instead of stressed pronouns
+ * - Wrong word order with quantities
+ *
+ * Each mistake shows wrong form, correct form, and explanation.
+ */
 export const commonMistakes = [
   {
     wrong: "Je vais à la banque. Je vais là.",
@@ -227,7 +373,28 @@ export const commonMistakes = [
   },
 ];
 
-// Section 9 — Practice Questions
+// =============================================================================
+// PRACTICE QUESTIONS (Section 9) - 18 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 18-question quiz for Lesson 11.
+ *
+ * Topics covered:
+ * - y (1-5): Using Y correctly
+ * - en (6-10): Using En correctly
+ * - distinction (11-14): Choosing between Y and En
+ * - position (15-16): Placement in different tenses
+ * - correction (17-18): Fixing common mistakes
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   {
     id: 1,
@@ -383,7 +550,22 @@ export const practiceQuestions = [
   },
 ];
 
-// Performance messages based on score
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/18: "Good effort" - suggests review of à vs de patterns
+ * - 8-13/18: "Nice progress" - encourages continued learning
+ * - 14-18/18: "Great job" - celebrates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (18)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) {
     return {

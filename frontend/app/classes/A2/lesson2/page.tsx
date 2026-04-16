@@ -1,25 +1,71 @@
+/**
+ * A2 Lesson 2 - Reflexive Verbs (Verbes Pronominaux)
+ * ===================================================
+ *
+ * This page teaches A2 learners how to use reflexive verbs in French,
+ * essential for describing daily routines and actions done to oneself.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to reflexive verbs concept
+ * 2. PronounsSection - Reflexive pronoun chart (me, te, se, nous, vous)
+ * 3. VerbsSection - Common reflexive verbs for routines
+ * 4. PresentSection - Present tense conjugation
+ * 5. RoutineSection - Daily routine sequences
+ * 6. NegationSection - Negative form with reflexive verbs
+ * 7. PasseComposeSection - Passé composé with reflexive verbs
+ * 8. MistakesSection - Common errors to avoid
+ * 9. PracticeSection - Interactive quiz (15 questions)
+ * 10. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts Covered:**
+ * - Reflexive pronouns match the subject (je → me, tu → te, etc.)
+ * - Pronoun placement before the verb (or before auxiliary in passé composé)
+ * - Elision: me/te/se → m'/t'/s' before vowels
+ * - Reflexive verbs use être in passé composé
+ * - Past participle agreement with subject in passé composé
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 15-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state and side effects
 import { useState, useEffect } from 'react'
+
+// Framer Motion for animations
 import { motion, AnimatePresence } from 'framer-motion'
+
+// React Icons for UI elements
 import {
-  FaHome,
-  FaCheck,
-  FaChevronRight,
-  FaArrowRight,
-  FaBookOpen,
-  FaGraduationCap,
-  FaLightbulb,
-  FaTimes,
-  FaRedo,
-  FaChevronDown,
-  FaChevronUp,
-  FaVolumeUp,
-  FaSun,
-  FaMoon,
-  FaExclamationTriangle
+  FaHome,               // Back navigation
+  FaCheck,              // Reviewed status, correct answer
+  FaChevronRight,       // Next button
+  FaArrowRight,         // Continue button
+  FaBookOpen,           // Section icons
+  FaGraduationCap,      // Lesson header
+  FaLightbulb,          // Tips and intro
+  FaTimes,              // Incorrect answer
+  FaRedo,               // Retake practice
+  FaChevronDown,        // Expand section
+  FaChevronUp,          // Collapse section
+  FaVolumeUp,           // Audio playback
+  FaSun,                // Morning routine
+  FaMoon,               // Evening routine
+  FaExclamationTriangle // Mistakes section
 } from 'react-icons/fa'
+
+// Next.js Link for navigation
 import Link from 'next/link'
+
+// Lesson data
 import {
   reflexivePronouns,
   commonReflexiveVerbs,
@@ -34,6 +80,13 @@ import {
   getPerformanceMessage
 } from './data'
 
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * LessonProgress - Shape of persisted lesson progress in localStorage.
+ */
 interface LessonProgress {
   reviewedSections: SectionId[]
   practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[]
@@ -41,23 +94,63 @@ interface LessonProgress {
   lessonCompleted: boolean
 }
 
+// =============================================================================
+// FEEDBACK MESSAGES
+// =============================================================================
+
+/**
+ * feedbackMessages - Random encouraging messages for quiz feedback.
+ */
 const feedbackMessages = {
   correct: ['Nice 😏', 'Good catch', "That's right", "You're getting it", 'Well done!', 'Perfect!'],
   incorrect: ['Careful now…', 'Almost there', 'Keep trying', 'Not quite', 'Review the pattern']
 }
 
+/**
+ * getRandomFeedback - Returns a random feedback message.
+ * @param isCorrect - Whether the answer was correct
+ * @returns Random message string
+ */
 function getRandomFeedback(isCorrect: boolean) {
   const messages = isCorrect ? feedbackMessages.correct : feedbackMessages.incorrect
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+/**
+ * A2Lesson2Page - Main component for the reflexive verbs lesson.
+ *
+ * Manages lesson state, persists progress to localStorage, and renders
+ * all lesson sections with collapsible cards.
+ */
 export default function A2Lesson2Page() {
+  // ---------------------------------------------------------------------------
+  // STATE: Section Review Tracking
+  // ---------------------------------------------------------------------------
   const [reviewedSections, setReviewedSections] = useState<SectionId[]>([])
+
+  // ---------------------------------------------------------------------------
+  // STATE: Practice Quiz
+  // ---------------------------------------------------------------------------
   const [practiceAnswers, setPracticeAnswers] = useState<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>([])
   const [practiceCompleted, setPracticeCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Lesson Completion
+  // ---------------------------------------------------------------------------
   const [lessonCompleted, setLessonCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Hydration Check
+  // ---------------------------------------------------------------------------
   const [isClient, setIsClient] = useState(false)
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true)
     const saved = localStorage.getItem('a2Lesson2Progress')
@@ -70,6 +163,9 @@ export default function A2Lesson2Page() {
     }
   }, [])
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('a2Lesson2Progress', JSON.stringify({
@@ -81,21 +177,33 @@ export default function A2Lesson2Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, lessonCompleted, isClient])
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Mark Section Reviewed
+  // ---------------------------------------------------------------------------
   const markSectionReviewed = (sectionId: SectionId) => {
     if (!reviewedSections.includes(sectionId)) {
       setReviewedSections(prev => [...prev, sectionId])
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
   const allSectionsReviewed = sectionIds.every(id => reviewedSections.includes(id))
   const practiceScore = practiceAnswers.filter(a => a.isCorrect).length
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Complete Lesson
+  // ---------------------------------------------------------------------------
   const completeLesson = () => {
     if (allSectionsReviewed && practiceCompleted) {
       setLessonCompleted(true)
     }
   }
 
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pb-24">
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -138,6 +246,20 @@ export default function A2Lesson2Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ *
+ * Features:
+ * - A2 Lesson 2 badge with graduation cap icon
+ * - Main title about reflexive verbs (pronominal verbs)
+ * - Blue gradient header background
+ * - Tip box with lightbulb icon
+ * - Fade-in animation on mount
+ */
 function LessonHeader() {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
@@ -161,6 +283,20 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual indicator of lesson progress.
+ *
+ * Displays:
+ * - Number of completed sections out of total (10)
+ * - Animated progress bar with gradient fill
+ * - Percentage completion
+ *
+ * @param reviewedSections - Array of section IDs that have been reviewed
+ */
 function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   const totalSections = sectionIds.length
   const completedSections = reviewedSections.length
@@ -179,11 +315,40 @@ function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionProps Interface
+// =============================================================================
+
+/**
+ * SectionProps - Common props for all lesson section components.
+ */
 interface SectionProps {
   isReviewed: boolean
   onMarkReviewed: () => void
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Clickable header to expand/collapse content
+ * - Auto-mark-as-reviewed when opened
+ * - Icon showing review status (checkmark when reviewed)
+ * - Animated expand/collapse with AnimatePresence
+ * - Color-coded header (blue when pending, green when reviewed)
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ * @param children - Section content to display when expanded
+ * @param defaultOpen - Whether section starts expanded
+ */
 function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, children, defaultOpen = false }: {
   id: string
   title: string
@@ -224,6 +389,19 @@ function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, childr
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: IntroSection
+// =============================================================================
+
+/**
+ * IntroSection - Introduction to reflexive verbs concept.
+ *
+ * Content:
+ * - Definition of reflexive/pronominal verbs
+ * - Explanation of reflexive pronouns
+ * - Quick examples showing the structure
+ * - Note about daily routine usage
+ */
 function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="intro" title="What is a Reflexive / Pronominal Verb?" icon={FaLightbulb} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>

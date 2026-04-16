@@ -1,6 +1,60 @@
-// A2 Lesson 10 — The Present Conditional
-// Data and content for the lesson
+/**
+ * A2 Lesson 10 - The Present Conditional (Le Conditionnel Présent)
+ * ===================================================================
+ *
+ * This file contains all lesson data for A2 Lesson 10, focusing on the
+ * present conditional tense in French for polite requests, wishes, and
+ * hypothetical situations.
+ *
+ * **Lesson Content:**
+ * - What the present conditional is and when to use it
+ * - Formation rule: future stem + imparfait endings
+ * - Regular verb conjugations in conditional
+ * - Common irregular stems (être → ser-, avoir → aur-, etc.)
+ * - Conditional vs futur simple distinctions
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Formation: future stem + imparfait endings (-ais, -ais, -ait, -ions, -iez, -aient)
+ * - Used for: polite requests, wishes, hypothetical situations, advice
+ * - Often corresponds to "would" in English
+ * - Irregular stems must be memorized
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. conditionalUses - When to use the conditional
+ * 3. conditionalFormationRule - Formation explanation
+ * 4. conditionalEndings - Conjugation endings table
+ * 5. regularConditionalVerbs - Regular verb examples
+ * 6. irregularConditionalVerbs - Irregular verb stems
+ * 7. futureVsConditionalComparisons - Conditional vs future
+ * 8. guidedExamples - Example sentences for study
+ * 9. commonMistakes - Common errors to avoid
+ * 10. practiceQuestions - 15 quiz questions
+ * 11. getPerformanceMessage - Score-based feedback
+ */
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to conditional
+ * 2. what-is-conditional - Understanding the tense
+ * 3. when-to-use - Appropriate contexts
+ * 4. formation - How to form the conditional
+ * 5. endings - Conjugation endings
+ * 6. regular-verbs - Regular verb examples
+ * 7. irregular-stems - Irregular verb stems
+ * 8. vs-futur - Conditional vs future
+ * 9. guided-examples - Example sentences
+ * 10. mistakes - Common errors
+ * 11. practice - Interactive quiz
+ * 12. completion - Lesson completion
+ */
 export const sectionIds = [
   "intro",
   "what-is-conditional",
@@ -16,7 +70,19 @@ export const sectionIds = [
   "completion",
 ];
 
-// Section 2 — When to use the present conditional
+// =============================================================================
+// WHEN TO USE THE CONDITIONAL (Section 2)
+// =============================================================================
+
+/**
+ * conditionalUses - Appropriate contexts for the present conditional.
+ *
+ * Primary uses:
+ * - Polite requests (voudrais, pourrais)
+ * - Wishes or desires (aimerais)
+ * - Hypothetical situations
+ * - Soft suggestions or advice (devrais)
+ */
 export const conditionalUses = [
   {
     title: "Polite requests",
@@ -44,7 +110,17 @@ export const conditionalUses = [
   },
 ];
 
-// Section 3 — Formation rule
+// =============================================================================
+// FORMATION RULE (Section 3)
+// =============================================================================
+
+/**
+ * conditionalFormationRule - How to form the present conditional.
+ *
+ * The key rule: future stem + imparfait endings
+ * - Take the future stem (usually infinitive or irregular stem)
+ * - Add imparfait endings: -ais, -ais, -ait, -ions, -iez, -aient
+ */
 export const conditionalFormationRule = {
   rule: "future stem + imparfait endings",
   examples: [
@@ -69,7 +145,21 @@ export const conditionalFormationRule = {
   ],
 };
 
-// Section 4 — Conditional endings
+// =============================================================================
+// CONDITIONAL ENDINGS (Section 4)
+// =============================================================================
+
+/**
+ * conditionalEndings - The imparfait endings used in conditional.
+ *
+ * Same endings as the imparfait tense:
+ * - je: -ais
+ * - tu: -ais
+ * - il/elle/on: -ait
+ * - nous: -ions
+ * - vous: -iez
+ * - ils/elles: -aient
+ */
 export const conditionalEndings = [
   { pronoun: "je", ending: "-ais", example: "je parlerais" },
   { pronoun: "tu", ending: "-ais", example: "tu parlerais" },
@@ -79,7 +169,17 @@ export const conditionalEndings = [
   { pronoun: "ils / elles", ending: "-aient", example: "ils parleraient" },
 ];
 
-// Section 5 — Common regular verbs
+// =============================================================================
+// REGULAR VERBS (Section 5)
+// =============================================================================
+
+/**
+ * regularConditionalVerbs - Common regular verbs in conditional.
+ *
+ * These use the standard formation:
+ * - Future stem (infinitive minus -e for -re verbs)
+ * + Conditional endings
+ */
 export const regularConditionalVerbs = [
   {
     infinitive: "parler",
@@ -123,7 +223,25 @@ export const regularConditionalVerbs = [
   },
 ];
 
-// Section 6 — Common irregular stems
+// =============================================================================
+// IRREGULAR STEMS (Section 6)
+// =============================================================================
+
+/**
+ * irregularConditionalVerbs - Common irregular conditional stems.
+ *
+ * These verbs have irregular future stems that carry into conditional:
+ * - être → ser-
+ * - avoir → aur-
+ * - aller → ir-
+ * - faire → fer-
+ * - venir → viendr-
+ * - voir → verr-
+ * - vouloir → voudr-
+ * - pouvoir → pourr-
+ * - devoir → devr-
+ * - savoir → saur-
+ */
 export const irregularConditionalVerbs = [
   {
     infinitive: "être",
@@ -187,7 +305,19 @@ export const irregularConditionalVerbs = [
   },
 ];
 
-// Section 7 — Conditional vs futur simple
+// =============================================================================
+// CONDITIONAL VS FUTUR SIMPLE (Section 7)
+// =============================================================================
+
+/**
+ * futureVsConditionalComparisons - Side-by-side future and conditional comparison.
+ *
+ * Shows the difference between:
+ * - Futur simple: real future action (will)
+ * - Conditionnel: possible/imagined action (would)
+ *
+ * Often the conditional depends on a condition (si clause).
+ */
 export const futureVsConditionalComparisons = [
   {
     future: "Je parlerai demain.",
@@ -212,7 +342,16 @@ export const futureVsConditionalComparisons = [
   },
 ];
 
-// Section 8 — Guided examples
+// =============================================================================
+// GUIDED EXAMPLES (Section 8)
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing conditional in everyday French,
+ * including polite requests, wishes, and hypothetical situations.
+ */
 export const guidedExamples = [
   {
     french: "Je voudrais un thé, s'il vous plaît.",
@@ -240,7 +379,20 @@ export const guidedExamples = [
   },
 ];
 
-// Section 9 — Common mistakes
+// =============================================================================
+// COMMON MISTAKES (Section 9)
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Common errors:
+ * - Confusing futur simple and conditional endings (-ai vs -ais)
+ * - Using wrong irregular stems
+ * - Wrong conjugation endings
+ *
+ * Each mistake shows wrong form, correct form, and explanation.
+ */
 export const commonMistakes = [
   {
     wrong: "Je parlerai si j'avais le temps.",
@@ -264,7 +416,28 @@ export const commonMistakes = [
   },
 ];
 
-// Section 10 — Practice questions
+// =============================================================================
+// PRACTICE QUESTIONS (Section 10) - 15 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for Lesson 10.
+ *
+ * Topics covered:
+ * - usage (1-4): When to use conditional
+ * - regular (5-8): Regular verb conjugations
+ * - irregular (9-11): Irregular verb stems
+ * - comparison (12-13): Conditional vs future
+ * - correction (14-15): Fixing mistakes
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   {
     id: 1,
@@ -412,7 +585,22 @@ export const practiceQuestions = [
   },
 ];
 
-// Performance messages based on score
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-6/15: "Good effort" - suggests review of endings and irregular stems
+ * - 7-11/15: "Nice progress" - encourages continued learning
+ * - 12-15/15: "Great job" - celebrates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 6) {
     return {

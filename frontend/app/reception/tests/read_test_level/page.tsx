@@ -1,8 +1,55 @@
+/**
+ * Read Test Level - French Reading Comprehension Assessment
+ * ===========================================================
+ *
+ * This page provides an interactive reading comprehension test to assess
+ * the user's French level. Users read French text and answer multiple-choice
+ * comprehension questions. The test progressively increases in difficulty
+ * from A0 (complete beginner) to B2 (upper intermediate).
+ *
+ * **Test Structure:**
+ * - 8 questions total (2 per CEFR level: A0, A1, A2, B1/B2)
+ * - Progressive difficulty from basic vocabulary to complex texts
+ * - Multiple choice answers (3 options per question)
+ * - Immediate feedback with color-coded responses
+ *
+ * **Scoring System:**
+ * - 0-2 correct: A0 (Beginner)
+ * - 3-4 correct: A1 (Elementary)
+ * - 5-6 correct: A2 (Pre-intermediate)
+ * - 7 correct: B1 (Intermediate)
+ * - 8 correct: B2 (Upper-intermediate)
+ *
+ * **Components:**
+ * - TestLevel: Main quiz component managing state and flow
+ * - Results Screen: Level badge, score, progress bar, motivational message
+ * - Question Card: French text display with animated options
+ *
+ * **Features:**
+ * - Framer Motion animations for smooth transitions between questions
+ * - Color-coded feedback (green for correct, red for incorrect)
+ * - Progress tracking with visual progress bar
+ * - Level indicator showing current CEFR difficulty
+ * - Restart option to retake the test
+ * - Navigation to learning dashboard after completion
+ */
+
 "use client"
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React state hook for quiz management
 import { useState } from "react"
+// Animation library for smooth transitions and interactions
 import { motion, AnimatePresence } from "framer-motion"
+// Next.js navigation for results CTA and back link
 import Link from "next/link"
+
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
 
 /**
  * Question interface - defines the structure for each quiz question
@@ -163,29 +210,59 @@ const getFeedbackMessage = (isCorrect: boolean): string => {
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+// =============================================================================
+// MAIN READING TEST COMPONENT
+// =============================================================================
+
 /**
- * Main component - French Reading Level Test
- * An interactive quiz that evaluates French reading comprehension from A0 to B2
- * Features: progressive difficulty, immediate feedback, smooth animations, results screen
+ * TestLevel - Main reading comprehension quiz component.
+ *
+ * Manages the complete test flow:
+ * - 8 questions with progressive difficulty (A0 to B2)
+ * - Answer selection with instant feedback
+ * - Results screen with level determination
+ * - Animated transitions between questions
+ *
+ * @returns JSX.Element - The reading test interface
  */
 export default function TestLevel() {
-  // State management for quiz flow
-  const [currentIndex, setCurrentIndex] = useState(0)      // Current question index (0-7)
-  const [score, setScore] = useState(0)                    // Number of correct answers
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)  // User's selected option index
-  const [hasAnswered, setHasAnswered] = useState(false)      // Whether current question has been answered
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null)  // Whether selected answer was correct
-  const [showResult, setShowResult] = useState(false)      // Whether to show results screen
-  const [feedback, setFeedback] = useState("")             // Current feedback message to display
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
 
-  // Derived state - get current question data and calculate progress percentage
+  // Current question index (0-7)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  // Number of correct answers so far
+  const [score, setScore] = useState(0)
+  // Currently selected answer option (null if none selected)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  // Whether current question has been answered
+  const [hasAnswered, setHasAnswered] = useState(false)
+  // Whether the selected answer was correct (null if not answered)
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
+  // Whether to show the results screen
+  const [showResult, setShowResult] = useState(false)
+  // Feedback message after answering (randomized encouraging message)
+  const [feedback, setFeedback] = useState("")
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+
+  // Current question data from questions array
   const currentQuestion = questions[currentIndex]
+  // Progress percentage for progress bar (0-100)
   const progress = ((currentIndex + 1) / questions.length) * 100
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+
   /**
-   * Handles user selecting an answer option
+   * Handle answer selection.
+   * Checks if answer is correct, updates score, shows feedback.
+   * Prevents changing answer after selection.
    * @param optionIndex - index of the selected option (0-2)
-   * Prevents multiple selections and triggers feedback display
    */
   const handleSelectAnswer = (optionIndex: number) => {
     if (hasAnswered) return
@@ -202,8 +279,8 @@ export default function TestLevel() {
   }
 
   /**
-   * Handles advancing to the next question or showing results
-   * Resets answer state for next question or triggers results screen
+   * Handle next button click.
+   * Advances to next question or shows results screen if last question.
    */
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
@@ -218,8 +295,8 @@ export default function TestLevel() {
   }
 
   /**
-   * Resets all state to restart the quiz from the beginning
-   * Clears score, resets to first question, hides results screen
+   * Handle restart button click.
+   * Resets all state to initial values to start quiz from beginning.
    */
   const handleRestart = () => {
     setCurrentIndex(0)
@@ -231,7 +308,11 @@ export default function TestLevel() {
     setFeedback("")
   }
 
-  // Results screen - shown when user completes all 8 questions
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+
+  // Results screen - shown after all questions answered
   if (showResult) {
     const result = getLevelFromScore(score)
     const percentage = (score / questions.length) * 100
@@ -304,7 +385,7 @@ export default function TestLevel() {
     )
   }
 
-  // Main quiz interface - shown when user is answering questions
+  // Main quiz interface - question card with French text and options
   return (
     // Full-screen container with soft gradient background
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8">

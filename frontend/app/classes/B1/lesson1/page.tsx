@@ -1,9 +1,59 @@
+/**
+ * B1 Lesson 1 - Conditional Mood (Le Conditionnel)
+ * =================================================
+ *
+ * This page teaches B1 learners the French conditional mood, used to express
+ * wishes, hypothetical situations, and polite requests.
+ *
+ * **Lesson Structure:**
+ * 1. LessonHeader - Title and introduction using lessonMeta
+ * 2. FormationSection - How to form the conditional (future stem + imparfait endings)
+ * 3. UsesSection - Common uses (politeness, wishes, hypothetical, advice)
+ * 4. IfClausesSection - Si clause patterns (si + imparfait → conditionnel)
+ * 5. IrregularsSection - Irregular verb stems
+ * 6. ComparisonSection - Future vs conditional comparison
+ * 7. MistakesSection - Common errors to avoid
+ * 8. PracticeSection - Interactive quiz (15 questions)
+ * 9. CompletionSection - Lesson completion with recap
+ *
+ * **Key Concepts:**
+ * - Conditional = future stem + imparfait endings
+ * - Never use conditional after "si"
+ * - Irregular stems: être→ser-, avoir→aur-, aller→ir-, faire→fer-, etc.
+ *
+ * **Features:**
+ * - Uses shared B1 components (SectionCard, ProgressBar, PracticeSection, etc.)
+ * - Indigo accent color theme
+ * - localStorage persistence for progress
+ * - 15-question interactive quiz
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations
 import { motion } from "framer-motion";
-import { FaBookOpen, FaGraduationCap, FaLink, FaBalanceScale, FaExclamationTriangle, FaLightbulb } from "react-icons/fa";
+
+// React Icons for UI elements
+import {
+  FaBookOpen,       // Irregular stems section
+  FaGraduationCap,  // Formation section
+  FaLink,           // If-clauses section
+  FaBalanceScale,   // Comparison section
+  FaExclamationTriangle, // Mistakes section
+  FaLightbulb,      // Uses section
+} from "react-icons/fa";
+
+// Shared B1 components
 import { SectionCard, ProgressBar, PracticeSection, CompletionSection, LessonNav } from "../components";
+
+// Lesson data imports
 import {
   sectionIds,
   lessonMeta,
@@ -17,6 +67,16 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Uses lessonMeta from data.ts for dynamic title and subtitle.
+ * Features indigo/violet gradient background.
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-indigo-500 to-violet-400 rounded-2xl p-8 text-white shadow-lg">
@@ -29,6 +89,14 @@ function LessonHeader() {
   );
 }
 
+/**
+ * FormationSection - How to form the conditional mood.
+ *
+ * Content:
+ * - Explanation of formation rule (future stem + imparfait endings)
+ * - Examples with -er, -ir, -re verbs
+ * - Endings table: -ais, -ais, -ait, -ions, -iez, -aient
+ */
 function FormationSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="formation" title="Formation of the Conditional" icon={FaGraduationCap} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="indigo">
@@ -51,6 +119,15 @@ function FormationSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean;
   );
 }
 
+/**
+ * UsesSection - Common uses of the conditional mood.
+ *
+ * Content:
+ * - Politeness (Je voudrais...)
+ * - Wishes (J'aimerais...)
+ * - Hypothetical situations
+ * - Advice (Tu devrais...)
+ */
 function UsesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="uses" title="Common Uses" icon={FaLightbulb} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="indigo">
@@ -69,6 +146,14 @@ function UsesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMa
   );
 }
 
+/**
+ * IfClausesSection - Si clause patterns with conditional.
+ *
+ * Content:
+ * - Pattern: Si + imparfait → conditionnel
+ * - Examples showing condition and result
+ * - Warning: Never use conditional after "si"
+ */
 function IfClausesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="if-clauses" title="If-Clauses (Si)" icon={FaLink} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="indigo">
@@ -90,6 +175,19 @@ function IfClausesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean;
   );
 }
 
+/**
+ * IrregularsSection - Irregular verb stems in the conditional.
+ *
+ * Content:
+ * - être → ser-
+ * - avoir → aur-
+ * - aller → ir-
+ * - faire → fer-
+ * - venir → viendr-
+ * - pouvoir → pourr-
+ * - vouloir → voudr-
+ * - devoir → devr-
+ */
 function IrregularsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="irregulars" title="Irregular Stems" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="indigo">
@@ -108,6 +206,14 @@ function IrregularsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * ComparisonSection - Comparing future and conditional.
+ *
+ * Content:
+ * - Future: definite, will happen
+ * - Conditional: hypothetical, depends on condition
+ * - Side-by-side examples
+ */
 function ComparisonSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="comparison" title="Future vs Conditional" icon={FaBalanceScale} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="indigo">
@@ -132,6 +238,14 @@ function ComparisonSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * MistakesSection - Common errors with the conditional.
+ *
+ * Content:
+ * - Using hyphens in conditional forms
+ * - Using conditional after "si"
+ * - Polite expression mistakes
+ */
 function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="mistakes" title="Common Mistakes" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="indigo">
@@ -158,12 +272,37 @@ function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson1Page - Main component for B1 Lesson 1.
+ *
+ * Manages:
+ * - Section review state
+ * - Practice quiz score and completion
+ * - Progress persistence to localStorage
+ * - Uses shared B1 components with indigo accent color
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson1Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("b1Lesson1Progress");
@@ -173,34 +312,70 @@ export default function Lesson1Page() {
         setReviewedSections(parsed.reviewedSections || []);
         setPracticeScore(parsed.practiceScore || 0);
         setPracticeCompleted(parsed.practiceCompleted || false);
-      } catch {}
+      } catch {
+        // Invalid saved data, ignore
+      }
     }
   }, []);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("b1Lesson1Progress", JSON.stringify({ reviewedSections, practiceScore, practiceCompleted }));
     }
   }, [reviewedSections, practiceScore, practiceCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => { setReviewedSections((prev) => (prev.includes(id) ? prev : [...prev, id])); };
+
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => { setPracticeScore(score); setPracticeCompleted(true); };
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => Math.round((reviewedSections.length / sectionIds.length) * 100), [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) return <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-50 flex items-center justify-center"><div className="text-indigo-600">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Navigation */}
         <LessonNav backPath="/classes/B1" />
+
+        {/* Lesson Header with title from lessonMeta */}
         <LessonHeader />
+
+        {/* Progress Bar */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100"><ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" accentColor="indigo" /></div>
+
+        {/* Lesson Sections - In Order of Instruction */}
         <FormationSection isReviewed={reviewedSections.includes("formation")} onMarkReviewed={handleMarkReviewed} />
         <UsesSection isReviewed={reviewedSections.includes("uses")} onMarkReviewed={handleMarkReviewed} />
         <IfClausesSection isReviewed={reviewedSections.includes("if-clauses")} onMarkReviewed={handleMarkReviewed} />
         <IrregularsSection isReviewed={reviewedSections.includes("irregulars")} onMarkReviewed={handleMarkReviewed} />
         <ComparisonSection isReviewed={reviewedSections.includes("comparison")} onMarkReviewed={handleMarkReviewed} />
         <MistakesSection isReviewed={reviewedSections.includes("mistakes")} onMarkReviewed={handleMarkReviewed} />
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-indigo-50 to-white">
             <h2 className="text-xl font-semibold text-slate-800">Guided Interactive Practice</h2>
@@ -209,6 +384,8 @@ export default function Lesson1Page() {
             <PracticeSection questions={practiceQuestions} isReviewed={reviewedSections.includes("practice")} onMarkReviewed={handleMarkReviewed} onComplete={handlePracticeComplete} getPerformanceMessage={getPerformanceMessage} accentColor="indigo" />
           </div>
         </div>
+
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection lessonNumber={1} lessonTitle={lessonMeta.title} practiceScore={practiceScore} totalQuestions={practiceQuestions.length} nextLessonPath="/classes/B1/lesson2" recapItems={["How to form the conditional mood", "Common irregular stems (être, avoir, aller, faire)", "Si clauses with imparfait + conditional", "Difference between future and conditional", "Using conditional for politeness and wishes"]} accentColor="indigo" />
         )}

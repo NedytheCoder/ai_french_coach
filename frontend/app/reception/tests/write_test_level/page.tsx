@@ -1,8 +1,62 @@
+/**
+ * Write Test Level - French Writing Skills Assessment
+ * ======================================================
+ *
+ * This page provides an interactive writing test to assess the user's French
+ * writing skills. Users complete various writing tasks ranging from simple
+ * copying to essay writing. The test progressively increases in difficulty
+ * from A0 (complete beginner) to B2 (upper intermediate).
+ *
+ * **Test Structure:**
+ * - 8 writing tasks total with progressive difficulty
+ * - Task types by level:
+ *   - A0: Copy (exact word copying), Fill (complete sentences)
+ *   - A1: Short sentence writing, Medium paragraph writing
+ *   - A2: Long story/essay writing
+ *   - B1: Email writing, Book review writing
+ *   - B2: Extended essay writing
+ *
+ * **Scoring System:**
+ * - 0-2 correct: A0 (Beginner)
+ * - 3-4 correct: A1 (Elementary)
+ * - 5-6 correct: A2 (Pre-intermediate)
+ * - 7 correct: B1 (Intermediate)
+ * - 8 correct: B2 (Upper-intermediate)
+ *
+ * **Validation Types:**
+ * - copy: Exact match validation (case-insensitive)
+ * - fill: Keyword matching in answer
+ * - short/medium/long: Word count validation
+ *
+ * **Components:**
+ * - WritingTestLevel: Main quiz component managing state and flow
+ * - Results Screen: Level badge, score, progress bar, motivational message
+ * - Writing Card: Task prompt, text input, word counter, submit/feedback
+ *
+ * **Features:**
+ * - Dynamic input fields (text input for short tasks, textarea for long)
+ * - Real-time word counter for medium/long tasks
+ * - Color-coded feedback (green for correct, red for incorrect)
+ * - Detailed validation explanations
+ * - Restart option to retake the test
+ */
+
 "use client"
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React state hook for quiz management
 import { useState } from "react"
+// Animation library for smooth transitions and interactions
 import { motion, AnimatePresence } from "framer-motion"
+// Next.js navigation for results CTA and back link
 import Link from "next/link"
+
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
 
 /**
  * Question interface for writing test
@@ -274,27 +328,62 @@ const countWords = (text: string): number => {
   return text.trim().split(/\s+/).filter(word => word.length > 0).length
 }
 
+// =============================================================================
+// MAIN WRITING TEST COMPONENT
+// =============================================================================
+
 /**
- * Main Writing Test Component
- * French writing skills quiz with progressive difficulty
+ * WritingTestLevel - Main writing skills quiz component.
+ *
+ * Manages the complete test flow:
+ * - 8 writing tasks with progressive difficulty (A0 to B2)
+ * - Text input with validation (exact match, keywords, word count)
+ * - Results screen with level determination
+ * - Animated transitions between tasks
+ *
+ * @returns JSX.Element - The writing test interface
  */
 export default function WritingTestLevel() {
-  // Quiz state management
-  const [currentIndex, setCurrentIndex] = useState(0)           // Current task index (0-7)
-  const [answers, setAnswers] = useState<string[]>(Array(write_questions.length).fill(""))  // User's answers
-  const [hasSubmitted, setHasSubmitted] = useState<boolean[]>(Array(write_questions.length).fill(false))  // Submission state
-  const [isCorrect, setIsCorrect] = useState<boolean[]>(Array(write_questions.length).fill(false))  // Correctness state
-  const [showResult, setShowResult] = useState(false)           // Show results screen
-  const [score, setScore] = useState(0)                       // Number of correct answers
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
 
+  // Current task index (0-7)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  // User's answers for all tasks
+  const [answers, setAnswers] = useState<string[]>(Array(write_questions.length).fill(""))
+  // Whether each task has been submitted
+  const [hasSubmitted, setHasSubmitted] = useState<boolean[]>(Array(write_questions.length).fill(false))
+  // Whether each submitted answer was correct
+  const [isCorrect, setIsCorrect] = useState<boolean[]>(Array(write_questions.length).fill(false))
+  // Whether to show the results screen
+  const [showResult, setShowResult] = useState(false)
+  // Number of correct answers so far
+  const [score, setScore] = useState(0)
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+
+  // Current question data from write_questions array
   const currentQuestion = write_questions[currentIndex]
+  // Progress percentage for progress bar (0-100)
   const progress = ((currentIndex + 1) / write_questions.length) * 100
+  // Current task's answer
   const currentAnswer = answers[currentIndex]
+  // Whether current task has been submitted
   const currentSubmitted = hasSubmitted[currentIndex]
+  // Whether current submitted answer was correct
   const currentIsCorrect = isCorrect[currentIndex]
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+
   /**
-   * Handles text input changes
+   * Handle text input changes.
+   * Updates answer state for current task.
+   * Disabled after submission to prevent changes.
    * @param value - new input value
    */
   const handleInputChange = (value: string) => {
@@ -305,7 +394,10 @@ export default function WritingTestLevel() {
   }
 
   /**
-   * Submits the current answer for validation
+   * Handle submit button click.
+   * Validates answer using validateAnswer function.
+   * Updates submission state and score.
+   * Shows feedback after validation.
    */
   const handleSubmit = () => {
     if (currentSubmitted || currentAnswer.trim() === "") return
@@ -326,7 +418,8 @@ export default function WritingTestLevel() {
   }
 
   /**
-   * Advances to next task or shows results
+   * Handle next button click.
+   * Advances to next task or shows results screen if last task.
    */
   const handleNext = () => {
     if (currentIndex < write_questions.length - 1) {
@@ -337,7 +430,8 @@ export default function WritingTestLevel() {
   }
 
   /**
-   * Restarts the quiz from beginning
+   * Handle restart button click.
+   * Resets all state to initial values to start quiz from beginning.
    */
   const handleRestart = () => {
     setCurrentIndex(0)
@@ -348,7 +442,11 @@ export default function WritingTestLevel() {
     setScore(0)
   }
 
-  // Results screen
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+
+  // Results screen - shown after all tasks completed
   if (showResult) {
     const result = getLevelFromScore(score)
 
@@ -417,7 +515,7 @@ export default function WritingTestLevel() {
     )
   }
 
-  // Main quiz interface
+  // Main quiz interface - writing task card with input and feedback
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-lg">

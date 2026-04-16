@@ -1,26 +1,73 @@
+/**
+ * A2 Lesson 9 - The Passive Voice (La Voix Passive)
+ * ====================================================
+ *
+ * This page teaches A2 learners how to form and use the passive voice in French,
+ * including formation with être + past participle and agreement rules.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to passive voice
+ * 2. WhatIsPassiveSection - Understanding active vs passive
+ * 3. ActiveVsPassiveSection - Side-by-side comparisons
+ * 4. FormationSection - How to form the passive (être + pp)
+ * 5. AgreementSection - Past participle agreement rules
+ * 6. AgentSection - Using "par" to indicate the agent
+ * 7. TensesSection - Passive in different tenses
+ * 8. WhenToUseSection - Appropriate contexts for passive
+ * 9. GuidedExamplesSection - Full example sentences
+ * 10. MistakesSection - Common errors to avoid
+ * 11. PracticeSection - Interactive quiz (15 questions)
+ * 12. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Passive = être + past participle (agrees with subject)
+ * - Agent introduced by "par" (when specified)
+ * - Used when focus is on the action/recipient, not the doer
+ * - Available in all tenses (present, passé composé, imparfait, etc.)
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 15-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaLightbulb,
-  FaExchangeAlt,
-  FaCogs,
-  FaCheck,
-  FaUser,
-  FaClock,
-  FaInfoCircle,
-  FaBookOpen,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaRedo,
-  FaArrowAltCircleRight,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaLightbulb,              // Introduction/tips
+  FaExchangeAlt,            // Active/Passive transformation
+  FaCogs,                   // Formation/steps
+  FaCheck,                  // Agreement checkmarks
+  FaUser,                   // Agent/doer
+  FaClock,                  // Tenses/timing
+  FaInfoCircle,             // Additional info
+  FaBookOpen,               // Lesson content
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   activeVsPassiveExamples,
@@ -35,7 +82,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
-// Types
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -45,7 +98,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
-// Components
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -122,6 +194,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 9 badge
+ * - Main title: "The Passive Voice"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-amber-500 to-orange-400 rounded-2xl p-8 text-white shadow-lg">
@@ -141,6 +222,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({
   current,
   total,
@@ -170,7 +258,19 @@ function ProgressBar({
   );
 }
 
-// Section Components
+// =============================================================================
+// SECTION COMPONENTS
+// =============================================================================
+
+/**
+ * WhatIsPassiveSection - Introduction to passive voice concept.
+ *
+ * Content:
+ * - Definition of active voice (subject does action)
+ * - Definition of passive voice (subject receives action)
+ * - Side-by-side comparison example
+ * - Key points about focus change
+ */
 function WhatIsPassiveSection({
   isReviewed,
   onMarkReviewed,
@@ -235,6 +335,14 @@ function WhatIsPassiveSection({
   );
 }
 
+/**
+ * ActiveVsPassiveSection - Side-by-side comparison of active and passive.
+ *
+ * Content:
+ * - Multiple transformation examples
+ * - Step-by-step transformation process
+ * - Visual distinction between active and passive
+ */
 function ActiveVsPassiveSection({
   isReviewed,
   onMarkReviewed,
@@ -301,6 +409,15 @@ function ActiveVsPassiveSection({
   );
 }
 
+/**
+ * FormationSection - How to form the passive voice.
+ *
+ * Content:
+ * - Pattern: subject + être + past participle (+ par + agent)
+ * - 5-step transformation process
+ * - Step-by-step examples
+ * - Reminder about agreement with être
+ */
 function FormationSection({
   isReviewed,
   onMarkReviewed,
@@ -385,6 +502,15 @@ function FormationSection({
   );
 }
 
+/**
+ * AgreementSection - Past participle agreement rules.
+ *
+ * Content:
+ * - Past participle must agree with subject
+ * - Masculine/feminine and singular/plural distinctions
+ * - Agreement examples
+ * - Key reminder about checking the subject
+ */
 function AgreementSection({
   isReviewed,
   onMarkReviewed,
@@ -439,6 +565,14 @@ function AgreementSection({
   );
 }
 
+/**
+ * AgentSection - Using "par" to indicate the agent.
+ *
+ * Content:
+ * - "Par" introduces the person/thing doing the action
+ * - Examples with and without agent
+ * - When agent can be omitted (focus on result)
+ */
 function AgentSection({
   isReviewed,
   onMarkReviewed,
@@ -495,6 +629,14 @@ function AgentSection({
   );
 }
 
+/**
+ * TensesSection - Passive voice in different tenses.
+ *
+ * Content:
+ * - Passive can appear in all tenses by changing "être"
+ * - Examples in present, passé composé, imparfait, future
+ * - Important note about A2 level expectations
+ */
 function TensesSection({
   isReviewed,
   onMarkReviewed,
@@ -542,6 +684,14 @@ function TensesSection({
   );
 }
 
+/**
+ * WhenToUseSection - Appropriate contexts for passive voice.
+ *
+ * Content:
+ * - When the result matters more than the doer
+ * - When the agent is unknown or unimportant
+ * - When focusing on the recipient of the action
+ */
 function WhenToUseSection({
   isReviewed,
   onMarkReviewed,
@@ -585,6 +735,11 @@ function WhenToUseSection({
   );
 }
 
+/**
+ * GuidedExamplesSection - Collection of example sentences for study.
+ *
+ * Various contexts showing passive voice in everyday French.
+ */
 function GuidedExamplesSection({
   isReviewed,
   onMarkReviewed,
@@ -623,6 +778,15 @@ function GuidedExamplesSection({
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Forgetting "être"
+ * - Forgetting agreement
+ * - Using wrong preposition for agent
+ * - Wrong vs correct examples with explanations
+ */
 function MistakesSection({
   isReviewed,
   onMarkReviewed,
@@ -672,6 +836,24 @@ function MistakesSection({
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for Lesson 9.
+ *
+ * Features:
+ * - 15 questions testing passive voice knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ * - Option to retake or continue
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-14)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -939,6 +1121,17 @@ function PracticeSection({
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to next lesson
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({
   practiceScore,
 }: {
@@ -989,16 +1182,41 @@ function CompletionSection({
   );
 }
 
-// Main Page Component
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson9Page - Main component for A2 Lesson 9.
+ *
+ * Manages:
+ * - Section review state (which sections have been reviewed)
+ * - Practice quiz answers and score
+ * - Lesson completion status
+ * - Progress persistence to localStorage
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson9Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Practice answers map (questionId -> selectedOption)
   const [practiceAnswers, setPracticeAnswers] = useState<Record<number, number>>({});
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether entire lesson is marked complete
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
-  // Load progress from localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson9Progress");
@@ -1016,7 +1234,9 @@ export default function Lesson9Page() {
     }
   }, []);
 
-  // Save progress to localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(
@@ -1032,23 +1252,44 @@ export default function Lesson9Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, practiceScore, lessonCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => {
     setReviewedSections((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
   };
 
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => {
     setPracticeScore(score);
     setPracticeCompleted(true);
   };
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => {
     const totalSections = sectionIds.length;
     const completed = reviewedSections.length;
     return Math.round((completed / totalSections) * 100);
   }, [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-slate-50 flex items-center justify-center">
@@ -1060,7 +1301,7 @@ export default function Lesson9Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Navigation */}
+        {/* Back Navigation */}
         <div className="flex items-center gap-4">
           <Link
             href="/classes/A2"
@@ -1071,10 +1312,10 @@ export default function Lesson9Page() {
           </Link>
         </div>
 
-        {/* Header */}
+        {/* Lesson Header */}
         <LessonHeader />
 
-        {/* Progress */}
+        {/* Progress Bar - Section Review Progress */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
           <ProgressBar
             current={reviewedSections.length}
@@ -1083,7 +1324,7 @@ export default function Lesson9Page() {
           />
         </div>
 
-        {/* Sections */}
+        {/* Lesson Sections - In Order of Instruction */}
         <WhatIsPassiveSection
           isReviewed={reviewedSections.includes("what-is-passive")}
           onMarkReviewed={handleMarkReviewed}
@@ -1129,7 +1370,7 @@ export default function Lesson9Page() {
           onMarkReviewed={handleMarkReviewed}
         />
 
-        {/* Practice */}
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-amber-50 to-white">
             <div className="flex items-center gap-4">
@@ -1150,7 +1391,7 @@ export default function Lesson9Page() {
           </div>
         </div>
 
-        {/* Completion */}
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection practiceScore={practiceScore} />
         )}

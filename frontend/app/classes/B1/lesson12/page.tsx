@@ -1,9 +1,62 @@
+/**
+ * B1 Lesson 12 - Double Object Pronouns (Les Pronoms Objets Doubles)
+ * =====================================================================
+ *
+ * This page teaches B1 learners how to combine multiple object pronouns in
+ * French sentences with correct order.
+ *
+ * **Lesson Structure:**
+ * 1. LessonHeader - Title and introduction using lessonMeta
+ * 2. OrderSection - Pronoun order rules (1st to 5th position table)
+ * 3. MeTeSeSection - 1st position pronouns (me/te/se)
+ * 4. LeLaLesSection - 2nd position pronouns (le/la/les)
+ * 5. YEnSection - 4th and 5th position pronouns (y + en)
+ * 6. ExamplesSection - Common examples with breakdowns
+ * 7. MistakesSection - Common errors to avoid
+ * 8. PracticeSection - Interactive quiz (15 questions)
+ * 9. CompletionSection - Lesson completion with recap
+ *
+ * **Key Concepts:**
+ * - Pronoun order: me/te/se → le/la/les → lui/leur → y → en
+ * - All pronouns go before the verb (except in positive imperatives)
+ * - Y always comes before en
+ * - Elision rules: te + y = t'y, se + en = s'en
+ *
+ * **Features:**
+ * - Uses shared B1 components (SectionCard, ProgressBar, PracticeSection, etc.)
+ * - Violet accent color theme
+ * - localStorage persistence for progress
+ * - 15-question interactive quiz
+ * - Order rules displayed in table format
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations
 import { motion } from "framer-motion";
-import { FaSortNumericDown, FaUser, FaArrowRight, FaMapMarkerAlt, FaBox, FaList, FaExclamationTriangle } from "react-icons/fa";
+
+// React Icons for UI elements
+import {
+  FaSortNumericDown, // Order section
+  FaUser,            // Me/te/se section
+  FaArrowRight,      // Le/la/les section
+  FaMapMarkerAlt,    // Y/en section
+  FaBox,             // Box icon
+  FaList,            // Examples section
+  FaExclamationTriangle, // Mistakes section
+} from "react-icons/fa";
+
+// Shared B1 components
 import { SectionCard, ProgressBar, PracticeSection, CompletionSection, LessonNav } from "../components";
+
+// Lesson data imports
 import {
   sectionIds,
   lessonMeta,
@@ -17,6 +70,16 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Uses lessonMeta from data.ts for dynamic title and subtitle.
+ * Features violet/fuchsia gradient background.
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-violet-500 to-fuchsia-400 rounded-2xl p-8 text-white shadow-lg">
@@ -29,6 +92,16 @@ function LessonHeader() {
   );
 }
 
+/**
+ * OrderSection - Pronoun order rules in French.
+ *
+ * Content displayed in table format:
+ * - 1st: me/te/se/nous/vous (reflexive/direct/indirect)
+ * - 2nd: le/la/les (direct object)
+ * - 3rd: lui/leur (indirect object)
+ * - 4th: y (place)
+ * - 5th: en (quantity)
+ */
 function OrderSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="order-rules" title="Pronoun Order" icon={FaSortNumericDown} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="violet">
@@ -62,6 +135,14 @@ function OrderSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onM
   );
 }
 
+/**
+ * MeTeSeSection - 1st position pronouns combined with others.
+ *
+ * Content:
+ * - me + le = me le (Il me le donne)
+ * - te + la = te la (Elle te la montre)
+ * - se + les = se les (Ils se les achètent)
+ */
 function MeTeSeSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="me-te-se" title="Me/Te/Se + Another Pronoun" icon={FaUser} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="violet">
@@ -79,6 +160,14 @@ function MeTeSeSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; on
   );
 }
 
+/**
+ * LeLaLesSection - 2nd position pronouns combined with others.
+ *
+ * Content:
+ * - le + lui = le lui (Je le lui donne)
+ * - la + leur = la leur (Tu la leur envoies)
+ * - les + y = les y (Il les y met)
+ */
 function LeLaLesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="le-la-les" title="Le/La/Les + Another Pronoun" icon={FaArrowRight} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="violet">
@@ -96,6 +185,15 @@ function LeLaLesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; o
   );
 }
 
+/**
+ * YEnSection - 4th and 5th position pronouns (y and en).
+ *
+ * Content:
+ * - y + en = y en (Il y en a)
+ * - nous + en = nous en (Elle nous en parle)
+ * - vous + y = vous y (Je vous y attends)
+ * Key: Y always comes before en
+ */
 function YEnSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="y-en" title="Y and En Combinations" icon={FaMapMarkerAlt} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="violet">
@@ -116,6 +214,14 @@ function YEnSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMar
   );
 }
 
+/**
+ * ExamplesSection - Common double pronoun examples with breakdowns.
+ *
+ * Content:
+ * - Mixed examples showing pronoun combinations
+ * - Breakdown of each pronoun's function
+ * - English translations
+ */
 function ExamplesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="examples" title="Common Examples" icon={FaList} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="violet">
@@ -134,6 +240,14 @@ function ExamplesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+/**
+ * MistakesSection - Common errors with double object pronouns.
+ *
+ * Content:
+ * - Wrong pronoun order (me le vs le me)
+ * - Putting y after en
+ * - Agreement errors with le/la/les
+ */
 function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="mistakes" title="Common Mistakes" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="violet">
@@ -152,12 +266,37 @@ function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson12Page - Main component for B1 Lesson 12.
+ *
+ * Manages:
+ * - Section review state
+ * - Practice quiz score and completion
+ * - Progress persistence to localStorage
+ * - Uses shared B1 components with violet accent color
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson12Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("b1Lesson12Progress");
@@ -167,34 +306,70 @@ export default function Lesson12Page() {
         setReviewedSections(parsed.reviewedSections || []);
         setPracticeScore(parsed.practiceScore || 0);
         setPracticeCompleted(parsed.practiceCompleted || false);
-      } catch {}
+      } catch {
+        // Invalid saved data, ignore
+      }
     }
   }, []);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("b1Lesson12Progress", JSON.stringify({ reviewedSections, practiceScore, practiceCompleted }));
     }
   }, [reviewedSections, practiceScore, practiceCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => { setReviewedSections((prev) => (prev.includes(id) ? prev : [...prev, id])); };
+
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => { setPracticeScore(score); setPracticeCompleted(true); };
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => Math.round((reviewedSections.length / sectionIds.length) * 100), [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) return <div className="min-h-screen bg-gradient-to-br from-violet-50 to-slate-50 flex items-center justify-center"><div className="text-violet-600">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Navigation */}
         <LessonNav backPath="/classes/B1" />
+
+        {/* Lesson Header with title from lessonMeta */}
         <LessonHeader />
+
+        {/* Progress Bar */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100"><ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" accentColor="violet" /></div>
+
+        {/* Lesson Sections - In Order of Instruction */}
         <OrderSection isReviewed={reviewedSections.includes("order-rules")} onMarkReviewed={handleMarkReviewed} />
         <MeTeSeSection isReviewed={reviewedSections.includes("me-te-se")} onMarkReviewed={handleMarkReviewed} />
         <LeLaLesSection isReviewed={reviewedSections.includes("le-la-les")} onMarkReviewed={handleMarkReviewed} />
         <YEnSection isReviewed={reviewedSections.includes("y-en")} onMarkReviewed={handleMarkReviewed} />
         <ExamplesSection isReviewed={reviewedSections.includes("examples")} onMarkReviewed={handleMarkReviewed} />
         <MistakesSection isReviewed={reviewedSections.includes("mistakes")} onMarkReviewed={handleMarkReviewed} />
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-violet-50 to-white">
             <h2 className="text-xl font-semibold text-slate-800">Guided Interactive Practice</h2>
@@ -203,6 +378,8 @@ export default function Lesson12Page() {
             <PracticeSection questions={practiceQuestions} isReviewed={reviewedSections.includes("practice")} onMarkReviewed={handleMarkReviewed} onComplete={handlePracticeComplete} getPerformanceMessage={getPerformanceMessage} accentColor="violet" />
           </div>
         </div>
+
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection lessonNumber={12} lessonTitle={lessonMeta.title} practiceScore={practiceScore} totalQuestions={practiceQuestions.length} nextLessonPath="/classes/B1/lesson13" recapItems={["Pronoun order: me/te/se + le/la/les + lui/leur + y + en", "Direct object before indirect object", "Y before en", "Common double pronoun combinations", "Position before the verb"]} accentColor="violet" />
         )}

@@ -1,9 +1,55 @@
+/**
+ * A0 Lesson 1 - French Alphabet Pronunciation
+ * =============================================
+ *
+ * This is the first lesson for absolute beginners (A0 level).
+ * It introduces the French alphabet with audio pronunciation,
+ * phonetic guides, and interactive play functionality.
+ *
+ * **Lesson Content:**
+ * - All 26 letters of the French alphabet (A-Z)
+ * - Phonetic pronunciation guides for each letter
+ * - Audio playback for each letter
+ * - Progress tracking (must play each letter twice to complete)
+ *
+ * **Features:**
+ * - Interactive letter cards with play button
+ * - Visual progress tracking
+ * - Audio playback with completion states
+ * - Sticky footer with navigation
+ * - Completion requirement: play every letter at least 2 times
+ *
+ * **Components:**
+ * - LessonHeader - Title and instructions
+ * - ProgressBar - Visual progress indicator
+ * - LetterCard - Individual letter with audio controls
+ * - FooterActionBar - Sticky footer with next button
+ *
+ * **Audio Files:**
+ * - Located at /audio/alphabet/[letter].mp3
+ */
+
 "use client"
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management, refs, and side effects
 import { useState, useRef, useEffect } from "react"
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion"
+
+// Next.js Link for navigation
 import Link from "next/link"
+
+// React Icons for UI elements
 import { FaPlay, FaCheck, FaArrowRight } from "react-icons/fa"
+
+// =============================================================================
+// TYPES & DATA
+// =============================================================================
 
 /**
  * Letter data interface for alphabet lesson
@@ -19,9 +65,26 @@ interface Letter {
   audioSrc: string
 }
 
+// =============================================================================
+// FRENCH ALPHABET DATA
+// =============================================================================
+
 /**
- * French alphabet data with phonetic guides
- * All 26 letters with pronunciation hints for beginners
+ * letters - French alphabet data with phonetic pronunciation guides.
+ *
+ * All 26 letters (A-Z) with:
+ * - Uppercase and lowercase forms
+ * - Phonetic pronunciation in English approximation
+ * - Path to audio file for each letter
+ *
+ * Note: French alphabet differs from English in pronunciation:
+ * - G = "zhay" (soft, like 's' in measure)
+ * - H = "ash" (always silent in French)
+ * - J = "zhee" (soft 'j')
+ * - R = "air" (guttural, from back of throat)
+ * - W = "doo-bluh-vay" (double V)
+ * - Y = "ee-grek" (Greek i)
+ * - Z = "zed" (not "zee")
  */
 const letters: Letter[] = [
   { id: "A", lowercase: "a", phonetic: "ah", audioSrc: "/audio/alphabet/a.mp3" },
@@ -52,9 +115,17 @@ const letters: Letter[] = [
   { id: "Z", lowercase: "z", phonetic: "zed", audioSrc: "/audio/alphabet/z.mp3" }
 ]
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
 /**
- * LessonHeader Component
- * Displays lesson title and instructions
+ * LessonHeader - Displays lesson title and instructions.
+ *
+ * Features:
+ * - A0 Level / Lesson 1 badge
+ * - Main title: "French Alphabet Pronunciation"
+ * - Instructions: Tap to hear, repeat out loud, play twice to continue
  */
 function LessonHeader() {
   return (
@@ -80,10 +151,15 @@ function LessonHeader() {
 }
 
 /**
- * ProgressBar Component
- * Shows overall lesson completion
- * @property completedCount - number of completed letters
- * @property totalCount - total number of letters
+ * ProgressBar - Visual indicator of overall lesson completion.
+ *
+ * Displays:
+ * - Completion count (e.g., "15 of 26 letters completed")
+ * - Animated progress bar with gradient fill
+ * - Percentage of letters played at least twice
+ *
+ * @param completedCount - Number of letters completed (played twice)
+ * @param totalCount - Total number of letters (26)
  */
 interface ProgressBarProps {
   completedCount: number
@@ -116,13 +192,21 @@ function ProgressBar({ completedCount, totalCount }: ProgressBarProps) {
 }
 
 /**
- * LetterCard Component
- * Individual letter card with play button and progress
- * @property letter - letter data
- * @property playCount - number of times audio has been played
- * @property isCompleted - whether letter is completed (playCount >= 2)
- * @property isPlaying - whether audio is currently playing
- * @property onPlay - callback when play button is clicked
+ * LetterCard - Individual letter card with play button and progress.
+ *
+ * Features:
+ * - Large letter display (uppercase + lowercase)
+ * - Phonetic pronunciation guide
+ * - Play button with visual states (idle, playing, completed)
+ * - Play counter (0/2, 1/2, 2/2)
+ * - Completion badge when played twice
+ * - Animated transitions
+ *
+ * @param letter - Letter data (id, lowercase, phonetic, audioSrc)
+ * @param playCount - Number of times audio has been played
+ * @param isCompleted - Whether letter is completed (playCount >= 2)
+ * @param isPlaying - Whether audio is currently playing for this letter
+ * @param onPlay - Callback when play button is clicked
  */
 interface LetterCardProps {
   letter: Letter
@@ -210,12 +294,18 @@ function LetterCard({ letter, playCount, isCompleted, isPlaying, onPlay }: Lette
 }
 
 /**
- * FooterActionBar Component
- * Sticky footer with next button and completion status
- * @property completedCount - number of completed letters
- * @property totalCount - total number of letters
- * @property canProceed - whether all letters are completed
- * @property onNext - callback when next button is clicked
+ * FooterActionBar - Sticky footer with next button and completion status.
+ *
+ * Features:
+ * - Fixed position at bottom of viewport
+ * - Completion status message
+ * - "Next Topic" button (disabled until all letters completed)
+ * - Visual feedback when all letters are done
+ *
+ * @param completedCount - Number of completed letters
+ * @param totalCount - Total number of letters (26)
+ * @param canProceed - Whether all letters are completed (enables button)
+ * @param onNext - Callback when next button is clicked
  */
 interface FooterActionBarProps {
   completedCount: number
@@ -262,29 +352,59 @@ function FooterActionBar({ completedCount, totalCount, canProceed, onNext }: Foo
   )
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
 /**
- * Main Alphabet Lesson Page Component
- * A0 Level Lesson 1: French Alphabet Pronunciation
+ * AlphabetLessonPage - Main component for A0 Lesson 1.
+ *
+ * Manages:
+ * - Play counts for each letter (must play twice to complete)
+ * - Audio playback state
+ * - Progress tracking
+ * - Navigation to next topic
+ *
+ * @returns JSX.Element - The rendered alphabet lesson page
  */
 export default function AlphabetLessonPage() {
-  // Track play count for each letter (index 0-25 corresponds to A-Z)
+  // ---------------------------------------------------------------------------
+  // STATE: Play Counts for Each Letter
+  // ---------------------------------------------------------------------------
+  // Track how many times each letter has been played (index 0-25 = A-Z)
   const [playCounts, setPlayCounts] = useState<number[]>(Array(letters.length).fill(0))
   
-  // Track which letter is currently playing audio
+  // ---------------------------------------------------------------------------
+  // STATE: Currently Playing Letter
+  // ---------------------------------------------------------------------------
+  // Index of letter currently playing audio, or null if none
   const [playingIndex, setPlayingIndex] = useState<number | null>(null)
   
-  // Ref for audio element
+  // ---------------------------------------------------------------------------
+  // REF: Audio Element
+  // ---------------------------------------------------------------------------
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Calculate completion stats
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE: Completion Stats
+  // ---------------------------------------------------------------------------
   const completedCount = playCounts.filter(count => count >= 2).length
   const totalCount = letters.length
   const canProceed = completedCount === totalCount
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Play Audio for Letter
+  // ---------------------------------------------------------------------------
   /**
-   * Handles playing audio for a specific letter
-   * Increments play count and manages audio playback
-   * @param index - index of the letter in the letters array
+   * handlePlay - Plays audio for a specific letter.
+   *
+   * Actions:
+   * - Increments play count for the letter
+   * - Plays audio from file
+   * - Manages playing state
+   * - Handles audio errors gracefully
+   *
+   * @param index - Index of the letter in the letters array (0-25)
    */
   const handlePlay = (index: number) => {
     if (playingIndex !== null) return
@@ -321,8 +441,14 @@ export default function AlphabetLessonPage() {
     }, 1000)
   }
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Navigate to Next Topic
+  // ---------------------------------------------------------------------------
   /**
-   * Handles navigation to next topic
+   * handleNext - Navigates to the next lesson/topic.
+   *
+   * Only navigates if all letters have been played at least twice.
+   * Redirects to /classes/A0/topic-2
    */
   const handleNext = () => {
     if (canProceed) {
@@ -331,7 +457,9 @@ export default function AlphabetLessonPage() {
     }
   }
 
-  // Cleanup audio on unmount
+  // ---------------------------------------------------------------------------
+  // EFFECT: Cleanup Audio on Unmount
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     return () => {
       if (audioRef.current) {
@@ -340,10 +468,13 @@ export default function AlphabetLessonPage() {
     }
   }, [])
 
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-24">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Back to home link */}
+        {/* Back to Home Link */}
         <div className="mb-6">
           <Link 
             href="/home" 
@@ -353,13 +484,13 @@ export default function AlphabetLessonPage() {
           </Link>
         </div>
 
-        {/* Lesson header */}
+        {/* Lesson Header - Title and Instructions */}
         <LessonHeader />
 
-        {/* Progress bar */}
+        {/* Progress Bar - Shows completion status */}
         <ProgressBar completedCount={completedCount} totalCount={totalCount} />
 
-        {/* Letter cards grid */}
+        {/* Letter Cards Grid - All 26 letters with audio */}
         <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
           {letters.map((letter, index) => (
             <LetterCard
@@ -374,7 +505,7 @@ export default function AlphabetLessonPage() {
         </div>
       </div>
 
-      {/* Sticky footer with next button */}
+      {/* Sticky Footer - Next button (enabled when all letters played twice) */}
       <FooterActionBar
         completedCount={completedCount}
         totalCount={totalCount}

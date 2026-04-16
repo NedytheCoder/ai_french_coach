@@ -1,9 +1,61 @@
+/**
+ * B1 Lesson 3 - Relative Pronouns Review (Pronoms Relatifs)
+ * ==========================================================
+ *
+ * This page teaches B1 learners to master French relative pronouns:
+ * qui, que, où, and dont, to connect sentences smoothly.
+ *
+ * **Lesson Structure:**
+ * 1. LessonHeader - Title and introduction using lessonMeta
+ * 2. QuiSection - Qui as subject pronoun (who/that)
+ * 3. QueSection - Que as direct object pronoun (whom/that)
+ * 4. OuSection - Où for place and time (where/when)
+ * 5. DontSection - Dont with de verbs (of which/about whom)
+ * 6. ComparisonSection - Side-by-side comparison of all pronouns
+ * 7. SentenceJoiningSection - How to join sentences
+ * 8. MistakesSection - Common errors to avoid
+ * 9. PracticeSection - Interactive quiz (15 questions)
+ * 10. CompletionSection - Lesson completion with recap
+ *
+ * **Key Concepts:**
+ * - Qui = subject (does the action)
+ * - Que = direct object (receives the action)
+ * - Où = place or time
+ * - Dont = with de (parler de, se souvenir de, etc.)
+ *
+ * **Features:**
+ * - Uses shared B1 components (SectionCard, ProgressBar, PracticeSection, etc.)
+ * - Purple accent color theme
+ * - localStorage persistence for progress
+ * - 15-question interactive quiz
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations
 import { motion } from "framer-motion";
-import { FaBookOpen, FaLink, FaBalanceScale, FaExclamationTriangle, FaUser, FaArrowRight } from "react-icons/fa";
+
+// React Icons for UI elements
+import {
+  FaBookOpen,       // Dont section
+  FaLink,           // Où section / Sentence joining
+  FaBalanceScale,   // Comparison section
+  FaExclamationTriangle, // Mistakes section
+  FaUser,           // Qui section
+  FaArrowRight,     // Que section
+} from "react-icons/fa";
+
+// Shared B1 components
 import { SectionCard, ProgressBar, PracticeSection, CompletionSection, LessonNav } from "../components";
+
+// Lesson data imports
 import {
   sectionIds,
   lessonMeta,
@@ -18,6 +70,16 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Uses lessonMeta from data.ts for dynamic title and subtitle.
+ * Features purple/pink gradient background.
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-purple-500 to-pink-400 rounded-2xl p-8 text-white shadow-lg">
@@ -30,6 +92,14 @@ function LessonHeader() {
   );
 }
 
+/**
+ * QuiSection - Qui as subject pronoun.
+ *
+ * Content:
+ * - Qui = subject (does the action)
+ * - Can refer to people or things
+ * - After qui, you'll usually see a verb directly
+ */
 function QuiSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="qui" title="Qui (Subject)" icon={FaUser} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="purple">
@@ -52,6 +122,14 @@ function QuiSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMar
   );
 }
 
+/**
+ * QueSection - Que as direct object pronoun.
+ *
+ * Content:
+ * - Que = direct object (receives the action)
+ * - After que, you'll usually see a subject + verb
+ * - Elides before a vowel (qu')
+ */
 function QueSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="que" title="Que (Direct Object)" icon={FaArrowRight} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="purple">
@@ -74,6 +152,14 @@ function QueSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMar
   );
 }
 
+/**
+ * OuSection - Où for place and time.
+ *
+ * Content:
+ * - Où = where (place) or when (time)
+ * - Does not contract or elide
+ * - Used for locations and temporal references
+ */
 function OuSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="ou" title="Où (Place and Time)" icon={FaLink} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="purple">
@@ -96,6 +182,14 @@ function OuSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMark
   );
 }
 
+/**
+ * DontSection - Dont with de verbs.
+ *
+ * Content:
+ * - Dont = of which / about whom / from which
+ * - Used with verbs that take de (parler de, se souvenir de)
+ * - Replaces de + noun
+ */
 function DontSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="dont" title="Dont (With 'de')" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="purple">
@@ -118,6 +212,13 @@ function DontSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMa
   );
 }
 
+/**
+ * ComparisonSection - Side-by-side comparison of all relative pronouns.
+ *
+ * Content:
+ * - Qui vs Que vs Où vs Dont
+ * - Quick reference table showing usage and examples
+ */
 function ComparisonSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="comparison" title="Qui vs Que vs Où vs Dont" icon={FaBalanceScale} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="purple">
@@ -138,6 +239,13 @@ function ComparisonSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * SentenceJoiningSection - How to join sentences with relative pronouns.
+ *
+ * Content:
+ * - Transform two simple sentences into one complex sentence
+ * - Examples showing qui and que usage
+ */
 function SentenceJoiningSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="sentence-joining" title="Joining Sentences" icon={FaLink} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="purple">
@@ -156,6 +264,14 @@ function SentenceJoiningSection({ isReviewed, onMarkReviewed }: { isReviewed: bo
   );
 }
 
+/**
+ * MistakesSection - Common errors with relative pronouns.
+ *
+ * Content:
+ * - Confusing qui and que (subject vs object)
+ * - Forgetting to use dont with de-verbs
+ * - Incorrect pronoun choice
+ */
 function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="mistakes" title="Common Mistakes" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="purple">
@@ -174,12 +290,37 @@ function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson3Page - Main component for B1 Lesson 3.
+ *
+ * Manages:
+ * - Section review state
+ * - Practice quiz score and completion
+ * - Progress persistence to localStorage
+ * - Uses shared B1 components with purple accent color
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson3Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("b1Lesson3Progress");
@@ -189,28 +330,63 @@ export default function Lesson3Page() {
         setReviewedSections(parsed.reviewedSections || []);
         setPracticeScore(parsed.practiceScore || 0);
         setPracticeCompleted(parsed.practiceCompleted || false);
-      } catch {}
+      } catch {
+        // Invalid saved data, ignore
+      }
     }
   }, []);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("b1Lesson3Progress", JSON.stringify({ reviewedSections, practiceScore, practiceCompleted }));
     }
   }, [reviewedSections, practiceScore, practiceCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => { setReviewedSections((prev) => (prev.includes(id) ? prev : [...prev, id])); };
+
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => { setPracticeScore(score); setPracticeCompleted(true); };
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => Math.round((reviewedSections.length / sectionIds.length) * 100), [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) return <div className="min-h-screen bg-gradient-to-br from-purple-50 to-slate-50 flex items-center justify-center"><div className="text-purple-600">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Navigation */}
         <LessonNav backPath="/classes/B1" />
+
+        {/* Lesson Header with title from lessonMeta */}
         <LessonHeader />
+
+        {/* Progress Bar */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100"><ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" accentColor="purple" /></div>
+
+        {/* Lesson Sections - In Order of Instruction */}
         <QuiSection isReviewed={reviewedSections.includes("qui")} onMarkReviewed={handleMarkReviewed} />
         <QueSection isReviewed={reviewedSections.includes("que")} onMarkReviewed={handleMarkReviewed} />
         <OuSection isReviewed={reviewedSections.includes("ou")} onMarkReviewed={handleMarkReviewed} />
@@ -218,6 +394,7 @@ export default function Lesson3Page() {
         <ComparisonSection isReviewed={reviewedSections.includes("comparison")} onMarkReviewed={handleMarkReviewed} />
         <SentenceJoiningSection isReviewed={reviewedSections.includes("sentence-joining")} onMarkReviewed={handleMarkReviewed} />
         <MistakesSection isReviewed={reviewedSections.includes("mistakes")} onMarkReviewed={handleMarkReviewed} />
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-purple-50 to-white">
             <h2 className="text-xl font-semibold text-slate-800">Guided Interactive Practice</h2>
@@ -226,6 +403,8 @@ export default function Lesson3Page() {
             <PracticeSection questions={practiceQuestions} isReviewed={reviewedSections.includes("practice")} onMarkReviewed={handleMarkReviewed} onComplete={handlePracticeComplete} getPerformanceMessage={getPerformanceMessage} accentColor="purple" />
           </div>
         </div>
+
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection lessonNumber={3} lessonTitle={lessonMeta.title} practiceScore={practiceScore} totalQuestions={practiceQuestions.length} nextLessonPath="/classes/B1/lesson4" recapItems={["Qui = subject pronoun", "Que = direct object pronoun", "Où = place and time", "Dont = with de verbs", "How to join sentences smoothly"]} accentColor="purple" />
         )}

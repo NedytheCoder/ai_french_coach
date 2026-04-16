@@ -1,25 +1,72 @@
+/**
+ * A2 Lesson 12 - Relative Pronouns: Qui, Que, Où
+ * ==================================================
+ *
+ * This page teaches A2 learners how to use the French relative pronouns
+ * qui, que, and où to join sentences and avoid repetition.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to relative pronouns
+ * 2. WhatAreRelativeSection - Understanding relative pronouns
+ * 3. UnderstandingQuiSection - Using qui for subjects
+ * 4. UnderstandingQueSection - Using que for direct objects
+ * 5. UnderstandingOuSection - Using où for places and times
+ * 6. QuiVsQueSection - Comparing qui and que
+ * 7. JoiningSentencesSection - How to join sentences
+ * 8. GuidedExamplesSection - Full example sentences
+ * 9. MistakesSection - Common errors to avoid
+ * 10. PracticeSection - Interactive quiz (18 questions)
+ * 11. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - Qui = who/that (replaces subject of second clause)
+ * - Que = whom/that (replaces direct object of second clause)
+ * - Où = where/when (replaces place or time)
+ * - Join two sentences by replacing the repeated noun
+ * - Que becomes qu' before vowel/silent h
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 18-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaLightbulb,
-  FaExchangeAlt,
-  FaLink,
-  FaBalanceScale,
-  FaBookOpen,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaRedo,
-  FaArrowAltCircleRight,
-  FaInfoCircle,
-  FaArrowDown,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaLightbulb,              // Introduction/tips
+  FaExchangeAlt,            // Exchange/comparison
+  FaLink,                   // Link/joining sentences
+  FaBalanceScale,           // Comparison qui vs que
+  FaBookOpen,               // Lesson content
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
+  FaInfoCircle,             // Additional info
+  FaArrowDown,              // Scroll indicator
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   quiExamples,
@@ -33,7 +80,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
-// Types
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -43,7 +96,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
-// Components
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -120,6 +192,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 12 badge
+ * - Main title: "Relative Pronouns: Qui, Que, Où"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl p-8 text-white shadow-lg">
@@ -139,6 +220,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({
   current,
   total,
@@ -168,7 +256,18 @@ function ProgressBar({
   );
 }
 
-// Section Components
+// =============================================================================
+// SECTION COMPONENTS
+// =============================================================================
+
+/**
+ * WhatAreRelativeSection - Introduction to relative pronouns.
+ *
+ * Content:
+ * - Definition of relative pronouns
+ * - Purpose: joining sentences and avoiding repetition
+ * - Overview of qui, que, and où
+ */
 function WhatAreRelativeSection({
   isReviewed,
   onMarkReviewed,
@@ -242,6 +341,14 @@ function WhatAreRelativeSection({
   );
 }
 
+/**
+ * UnderstandingQuiSection - Using the relative pronoun qui.
+ *
+ * Content:
+ * - Qui replaces the subject of the second clause
+ * - Pattern: Noun + qui + verb
+ * - Examples showing transformation from two sentences to one
+ */
 function UnderstandingQuiSection({
   isReviewed,
   onMarkReviewed,
@@ -294,6 +401,15 @@ function UnderstandingQuiSection({
   );
 }
 
+/**
+ * UnderstandingQueSection - Using the relative pronoun que.
+ *
+ * Content:
+ * - Que replaces the direct object of the second clause
+ * - Pattern: Noun + que/qu' + subject + verb
+ * - Que becomes qu' before vowel/silent h
+ * - Examples showing transformation from two sentences to one
+ */
 function UnderstandingQueSection({
   isReviewed,
   onMarkReviewed,
@@ -346,6 +462,15 @@ function UnderstandingQueSection({
   );
 }
 
+/**
+ * UnderstandingOuSection - Using the relative pronoun où.
+ *
+ * Content:
+ * - Où replaces place expressions (where)
+ * - Où can also replace time expressions (when)
+ * - Used for places (ville, restaurant, maison)
+ * - Used for times (jour, moment, année)
+ */
 function UnderstandingOuSection({
   isReviewed,
   onMarkReviewed,
@@ -407,6 +532,15 @@ function UnderstandingOuSection({
   );
 }
 
+/**
+ * QuiVsQueSection - Comparing qui and que.
+ *
+ * Content:
+ * - Side-by-side examples of qui vs que
+ * - Key distinction: subject vs direct object
+ * - How to determine which pronoun to use
+ * - Visual comparison showing the difference
+ */
 function QuiVsQueSection({
   isReviewed,
   onMarkReviewed,
@@ -467,6 +601,15 @@ function QuiVsQueSection({
   );
 }
 
+/**
+ * JoiningSentencesSection - How to join sentences with relative pronouns.
+ *
+ * Content:
+ * - Step-by-step process for joining sentences
+ * - Identify repeated noun
+ * - Determine if subject, object, or place/time
+ * - Replace with appropriate pronoun
+ */
 function JoiningSentencesSection({
   isReviewed,
   onMarkReviewed,
@@ -540,6 +683,11 @@ function JoiningSentencesSection({
   );
 }
 
+/**
+ * GuidedExamplesSection - Collection of example sentences for study.
+ *
+ * Various contexts showing qui, que, and où in natural French sentences.
+ */
 function GuidedExamplesSection({
   isReviewed,
   onMarkReviewed,
@@ -578,6 +726,15 @@ function GuidedExamplesSection({
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Using que instead of qui for subjects
+ * - Using qui instead of que for objects
+ * - Using que instead of où for places
+ * - Forgetting que becomes qu' before vowels
+ */
 function MistakesSection({
   isReviewed,
   onMarkReviewed,
@@ -627,6 +784,23 @@ function MistakesSection({
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for Lesson 12.
+ *
+ * Features:
+ * - 18 questions testing relative pronoun knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-17)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -894,6 +1068,17 @@ function PracticeSection({
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to B1 lessons (next level)
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({
   practiceScore,
 }: {
@@ -944,16 +1129,41 @@ function CompletionSection({
   );
 }
 
-// Main Page Component
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson12Page - Main component for A2 Lesson 12.
+ *
+ * Manages:
+ * - Section review state (which sections have been reviewed)
+ * - Practice quiz answers and score
+ * - Lesson completion status
+ * - Progress persistence to localStorage
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson12Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Practice answers map (questionId -> selectedOption)
   const [practiceAnswers, setPracticeAnswers] = useState<Record<number, number>>({});
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether entire lesson is marked complete
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
-  // Load progress from localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson12Progress");
@@ -971,7 +1181,9 @@ export default function Lesson12Page() {
     }
   }, []);
 
-  // Save progress to localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(
@@ -987,23 +1199,44 @@ export default function Lesson12Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, practiceScore, lessonCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => {
     setReviewedSections((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
   };
 
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => {
     setPracticeScore(score);
     setPracticeCompleted(true);
   };
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => {
     const totalSections = sectionIds.length;
     const completed = reviewedSections.length;
     return Math.round((completed / totalSections) * 100);
   }, [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-slate-50 flex items-center justify-center">
@@ -1015,7 +1248,7 @@ export default function Lesson12Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Navigation */}
+        {/* Back Navigation */}
         <div className="flex items-center gap-4">
           <Link
             href="/classes/A2"
@@ -1026,10 +1259,10 @@ export default function Lesson12Page() {
           </Link>
         </div>
 
-        {/* Header */}
+        {/* Lesson Header */}
         <LessonHeader />
 
-        {/* Progress */}
+        {/* Progress Bar - Section Review Progress */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
           <ProgressBar
             current={reviewedSections.length}
@@ -1038,7 +1271,7 @@ export default function Lesson12Page() {
           />
         </div>
 
-        {/* Sections */}
+        {/* Lesson Sections - In Order of Instruction */}
         <WhatAreRelativeSection
           isReviewed={reviewedSections.includes("what-are-relative")}
           onMarkReviewed={handleMarkReviewed}
@@ -1079,7 +1312,7 @@ export default function Lesson12Page() {
           onMarkReviewed={handleMarkReviewed}
         />
 
-        {/* Practice */}
+        {/* Practice Section - 18 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-emerald-50 to-white">
             <div className="flex items-center gap-4">
@@ -1100,7 +1333,7 @@ export default function Lesson12Page() {
           </div>
         </div>
 
-        {/* Completion */}
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection practiceScore={practiceScore} />
         )}

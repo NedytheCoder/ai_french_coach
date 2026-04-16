@@ -1,3 +1,46 @@
+/**
+ * A2 Lesson 5 - Comparisons (Comparatifs) Data
+ * =============================================
+ *
+ * This file contains all lesson data for A2 Lesson 5, focusing on making
+ * comparisons in French using plus...que, moins...que, and aussi...que.
+ *
+ * **Lesson Content:**
+ * - Adjective comparisons (plus grand que, moins cher que, aussi lourd que)
+ * - Adverb comparisons (plus vite, moins lentement, aussi bien)
+ * - Noun comparisons (plus de, moins de, autant de)
+ * - Irregular comparatives (bon → meilleur, bien → mieux)
+ * - Using que + stress pronouns (moi, toi, lui, elle)
+ * - Common mistakes to avoid
+ * - 15 practice quiz questions
+ *
+ * **Key Patterns:**
+ * - plus + adjective/adverb/noun + que = more...than
+ * - moins + adjective/adverb/noun + que = less...than
+ * - aussi + adjective/adverb + que = as...as
+ * - plus/moins/autant + de + noun = more/less/as many...noun
+ *
+ * **Data Categories:**
+ * 1. AdjectiveComparison / adjectiveComparisons
+ * 2. AdverbComparison / adverbComparisons
+ * 3. NounComparison / nounComparisons
+ * 4. IrregularComparative / irregularComparatives
+ * 5. StressPronoun / stressPronouns
+ * 6. CommonMistake / commonMistakes
+ * 7. PracticeQuestion / practiceQuestions
+ * 8. sectionIds / SectionId
+ * 9. getPerformanceMessage
+ */
+
+// =============================================================================
+// ADJECTIVE COMPARISONS
+// =============================================================================
+
+/**
+ * AdjectiveComparison - Comparison using adjectives.
+ *
+ * Pattern: plus/moins/aussi + adjective + que
+ */
 export interface AdjectiveComparison {
   french: string
   english: string
@@ -22,6 +65,15 @@ export const adjectiveComparisons: AdjectiveComparison[] = [
   }
 ]
 
+// =============================================================================
+// ADVERB COMPARISONS
+// =============================================================================
+
+/**
+ * AdverbComparison - Comparing actions using adverbs.
+ *
+ * Pattern: plus/moins/aussi + adverb + que
+ */
 export interface AdverbComparison {
   french: string
   english: string
@@ -42,6 +94,16 @@ export const adverbComparisons: AdverbComparison[] = [
   }
 ]
 
+// =============================================================================
+// NOUN COMPARISONS
+// =============================================================================
+
+/**
+ * NounComparison - Comparing quantities with nouns.
+ *
+ * Pattern: plus de / moins de / autant de + noun + que
+ * Note: "de" is required before the noun being compared.
+ */
 export interface NounComparison {
   french: string
   english: string
@@ -62,6 +124,13 @@ export const nounComparisons: NounComparison[] = [
   }
 ]
 
+// =============================================================================
+// VERB COMPARISONS
+// =============================================================================
+
+/**
+ * VerbComparison - Comparing actions or verb frequency/intensity.
+ */
 export interface VerbComparison {
   french: string
   english: string
@@ -82,6 +151,16 @@ export const verbComparisons: VerbComparison[] = [
   }
 ]
 
+// =============================================================================
+// SUPERLATIVE EXAMPLES
+// =============================================================================
+
+/**
+ * SuperlativeExample - Using le plus/le moins to express extremes.
+ *
+ * Pattern: le/la/les + plus/moins + adjective
+ * Indicates the highest or lowest degree of a quality.
+ */
 export interface SuperlativeExample {
   french: string
   english: string
@@ -106,6 +185,18 @@ export const superlativeExamples: SuperlativeExample[] = [
   }
 ]
 
+// =============================================================================
+// IRREGULAR COMPARISONS
+// =============================================================================
+
+/**
+ * IrregularComparison - Irregular comparative forms in French.
+ *
+ * Unlike regular comparisons, these don't follow the standard plus/moins pattern:
+ * - bon → meilleur (better, adjective)
+ * - bien → mieux (better, adverb)
+ * - mauvais → pire (worse)
+ */
 export interface IrregularComparison {
   form: string
   use: string
@@ -134,6 +225,15 @@ export const irregularComparisons: IrregularComparison[] = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * GuidedExample - Full sentences demonstrating comparison patterns.
+ *
+ * Mix of adjective, adverb, noun, verb comparisons and superlatives.
+ */
 export interface GuidedExample {
   french: string
   english: string
@@ -148,6 +248,19 @@ export const guidedExamples: GuidedExample[] = [
   { french: "Tu chantes mieux maintenant.", english: "You sing better now." }
 ]
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * CommonMistake - Incorrect vs correct comparison usage.
+ *
+ * Typical errors:
+ * - Using "de" instead of "que" after comparisons
+ * - Forgetting "de" when comparing nouns
+ * - Using wrong irregular forms (meilleur vs mieux)
+ * - Missing articles in superlatives
+ */
 export interface CommonMistake {
   wrong: string
   correct: string
@@ -161,6 +274,13 @@ export const commonMistakes: CommonMistake[] = [
   { wrong: "C'est plus grand bâtiment.", correct: "C'est le plus grand bâtiment.", explanation: "Superlatives need the definite article: le / la / les." }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion - Multiple-choice question for the quiz.
+ */
 export interface PracticeQuestion {
   id: number
   topic: string
@@ -170,6 +290,16 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * practiceQuestions - 15 questions testing comparison knowledge.
+ *
+ * Topic distribution:
+ * - adjective (4): Comparing adjectives
+ * - noun (3): Comparing quantities with nouns
+ * - adverb (2): Comparing adverbs
+ * - superlative (3): Using le plus/le moins
+ * - irregular (3): Irregular forms (meilleur, mieux)
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,
@@ -349,6 +479,26 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections in order:
+ * 1. intro - Introduction to comparisons
+ * 2. adjectives - Comparing adjectives
+ * 3. adverbs - Comparing adverbs
+ * 4. nouns - Comparing nouns with quantities
+ * 5. verbs - Comparing verbs/actions
+ * 6. superlatives-intro - Introduction to superlatives
+ * 7. superlatives - Using le plus/le moins
+ * 8. irregular - Irregular forms
+ * 9. examples - Guided example sentences
+ * 10. mistakes - Common errors
+ * 11. practice - Interactive quiz
+ */
 export const sectionIds = [
   'intro',
   'adjectives',
@@ -365,6 +515,13 @@ export const sectionIds = [
 
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * PerformanceMessage - Feedback message based on quiz performance.
+ */
 export interface PerformanceMessage {
   title: string
   message: string
@@ -372,6 +529,18 @@ export interface PerformanceMessage {
   color: 'green' | 'blue' | 'amber'
 }
 
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score thresholds:
+ * - ≥80% (12/15): "Great job!" - green, high tone
+ * - 47-79% (7-11/15): "Nice progress" - blue, medium tone
+ * - <47% (<7/15): "Good effort" - amber, low tone
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns PerformanceMessage with title, message, tone, and color
+ */
 export function getPerformanceMessage(score: number, total: number): PerformanceMessage {
   const percentage = (score / total) * 100
   

@@ -1,6 +1,63 @@
-// A2 Lesson 8 — More Advanced Prepositions
-// Data and content for the lesson
+/**
+ * A2 Lesson 8 - More Advanced Prepositions
+ * ==========================================
+ *
+ * This file contains all lesson data for A2 Lesson 8, focusing on
+ * advanced French prepositions for time, movement, purpose, and cause.
+ *
+ * **Lesson Content:**
+ * - Time prepositions: depuis, pendant, pour
+ * - Limit/endpoint prepositions: jusqu'à, vers, envers
+ * - Movement/place prepositions: chez, entre, parmi, à travers, au fond de
+ * - Purpose/reason prepositions: pour, afin de, grâce à, à cause de
+ * - Advanced expressions: loin de, près de, autour de, etc.
+ * - Confusing pairs: depuis vs pendant, grâce à vs à cause de, etc.
+ * - 18 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Depuis = since/for (ongoing action)
+ * - Pendant = for/during (completed duration)
+ * - Pour = for (intended duration)
+ * - Jusqu'à = until/up to (endpoint)
+ * - Grâce à = thanks to (positive)
+ * - À cause de = because of (negative)
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. timePrepositions - depuis, pendant, pour
+ * 3. timeComparisonExamples - Side-by-side comparisons
+ * 4. limitPrepositions - jusqu'à, vers, envers
+ * 5. movementAndPlacePrepositions - chez, entre, parmi, etc.
+ * 6. purposeAndReasonPrepositions - pour, afin de, grâce à, à cause de
+ * 7. advancedPrepositionExpressions - Compound expressions
+ * 8. confusingPairs - Often confused preposition pairs
+ * 9. guidedExamples - Example sentences for study
+ * 10. commonMistakes - Common errors to avoid
+ * 11. practiceQuestions - 18 quiz questions
+ * 12. getPerformanceMessage - Score-based feedback
+ */
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to advanced prepositions
+ * 2. why-harder - Why these prepositions are challenging
+ * 3. time-prepositions - Depuis, pendant, pour
+ * 4. limit-prepositions - Jusqu'à, vers, envers
+ * 5. movement-place - Chez, entre, parmi, etc.
+ * 6. purpose-reason - Pour, afin de, grâce à, à cause de
+ * 7. advanced-expressions - Compound preposition expressions
+ * 8. confusing-pairs - Comparison of similar prepositions
+ * 9. guided-examples - Example sentences
+ * 10. mistakes - Common errors
+ * 11. practice - Interactive quiz
+ * 12. completion - Lesson completion
+ */
 export const sectionIds = [
   "intro",
   "why-harder",
@@ -16,7 +73,22 @@ export const sectionIds = [
   "completion",
 ];
 
-// Section 2 — Time prepositions: depuis, pendant, pour
+// =============================================================================
+// TIME PREPOSITIONS (Section 2)
+// =============================================================================
+
+/**
+ * timePrepositions - depuis, pendant, pour
+ *
+ * These three prepositions all translate to "for" in English but have
+ * distinct meanings in French:
+ * - depuis: since/for (action started in past, continues now)
+ * - pendant: for/during (completed or bounded duration)
+ * - pour: for (intended or planned duration)
+ *
+ * Each entry includes preposition name, core meaning, usage description,
+ * examples, and teaching note.
+ */
 export const timePrepositions = [
   {
     preposition: "depuis",
@@ -68,7 +140,16 @@ export const timePrepositions = [
   },
 ];
 
-// Time comparison examples
+// =============================================================================
+// TIME COMPARISON EXAMPLES
+// =============================================================================
+
+/**
+ * timeComparisonExamples - Side-by-side comparison of depuis, pendant, pour.
+ *
+ * Shows the same duration (two years) expressed with each preposition
+ * to highlight the subtle differences in meaning.
+ */
 export const timeComparisonExamples = [
   {
     french: "J'etudie ici depuis deux ans.",
@@ -87,7 +168,17 @@ export const timeComparisonExamples = [
   },
 ];
 
-// Section 3 — Limit / endpoint prepositions
+// =============================================================================
+// LIMIT / ENDPOINT PREPOSITIONS (Section 3)
+// =============================================================================
+
+/**
+ * limitPrepositions - jusqu'à, vers, envers
+ *
+ * - jusqu'à: until, up to, as far as (endpoint in time or place)
+ * - vers: toward, around (direction or approximate time)
+ * - envers: toward/with regard to (attitude/behavior, not physical direction)
+ */
 export const limitPrepositions = [
   {
     preposition: "jusqu'a",
@@ -135,7 +226,19 @@ export const limitPrepositions = [
   },
 ];
 
-// Section 4 — Movement / place / route prepositions
+// =============================================================================
+// MOVEMENT / PLACE PREPOSITIONS (Section 4)
+// =============================================================================
+
+/**
+ * movementAndPlacePrepositions - chez, entre, parmi, à travers, au fond de
+ *
+ * - chez: at/to the home of (people, professionals)
+ * - entre: between (two or more items)
+ * - parmi: among (inside a group)
+ * - à travers: through/across (movement)
+ * - au fond de: at the back/bottom of (location)
+ */
 export const movementAndPlacePrepositions = [
   {
     preposition: "chez",
@@ -202,7 +305,18 @@ export const movementAndPlacePrepositions = [
   },
 ];
 
-// Section 5 — Purpose / reason prepositions
+// =============================================================================
+// PURPOSE / REASON PREPOSITIONS (Section 5)
+// =============================================================================
+
+/**
+ * purposeAndReasonPrepositions - pour, afin de, grâce à, à cause de
+ *
+ * - pour: for, in order to (purpose, goal, recipient)
+ * - afin de: in order to (more formal)
+ * - grâce à: thanks to (positive cause)
+ * - à cause de: because of (often negative cause)
+ */
 export const purposeAndReasonPrepositions = [
   {
     preposition: "pour",
@@ -255,7 +369,21 @@ export const purposeAndReasonPrepositions = [
   },
 ];
 
-// Section 6 — Advanced prepositions and expressions
+// =============================================================================
+// ADVANCED PREPOSITION EXPRESSIONS (Section 6)
+// =============================================================================
+
+/**
+ * advancedPrepositionExpressions - Compound expressions with prepositions.
+ *
+ * Common two-word expressions:
+ * - loin de: far from
+ * - près de: near/close to
+ * - autour de: around
+ * - au lieu de: instead of
+ * - en face de: opposite/facing
+ * - auprès de: with/near (formal)
+ */
 export const advancedPrepositionExpressions = [
   {
     expression: "loin de",
@@ -295,7 +423,19 @@ export const advancedPrepositionExpressions = [
   },
 ];
 
-// Section 7 — Confusing pairs comparison
+// =============================================================================
+// CONFUSING PAIRS (Section 7)
+// =============================================================================
+
+/**
+ * confusingPairs - Side-by-side comparison of often-confused prepositions.
+ *
+ * Pairs covered:
+ * - depuis vs pendant (ongoing vs completed)
+ * - pour vs pendant (intended vs actual)
+ * - vers vs jusqu'à (direction/approx vs endpoint)
+ * - grâce à vs à cause de (positive vs negative)
+ */
 export const confusingPairs = [
   {
     pair: "depuis vs pendant",
@@ -355,7 +495,15 @@ export const confusingPairs = [
   },
 ];
 
-// Section 8 — Guided examples
+// =============================================================================
+// GUIDED EXAMPLES (Section 8)
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing advanced prepositions in everyday French.
+ */
 export const guidedExamples = [
   {
     french: "J'apprends le francais depuis six mois.",
@@ -391,7 +539,18 @@ export const guidedExamples = [
   },
 ];
 
-// Section 9 — Common mistakes
+// =============================================================================
+// COMMON MISTAKES (Section 9)
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Each mistake shows:
+ * - Wrong formulation with context
+ * - Correct formulation
+ * - Explanation of why the correct form works
+ */
 export const commonMistakes = [
   {
     wrong: "J'etudie ici pendant deux ans. (for an action still continuing now)",
@@ -420,7 +579,28 @@ export const commonMistakes = [
   },
 ];
 
-// Section 10 — Practice questions
+// =============================================================================
+// PRACTICE QUESTIONS (Section 10) - 18 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 18-question quiz for Lesson 8.
+ *
+ * Topics covered:
+ * - time (1-5): depuis, pendant, pour, jusqu'à
+ * - movement (6-9): chez, entre, parmi, à travers
+ * - purpose (10-13): pour, afin de, grâce à, à cause de
+ * - comparison (14-16): confusing pairs
+ * - correction (17-18): fixing mistakes
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   {
     id: 1,
@@ -636,7 +816,22 @@ export const practiceQuestions = [
   },
 ];
 
-// Performance messages based on score
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/18: "Good effort" - suggests review of depuis, pendant, pour, jusqu'à
+ * - 8-13/18: "Nice progress" - encourages continued learning
+ * - 14-18/18: "Great job" - celebrates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (18)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) {
     return {

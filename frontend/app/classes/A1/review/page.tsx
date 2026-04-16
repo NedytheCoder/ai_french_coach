@@ -1,10 +1,66 @@
+/**
+ * A1 French Level Landing Page (A1HomePage)
+ * ===========================================
+ *
+ * This page serves as the main landing/hub page for the A1 (Beginner) French level.
+ * It provides navigation to all 10 A1 lessons and access to the final exam.
+ *
+ * **Page Structure:**
+ * 1. Header - A1 level badge, title, and introduction text
+ * 2. Lessons Section - Grid of links to all 10 A1 lessons
+ * 3. Exam Card - Information about the final exam with start button
+ *
+ * **Features:**
+ * - Responsive layout (3 columns on large screens, stacked on mobile)
+ * - Gradient background for visual appeal
+ * - Consistent card styling with shadows and borders
+ * - Lesson grid with hover states
+ * - Exam card with gradient call-to-action button
+ *
+ * **Exam Details:**
+ * - 4 sections: Reading, Listening, Writing, Speaking
+ * - 60% minimum overall score to pass
+ * - Retakes allowed
+ *
+ * **Lessons Available:**
+ * - Lessons 1-10 covering A1 curriculum topics
+ *
+ * **Usage:**
+ * This is the entry point at `/classes/A1`
+ */
+
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// Next.js Link for client-side navigation
 import Link from 'next/link'
+
+// React Icons for UI elements
 import { FaArrowRight, FaClipboardCheck } from 'react-icons/fa'
 
+// =============================================================================
+// COMPONENT
+// =============================================================================
+
+/**
+ * A1HomePage - Main landing page for A1 French level.
+ *
+ * Renders:
+ * - A1 header with description
+ * - Grid of lesson navigation links
+ * - Exam card with exam details and start button
+ *
+ * @returns JSX.Element - The rendered A1 level page
+ */
 export default function A1HomePage() {
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 pb-24">
       <div className="max-w-6xl mx-auto px-4 py-10">
+        {/* Header Section - Level badge, title, and description */}
         <header className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold mb-3">
             A1
@@ -16,10 +72,13 @@ export default function A1HomePage() {
           </p>
         </header>
 
+        {/* Main Content Grid - Lessons (2/3) and Exam Card (1/3) */}
         <div className="grid gap-6 lg:grid-cols-3">
+          {/* Lessons Grid - Links to all 10 A1 lessons */}
           <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Lessons</h2>
             <div className="grid gap-3 sm:grid-cols-2">
+              {/* Array of all A1 lessons mapped to navigation links */}
               {[
                 { href: '/classes/A1/lesson1', label: 'Lesson 1' },
                 { href: '/classes/A1/lesson2', label: 'Lesson 2' },
@@ -44,6 +103,7 @@ export default function A1HomePage() {
             </div>
           </div>
 
+          {/* Exam Card - Final exam information and start button */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold mb-3">
               <FaClipboardCheck />

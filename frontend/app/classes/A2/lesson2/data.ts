@@ -1,9 +1,51 @@
+/**
+ * A2 Lesson 2 - Reflexive Verbs (Verbes Pronominaux) Data
+ * ========================================================
+ *
+ * This file contains all lesson data for A2 Lesson 2, focusing on reflexive verbs
+ * in French (les verbes pronominaux).
+ *
+ * **Lesson Content:**
+ * - Reflexive pronouns (me, te, se, nous, vous) and their usage
+ * - Common reflexive verbs for daily routines
+ * - Present tense conjugation of reflexive verbs
+ * - Daily routine examples and sequences
+ * - Negation with reflexive verbs (ne...pas placement)
+ * - Passé composé with reflexive verbs (using être)
+ * - Common mistakes to avoid
+ * - 15 practice quiz questions
+ *
+ * **Data Categories:**
+ * 1. ReflexivePronoun / reflexivePronouns - Pronoun chart by subject
+ * 2. ReflexiveVerb / commonReflexiveVerbs - 10 common reflexive verbs
+ * 3. PresentExample / presentTenseExamples - Present tense sentences
+ * 4. PresentExample / dailyRoutineExamples - Daily routine sequences
+ * 5. NegativeExample / negativeExamples - Affirmative to negative
+ * 6. PasseComposeExample / passeComposeExamples - Past tense examples
+ * 7. CommonMistake / commonMistakes - Incorrect vs correct comparisons
+ * 8. PracticeQuestion / practiceQuestions - 15 quiz questions
+ * 9. sectionIds / SectionId - Lesson section identifiers
+ * 10. getPerformanceMessage - Score-based feedback
+ */
+
+// =============================================================================
+// REFLEXIVE PRONOUNS
+// =============================================================================
+
+/**
+ * ReflexivePronoun - Represents a reflexive pronoun with subject and example.
+ */
 export interface ReflexivePronoun {
   subject: string
   pronoun: string
   example: string
 }
 
+/**
+ * reflexivePronouns - Chart of reflexive pronouns by subject.
+ *
+ * Note: me/te/se become m'/t'/s' before vowels (elision).
+ */
 export const reflexivePronouns: ReflexivePronoun[] = [
   { subject: "je", pronoun: "me / m'", example: "Je me lève." },
   { subject: "tu", pronoun: "te / t'", example: "Tu te laves." },
@@ -13,11 +55,23 @@ export const reflexivePronouns: ReflexivePronoun[] = [
   { subject: "ils / elles", pronoun: "se / s'", example: "Ils se couchent." }
 ]
 
+// =============================================================================
+// COMMON REFLEXIVE VERBS
+// =============================================================================
+
+/**
+ * ReflexiveVerb - Represents a reflexive infinitive with English translation.
+ */
 export interface ReflexiveVerb {
   infinitive: string
   english: string
 }
 
+/**
+ * commonReflexiveVerbs - Common reflexive verbs for daily routines.
+ *
+ * These are essential for describing morning/evening routines in French.
+ */
 export const commonReflexiveVerbs: ReflexiveVerb[] = [
   { infinitive: "se lever", english: "to get up" },
   { infinitive: "se laver", english: "to wash oneself" },
@@ -31,11 +85,23 @@ export const commonReflexiveVerbs: ReflexiveVerb[] = [
   { infinitive: "se dépêcher", english: "to hurry" }
 ]
 
+// =============================================================================
+// PRESENT TENSE EXAMPLES
+// =============================================================================
+
+/**
+ * PresentExample - A complete sentence with English translation.
+ */
 export interface PresentExample {
   french: string
   english: string
 }
 
+/**
+ * presentTenseExamples - Present tense reflexive verb sentences.
+ *
+ * Shows the pattern: subject + reflexive pronoun + conjugated verb.
+ */
 export const presentTenseExamples: PresentExample[] = [
   { french: "Je me lève à sept heures.", english: "I get up at seven o'clock." },
   { french: "Tu te laves rapidement.", english: "You wash yourself quickly." },
@@ -45,6 +111,15 @@ export const presentTenseExamples: PresentExample[] = [
   { french: "Ils se réveillent tôt.", english: "They wake up early." }
 ]
 
+// =============================================================================
+// DAILY ROUTINE EXAMPLES
+// =============================================================================
+
+/**
+ * dailyRoutineExamples - Sequence of daily routine activities.
+ *
+ * Shows how reflexive verbs connect in a typical morning routine.
+ */
 export const dailyRoutineExamples: PresentExample[] = [
   { french: "Je me réveille à six heures.", english: "I wake up at six o'clock." },
   { french: "Je me lève et je me lave.", english: "I get up and wash myself." },
@@ -52,23 +127,50 @@ export const dailyRoutineExamples: PresentExample[] = [
   { french: "Le soir, je me couche à dix heures.", english: "In the evening, I go to bed at ten o'clock." }
 ]
 
+// =============================================================================
+// NEGATION EXAMPLES
+// =============================================================================
+
+/**
+ * NegativeExample - Shows affirmative and negative forms side by side.
+ */
 export interface NegativeExample {
   affirmative: string
   negative: string
   english: string
 }
 
+/**
+ * negativeExamples - Reflexive verbs in negative form.
+ *
+ * Pattern: subject + ne + reflexive pronoun + verb + pas.
+ * The reflexive pronoun stays close to the verb.
+ */
 export const negativeExamples: NegativeExample[] = [
   { affirmative: "Je me lève tôt.", negative: "Je ne me lève pas tôt.", english: "I do not get up early." },
   { affirmative: "Elle se couche tard.", negative: "Elle ne se couche pas tard.", english: "She does not go to bed late." },
   { affirmative: "Nous nous reposons.", negative: "Nous ne nous reposons pas.", english: "We do not rest." }
 ]
 
+// =============================================================================
+// PASSÉ COMPOSÉ EXAMPLES
+// =============================================================================
+
+/**
+ * PasseComposeExample - Reflexive verbs in passé composé.
+ */
 export interface PasseComposeExample {
   french: string
   english: string
 }
 
+/**
+ * passeComposeExamples - Reflexive verbs in the passé composé.
+ *
+ * Key rule: Reflexive verbs use être as the auxiliary.
+ * Pattern: reflexive pronoun + être + past participle.
+ * The past participle agrees with the subject in gender/number.
+ */
 export const passeComposeExamples: PasseComposeExample[] = [
   { french: "Je me suis levé(e).", english: "I got up." },
   { french: "Elle s'est lavée.", english: "She washed herself." },
@@ -76,12 +178,28 @@ export const passeComposeExamples: PasseComposeExample[] = [
   { french: "Ils se sont couchés tard.", english: "They went to bed late." }
 ]
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * CommonMistake - Incorrect form with correction and explanation.
+ */
 export interface CommonMistake {
   wrong: string
   correct: string
   explanation: string
 }
 
+/**
+ * commonMistakes - Common errors with reflexive verbs.
+ *
+ * Typical mistakes:
+ * - Forgetting the reflexive pronoun
+ * - Wrong pronoun for the subject
+ * - Incorrect pronoun placement in negation
+ * - Wrong word order in passé composé
+ */
 export const commonMistakes: CommonMistake[] = [
   { wrong: "Je lève à sept heures.", correct: "Je me lève à sept heures.", explanation: "Do not forget the reflexive pronoun." },
   { wrong: "Nous se couchons tôt.", correct: "Nous nous couchons tôt.", explanation: "The reflexive pronoun must match the subject." },
@@ -89,6 +207,13 @@ export const commonMistakes: CommonMistake[] = [
   { wrong: "Je suis me levé.", correct: "Je me suis levé.", explanation: "In the passé composé, the reflexive pronoun comes before the auxiliary." }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeQuestion - Multiple-choice question for the quiz.
+ */
 export interface PracticeQuestion {
   id: number
   topic: string
@@ -98,6 +223,16 @@ export interface PracticeQuestion {
   explanation: string
 }
 
+/**
+ * practiceQuestions - 15 questions testing reflexive verb knowledge.
+ *
+ * Topic distribution:
+ * - pronouns (4): me, te, se, nous usage
+ * - present (4): Present tense sentence construction
+ * - negation (3): Negative sentence formation
+ * - passe-compose (2): Passé composé with être
+ * - correction (2): Error identification and correction
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,
@@ -221,6 +356,24 @@ export const practiceQuestions: PracticeQuestion[] = [
   }
 ]
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections in order:
+ * 1. intro - Introduction to reflexive verbs
+ * 2. pronouns - Reflexive pronoun chart
+ * 3. verbs - Common reflexive verbs
+ * 4. present - Present tense conjugation
+ * 5. routine - Daily routine examples
+ * 6. negation - Negative form
+ * 7. passe-compose - Passé composé form
+ * 8. mistakes - Common errors
+ * 9. practice - Interactive quiz
+ */
 export const sectionIds = [
   'intro',
   'pronouns',
@@ -235,6 +388,13 @@ export const sectionIds = [
 
 export type SectionId = typeof sectionIds[number]
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * PerformanceMessage - Feedback message based on quiz performance.
+ */
 export interface PerformanceMessage {
   title: string
   message: string
@@ -242,6 +402,18 @@ export interface PerformanceMessage {
   color: 'green' | 'blue' | 'amber'
 }
 
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score thresholds:
+ * - ≥80% (12/15): "Great job!" - green, high tone
+ * - 47-79% (7-11/15): "Nice progress" - blue, medium tone
+ * - <47% (<7/15): "Good effort" - amber, low tone
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns PerformanceMessage with title, message, tone, and color
+ */
 export function getPerformanceMessage(score: number, total: number): PerformanceMessage {
   const percentage = (score / total) * 100
   

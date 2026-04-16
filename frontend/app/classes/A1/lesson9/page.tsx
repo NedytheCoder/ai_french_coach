@@ -1,16 +1,70 @@
+/**
+ * A1 Lesson 9 - Passé Composé (Past Tense) Page
+ * =============================================
+ *
+ * This page implements A1 Lesson 9, teaching the French passé composé,
+ * the compound past tense used for completed actions. The lesson covers:
+ * - What the passé composé is and when to use it
+ * - How it's formed (auxiliary verb + past participle)
+ * - Verbs using AVOIR as auxiliary (most verbs)
+ * - Verbs using ÊTRE as auxiliary (DR MRS VANDERTRAMP)
+ * - Gender/number agreement with être verbs
+ * - Interactive practice with 18 questions
+ *
+ * Page Structure:
+ * ---------------
+ * 1. Header with back navigation and lesson title
+ * 2. Progress bar showing lesson completion
+ * 3. Eight content sections:
+ *    - What is the passé composé?
+ *    - How it's formed (auxiliary + past participle)
+ *    - Avoir as auxiliary (most verbs)
+ *    - Être as auxiliary (small group)
+ *    - Dr. & Mrs. Vandertramp mnemonic
+ *    - Agreement with être verbs
+ *    - Avoir vs Être comparison
+ *    - Guided examples with audio
+ * 4. Interactive Practice (18 questions)
+ * 5. Completion section with score display
+ *
+ * State Management:
+ * -----------------
+ * - reviewedSections: Tracks which of 8 sections have been opened
+ * - currentlyPlaying: ID of currently playing audio
+ * - currentPracticeIndex: Current question in practice quiz
+ * - practiceAnswers: User's answers with correctness tracking
+ * - selectedOption: Currently selected option in practice
+ * - showFeedback: Whether to show answer feedback
+ * - showResults: Whether to show practice results
+ * - showCompletion: Whether to show lesson completion card
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and memoization
 import { useMemo, useRef, useState } from 'react'
+
+// Framer Motion for smooth animations
 import { motion, AnimatePresence } from 'framer-motion'
+
+// Font Awesome icons for UI elements
 import {
-  FaArrowRight,
-  FaCheck,
-  FaChevronRight,
-  FaHome,
-  FaPlay,
-  FaRedoAlt
+  FaArrowRight,   // Navigation and action buttons
+  FaCheck,        // Completion checkmarks
+  FaChevronRight, // Navigation arrows
+  FaHome,         // Back to lessons link
+  FaPlay,         // Audio play button
+  FaRedoAlt       // Retake practice
 } from 'react-icons/fa'
+
+// Next.js navigation
 import Link from 'next/link'
+
+// Lesson data imports
 import {
   agreementExamples,
   avoirExamples,
@@ -22,25 +76,56 @@ import {
   type PracticeTopic
 } from './data'
 
-type SectionKey =
-  | 'what'
-  | 'formed'
-  | 'avoir'
-  | 'etre'
-  | 'mnemonic'
-  | 'agreement'
-  | 'comparison'
-  | 'guided'
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
 
+/**
+ * SectionKey - Union type of all section identifiers.
+ * Used for tracking which sections have been reviewed.
+ */
+type SectionKey =
+  | 'what'       // What is the passé composé?
+  | 'formed'     // How it's formed
+  | 'avoir'      // Avoir as auxiliary
+  | 'etre'       // Être as auxiliary
+  | 'mnemonic'   // Dr. & Mrs. Vandertramp
+  | 'agreement'  // Agreement with être
+  | 'comparison' // Avoir vs Être comparison
+  | 'guided'     // Guided examples
+
+/**
+ * SectionReview - Record type mapping section keys to review status.
+ */
 type SectionReview = Record<SectionKey, boolean>
 
+/**
+ * PracticeAnswer - Structure for a single practice answer.
+ */
 type PracticeAnswer = {
   questionId: number
   selectedOption: number
   isCorrect: boolean
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+/**
+ * A1Lesson9Page - Main component implementation
+ *
+ * Manages lesson state, audio playback, practice quiz, and completion tracking.
+ */
 export default function A1Lesson9Page() {
+  // ===========================================================================
+  // STATE: Section Review Tracking
+  // ===========================================================================
+
+  /**
+   * reviewedSections - Tracks which of the 8 sections have been opened/reviewed.
+   * Each section is initially false and set to true when expanded.
+   */
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
     what: false,
     formed: false,
@@ -52,22 +137,85 @@ export default function A1Lesson9Page() {
     guided: false
   })
 
+  // ===========================================================================
+  // STATE: Audio Playback
+  // ===========================================================================
+
+  /**
+   * currentlyPlaying - ID of the audio currently playing (null if none).
+   * Used to show playing state and prevent multiple simultaneous playbacks.
+   */
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
+
+  /**
+   * audioRef - Ref to the currently playing HTMLAudioElement.
+   * Used to control playback (pause when starting new audio).
+   */
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // ===========================================================================
+  // STATE: Practice Quiz
+  // ===========================================================================
+
+  /**
+   * currentPracticeIndex - Index of the current question being displayed (0-17).
+   */
   const [currentPracticeIndex, setCurrentPracticeIndex] = useState(0)
+
+  /**
+   * practiceAnswers - Array of user's answers to practice questions.
+   * Each answer tracks the question ID, selected option, and correctness.
+   */
   const [practiceAnswers, setPracticeAnswers] = useState<PracticeAnswer[]>([])
+
+  /**
+   * selectedOption - Index of the currently selected option in practice (null if none selected).
+   */
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
+
+  /**
+   * showFeedback - Whether to show the feedback after submitting an answer.
+   */
   const [showFeedback, setShowFeedback] = useState(false)
 
+  /**
+   * showResults - Whether to display the practice results card.
+   */
   const [showResults, setShowResults] = useState(false)
+
+  /**
+   * showCompletion - Whether to display the lesson completion celebration card.
+   */
   const [showCompletion, setShowCompletion] = useState(false)
 
+  // ===========================================================================
+  // DERIVED STATE: Progress Calculations
+  // ===========================================================================
+
+  /**
+   * allSectionsReviewed - True when all 8 lesson sections have been marked as reviewed.
+   */
   const allSectionsReviewed = Object.values(reviewedSections).every(Boolean)
+
+  /**
+   * practiceComplete - True when all 18 practice questions have been answered.
+   */
   const practiceComplete = practiceAnswers.length === practiceQuestions.length
+
+  /**
+   * score - Number of correctly answered practice questions.
+   */
   const score = practiceAnswers.filter(a => a.isCorrect).length
+
+  /**
+   * percentage - Practice score as a percentage (0-100).
+   */
   const percentage = Math.round((score / practiceQuestions.length) * 100)
 
+  /**
+   * topicCounts - Count of answered questions by topic category.
+   * Used to display progress breakdown in PracticeMetaRow.
+   */
   const topicCounts = useMemo(() => {
     return practiceAnswers.reduce<Record<PracticeTopic, number>>(
       (acc, a) => {
@@ -80,7 +228,17 @@ export default function A1Lesson9Page() {
     )
   }, [practiceAnswers])
 
+  // ===========================================================================
+  // HANDLERS: Audio Playback
+  // ===========================================================================
+
+  /**
+   * playAudio - Plays audio for a given source and tracks playing state.
+   * @param audioSrc - Path to the audio file
+   * @param id - Unique identifier for the audio element
+   */
   const playAudio = (audioSrc: string, id: string) => {
+    // Stop any currently playing audio
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current = null
@@ -97,15 +255,34 @@ export default function A1Lesson9Page() {
     audio.onended = () => setCurrentlyPlaying(null)
   }
 
+  // ===========================================================================
+  // HANDLERS: Section Review
+  // ===========================================================================
+
+  /**
+   * markSectionReviewed - Marks a lesson section as reviewed.
+   * @param section - The section key to mark as reviewed
+   */
   const markSectionReviewed = (section: SectionKey) => {
     setReviewedSections(prev => ({ ...prev, [section]: true }))
   }
 
+  // ===========================================================================
+  // HANDLERS: Practice Quiz
+  // ===========================================================================
+
+  /**
+   * handlePracticeAnswer - Handles selection of an answer option.
+   * @param optionIndex - Index of the selected option
+   */
   const handlePracticeAnswer = (optionIndex: number) => {
     if (showFeedback) return
     setSelectedOption(optionIndex)
   }
 
+  /**
+   * submitAnswer - Submits the selected answer and shows feedback.
+   */
   const submitAnswer = () => {
     if (selectedOption === null) return
     const currentQuestion = practiceQuestions[currentPracticeIndex]
@@ -117,6 +294,10 @@ export default function A1Lesson9Page() {
     setShowFeedback(true)
   }
 
+  /**
+   * nextQuestion - Advances to the next practice question.
+   * Shows results when all questions are answered.
+   */
   const nextQuestion = () => {
     const nextIndex = currentPracticeIndex + 1
     setSelectedOption(null)
@@ -125,6 +306,9 @@ export default function A1Lesson9Page() {
     if (nextIndex >= practiceQuestions.length) setShowResults(true)
   }
 
+  /**
+   * retakePractice - Resets practice state to allow retaking the quiz.
+   */
   const retakePractice = () => {
     setCurrentPracticeIndex(0)
     setPracticeAnswers([])
@@ -134,17 +318,43 @@ export default function A1Lesson9Page() {
     setShowCompletion(false)
   }
 
+  /**
+   * continueFromResults - Continues from results to completion screen.
+   */
   const continueFromResults = () => {
     setShowResults(false)
     setShowCompletion(true)
   }
 
+  // ===========================================================================
+  // DERIVED STATE: Lesson Completion
+  // ===========================================================================
+
+  /**
+   * lessonReadyToComplete - True when all sections reviewed AND practice complete.
+   */
   const lessonReadyToComplete = allSectionsReviewed && practiceComplete
+
+  /**
+   * lessonComplete - True when lesson is ready AND completion screen shown.
+   */
   const lessonComplete = lessonReadyToComplete && showCompletion
 
+  // ===========================================================================
+  // RENDER: Main JSX
+  // ===========================================================================
+
   return (
+    // -------------------------------------------------------------------------
+    // Main page container with gradient background and bottom padding for footer
+    // -------------------------------------------------------------------------
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
       <div className="max-w-7xl mx-auto px-4 py-8">
+
+        {/* ---------------------------------------------------------------------
+          Back Navigation
+          Links back to A1 lessons list
+        --------------------------------------------------------------------- */}
         <div className="mb-6">
           <Link
             href="/classes/A1"
@@ -155,15 +365,26 @@ export default function A1Lesson9Page() {
           </Link>
         </div>
 
+        {/* ---------------------------------------------------------------------
+          Lesson Header Component
+          Displays lesson title and description
+        --------------------------------------------------------------------- */}
         <LessonHeader />
 
+        {/* ---------------------------------------------------------------------
+          Progress Bar Component
+          Shows overall lesson completion including sections and practice
+        --------------------------------------------------------------------- */}
         <ProgressBar
           reviewedSections={reviewedSections}
           practiceProgress={practiceAnswers.length}
           totalPractice={practiceQuestions.length}
         />
 
-        {/* 2. What is the passé composé? */}
+        {/* ---------------------------------------------------------------------
+          SECTION 1: What is the passé composé?
+          Introduction to the French compound past tense
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="What is the passé composé?"
           subtitle="A very useful past tense for beginners"
@@ -202,7 +423,10 @@ export default function A1Lesson9Page() {
           </div>
         </SectionCard>
 
-        {/* 3. How formed */}
+        {/* ---------------------------------------------------------------------
+          SECTION 2: How the passé composé is formed
+          Explains the structure: auxiliary + past participle
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="How the passé composé is formed"
           subtitle="Auxiliary + past participle"
@@ -233,7 +457,10 @@ export default function A1Lesson9Page() {
           </div>
         </SectionCard>
 
-        {/* 4. Avoir */}
+        {/* ---------------------------------------------------------------------
+          SECTION 3: Avoir as auxiliary
+          Shows examples of verbs using AVOIR (most verbs)
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="Avoir as auxiliary"
           subtitle="The default pattern (most verbs)"
@@ -263,7 +490,10 @@ export default function A1Lesson9Page() {
           </div>
         </SectionCard>
 
-        {/* 5. Être */}
+        {/* ---------------------------------------------------------------------
+          SECTION 4: Être as auxiliary
+          Introduces the small group of verbs using ÊTRE
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="Être as auxiliary"
           subtitle="A small but important group"
@@ -287,7 +517,10 @@ export default function A1Lesson9Page() {
           </div>
         </SectionCard>
 
-        {/* 6. Vandertramp */}
+        {/* ---------------------------------------------------------------------
+          SECTION 5: Dr. & Mrs. Vandertramp verbs
+          Displays the 16 être verbs using the mnemonic
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="Dr. & Mrs. Vandertramp verbs"
           subtitle="Common être verbs (movement / change of state)"
@@ -320,7 +553,10 @@ export default function A1Lesson9Page() {
           </div>
         </SectionCard>
 
-        {/* 7. Agreement with être */}
+        {/* ---------------------------------------------------------------------
+          SECTION 6: Agreement with être
+          Shows gender/number agreement rules for être verbs
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="Agreement with être"
           subtitle="Notice the pattern (don’t panic)"
@@ -351,7 +587,10 @@ export default function A1Lesson9Page() {
           </div>
         </SectionCard>
 
-        {/* 8. Avoir vs être comparison */}
+        {/* ---------------------------------------------------------------------
+          SECTION 7: Avoir vs Être comparison
+          Side-by-side comparison of both auxiliary types
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="Avoir vs être comparison"
           subtitle="Same tense, different auxiliary"
@@ -363,7 +602,10 @@ export default function A1Lesson9Page() {
           <ComparisonPanel />
         </SectionCard>
 
-        {/* 9. Guided examples */}
+        {/* ---------------------------------------------------------------------
+          SECTION 8: Guided examples
+          Full sentences demonstrating passé composé in context
+        --------------------------------------------------------------------- */}
         <SectionCard
           title="Guided examples"
           subtitle="Read, notice the auxiliary, then copy"
@@ -386,7 +628,10 @@ export default function A1Lesson9Page() {
           </div>
         </SectionCard>
 
-        {/* 10. Practice */}
+        {/* ---------------------------------------------------------------------
+          SECTION 9: Interactive Practice
+          18-question quiz testing passé composé concepts
+        --------------------------------------------------------------------- */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -422,7 +667,10 @@ export default function A1Lesson9Page() {
           )}
         </div>
 
-        {/* 12. Completion */}
+        {/* ---------------------------------------------------------------------
+          SECTION 10: Lesson Completion
+          Celebration card shown when all sections and practice complete
+        --------------------------------------------------------------------- */}
         <AnimatePresence>
           {showCompletion && (
             <motion.div
@@ -486,7 +734,10 @@ export default function A1Lesson9Page() {
         </AnimatePresence>
       </div>
 
-      {/* Sticky footer */}
+      {/* ---------------------------------------------------------------------
+        STICKY FOOTER
+        Progress indicator and Continue button fixed at bottom
+      --------------------------------------------------------------------- */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
@@ -533,6 +784,11 @@ export default function A1Lesson9Page() {
   )
 }
 
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ *
+ * Shows A1 Lesson 9 title and subtitle explaining the passé composé.
+ */
 function LessonHeader() {
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
@@ -552,6 +808,15 @@ function LessonHeader() {
   )
 }
 
+/**
+ * ProgressBar - Displays overall lesson progress.
+ *
+ * Shows percentage bar, reviewed sections count, and practice questions answered.
+ *
+ * @param reviewedSections - Object tracking which sections have been reviewed
+ * @param practiceProgress - Number of practice questions answered
+ * @param totalPractice - Total number of practice questions
+ */
 function ProgressBar({
   reviewedSections,
   practiceProgress,
@@ -588,6 +853,19 @@ function ProgressBar({
   )
 }
 
+/**
+ * SectionCard - Wrapper component for lesson sections.
+ *
+ * Displays section with title, icon, subtitle, and "Mark as Reviewed" button.
+ *
+ * @param title - Section title
+ * @param subtitle - Section subtitle/description
+ * @param icon - Emoji icon for the section
+ * @param isReviewed - Whether section has been marked as reviewed
+ * @param onMarkReviewed - Callback when review button is clicked
+ * @param index - Section index for color rotation and animation delay
+ * @param children - Section content
+ */
 function SectionCard({
   title,
   subtitle,
@@ -605,6 +883,7 @@ function SectionCard({
   index: number
   children: React.ReactNode
 }) {
+  // Gradient colors for section icons (8 different gradients)
   const colors = [
     'from-purple-500 to-pink-500',
     'from-blue-500 to-cyan-500',
@@ -647,6 +926,15 @@ function SectionCard({
   )
 }
 
+/**
+ * ExplanationCard - Displays explanation with bullet points.
+ *
+ * Used in the "How formed" section to show the 2-part structure.
+ *
+ * @param title - Card title
+ * @param bullets - Array of bullet point strings
+ * @param accent - Color accent for styling (purple or blue)
+ */
 function ExplanationCard({
   title,
   bullets,
@@ -676,6 +964,12 @@ function ExplanationCard({
   )
 }
 
+/**
+ * FormulaCard - Displays the passé composé formula with visual breakdown.
+ *
+ * Shows: subject + auxiliary + past participle
+ * Example: Je + ai + mangé
+ */
 function FormulaCard() {
   return (
     <div className="rounded-2xl p-5 border-2 bg-slate-50 border-slate-200">
@@ -692,6 +986,13 @@ function FormulaCard() {
   )
 }
 
+/**
+ * MiniExample - Simple card displaying a French sentence example.
+ *
+ * Used for quick examples in the "How formed" section.
+ *
+ * @param french - French sentence to display
+ */
 function MiniExample({ french }: { french: string }) {
   return (
     <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 font-semibold text-slate-800">
@@ -700,6 +1001,19 @@ function MiniExample({ french }: { french: string }) {
   )
 }
 
+/**
+ * ExampleCard - Card displaying a French sentence example with audio button.
+ *
+ * Used in the Avoir section to show avoir example sentences.
+ *
+ * @param label - Label showing the verb (e.g., "avoir • manger")
+ * @param french - French sentence
+ * @param english - English translation
+ * @param accent - Color accent (blue or purple)
+ * @param isPlaying - Whether this audio is currently playing
+ * @param onPlay - Callback to play audio
+ * @param index - Index for animation delay
+ */
 function ExampleCard({
   label,
   french,
@@ -741,6 +1055,11 @@ function ExampleCard({
   )
 }
 
+/**
+ * MnemonicGrid - Displays the 16 Dr. & Mrs. Vandertramp verbs in a grid.
+ *
+ * Shows each letter of the mnemonic with corresponding verb and English translation.
+ */
 function MnemonicGrid() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -764,6 +1083,16 @@ function MnemonicGrid() {
   )
 }
 
+/**
+ * AgreementCard - Card showing gender/number agreement examples.
+ *
+ * Displays French sentence, English translation, and agreement rule note.
+ *
+ * @param sentence - French sentence showing agreement
+ * @param english - English translation
+ * @param note - Agreement rule note (e.g., "Feminine singular adds -e")
+ * @param index - Index for animation delay
+ */
 function AgreementCard({ sentence, english, note, index }: { sentence: string; english: string; note: string; index: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-emerald-200">
@@ -776,6 +1105,11 @@ function AgreementCard({ sentence, english, note, index }: { sentence: string; e
   )
 }
 
+/**
+ * ComparisonPanel - Side-by-side comparison of avoir vs être examples.
+ *
+ * Shows examples using each auxiliary with summary notes.
+ */
 function ComparisonPanel() {
   return (
     <div className="space-y-4">
@@ -824,6 +1158,17 @@ function ComparisonPanel() {
   )
 }
 
+/**
+ * GuidedExampleCard - Card for guided example sentences with audio.
+ *
+ * Auto-detects whether the sentence uses avoir or être based on auxiliary verb.
+ *
+ * @param french - French sentence
+ * @param english - English translation
+ * @param isPlaying - Whether this audio is currently playing
+ * @param onPlay - Callback to play audio
+ * @param index - Index for animation delay
+ */
 function GuidedExampleCard({
   french,
   english,
@@ -837,6 +1182,7 @@ function GuidedExampleCard({
   onPlay: () => void
   index: number
 }) {
+  // Detect if this example uses être by checking for être conjugations
   const isEtre = french.includes(' suis ') || french.includes(' sommes ') || french.includes(' sont ') || french.includes(' est ')
   const chip = isEtre ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
   const label = isEtre ? 'être' : 'avoir'
@@ -864,6 +1210,15 @@ function GuidedExampleCard({
   )
 }
 
+/**
+ * PracticeMetaRow - Shows practice progress and topic counts.
+ *
+ * Displays number of questions answered and counts for each topic category.
+ *
+ * @param answered - Number of questions answered
+ * @param total - Total number of practice questions
+ * @param counts - Record of answered questions by topic
+ */
 function PracticeMetaRow({
   answered,
   total,
@@ -888,6 +1243,11 @@ function PracticeMetaRow({
   )
 }
 
+/**
+ * Chip - Small pill-shaped label for topic counts.
+ *
+ * @param label - Text to display inside the chip
+ */
 function Chip({ label }: { label: string }) {
   return (
     <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">
@@ -896,6 +1256,21 @@ function Chip({ label }: { label: string }) {
   )
 }
 
+/**
+ * PracticeCard - Interactive practice question card.
+ *
+ * Displays a multiple-choice question with selectable options,
+ * feedback after submission, and navigation to next question.
+ *
+ * @param question - The practice question to display
+ * @param questionNumber - Current question number (1-based)
+ * @param totalQuestions - Total number of questions in the quiz
+ * @param selectedOption - Index of currently selected option
+ * @param showFeedback - Whether to show answer feedback
+ * @param onSelectOption - Callback when an option is selected
+ * @param onSubmit - Callback to submit the selected answer
+ * @param onNext - Callback to go to the next question
+ */
 function PracticeCard({
   question,
   questionNumber,
@@ -915,9 +1290,11 @@ function PracticeCard({
   onSubmit: () => void
   onNext: () => void
 }) {
+  // Check if the selected answer is correct
   const isCorrect = selectedOption === question.correct
 
-  const feedbackMessagesCorrect = ["Nice 😏", "Good catch", "That’s right", "You’re getting the pattern"]
+  // Random feedback messages based on correctness
+  const feedbackMessagesCorrect = ["Nice 😏", "Good catch", "That's right", "You're getting the pattern"]
   const feedbackMessagesWrong = ["Careful now…", "Good try — check the auxiliary", "Almost — notice the pattern"]
   const message = isCorrect
     ? feedbackMessagesCorrect[Math.floor(Math.random() * feedbackMessagesCorrect.length)]
@@ -1030,6 +1407,17 @@ function PracticeCard({
   )
 }
 
+/**
+ * PracticeResultsCard - Shows practice quiz results with score and feedback.
+ *
+ * Displays final score, percentage, personalized feedback based on score,
+ * and buttons to retake or continue.
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions
+ * @param onRetake - Callback to retake the quiz
+ * @param onContinue - Callback to continue to lesson completion
+ */
 function PracticeResultsCard({
   score,
   total,
@@ -1041,7 +1429,10 @@ function PracticeResultsCard({
   onRetake: () => void
   onContinue: () => void
 }) {
+  // Calculate percentage score
   const percentage = Math.round((score / total) * 100)
+
+  // Feedback message based on score tier
   const feedback =
     score <= 7
       ? {

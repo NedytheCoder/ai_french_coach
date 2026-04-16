@@ -1,24 +1,69 @@
+/**
+ * A2 Lesson 1 - Near Future (Futur Proche) with Aller + Infinitive
+ * ================================================================
+ *
+ * This page teaches A2 learners how to form the near future tense in French
+ * using the structure: aller + infinitive (le futur proche).
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to the near future concept
+ * 2. FormulaSection - Structure formula explanation
+ * 3. ConjugationSection - Present tense conjugation of "aller"
+ * 4. InfinitivesSection - Common infinitives to use
+ * 5. ComparisonSection - Present vs near future comparison
+ * 6. ExamplesSection - Guided example sentences
+ * 7. MistakesSection - Common beginner mistakes
+ * 8. PracticeSection - Interactive quiz (15 questions)
+ * 9. CompletionSection - Lesson completion UI
+ *
+ * **State Management:**
+ * - reviewedSections: Array of reviewed section IDs (persisted to localStorage)
+ * - practiceAnswers: Array of user's quiz answers
+ * - practiceCompleted: Boolean flag for quiz completion
+ * - lessonCompleted: Boolean flag for overall lesson completion
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed on open
+ * - Progress bar showing completion status
+ * - 15-question interactive quiz with feedback
+ * - LocalStorage persistence for progress
+ * - Performance-based feedback messages
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state and side effects
 import { useState, useEffect } from 'react'
+
+// Framer Motion for animations
 import { motion, AnimatePresence } from 'framer-motion'
+
+// React Icons for UI elements
 import {
-  FaHome,
-  FaCheck,
-  FaChevronRight,
-  FaArrowRight,
-  FaBookOpen,
-  FaGraduationCap,
-  FaLightbulb,
-  FaTimes,
-  FaRedo,
-  FaChevronDown,
-  FaChevronUp,
-  FaVolumeUp,
-  FaRocket,
-  FaExclamationTriangle
+  FaHome,             // Back navigation
+  FaCheck,            // Reviewed status, correct answer
+  FaChevronRight,     // Next button
+  FaArrowRight,       // Continue button
+  FaBookOpen,         // Section icons
+  FaGraduationCap,    // Lesson header icon
+  FaLightbulb,        // Intro section, tips
+  FaTimes,            // Incorrect answer
+  FaRedo,             // Retake practice
+  FaChevronDown,      // Expand section
+  FaChevronUp,        // Collapse section
+  FaVolumeUp,         // Audio playback
+  FaRocket,           // Completion
+  FaExclamationTriangle // Mistakes section
 } from 'react-icons/fa'
+
+// Next.js Link for navigation
 import Link from 'next/link'
+
+// Lesson data
 import {
   allerConjugation,
   commonInfinitives,
@@ -31,6 +76,13 @@ import {
   getPerformanceMessage
 } from './data'
 
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * LessonProgress - Shape of persisted lesson progress in localStorage.
+ */
 interface LessonProgress {
   reviewedSections: SectionId[]
   practiceAnswers: { questionId: number; selectedOption: number; isCorrect: boolean }[]
@@ -38,23 +90,64 @@ interface LessonProgress {
   lessonCompleted: boolean
 }
 
+// =============================================================================
+// FEEDBACK MESSAGES
+// =============================================================================
+
+/**
+ * feedbackMessages - Random encouraging messages for quiz feedback.
+ */
 const feedbackMessages = {
   correct: ['Nice 😏', 'Good catch', "That's right", "You're getting it", 'Well done!', 'Perfect!'],
   incorrect: ['Careful now…', 'Almost there', 'Keep trying', 'Not quite', 'Review the pattern']
 }
 
+/**
+ * getRandomFeedback - Returns a random feedback message.
+ * @param isCorrect - Whether the answer was correct
+ * @returns Random message string
+ */
 function getRandomFeedback(isCorrect: boolean) {
   const messages = isCorrect ? feedbackMessages.correct : feedbackMessages.incorrect
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+/**
+ * A2Lesson1Page - Main component for the near future lesson.
+ *
+ * Manages lesson state, persists progress to localStorage, and renders
+ * all lesson sections with collapsible cards.
+ */
 export default function A2Lesson1Page() {
+  // ---------------------------------------------------------------------------
+  // STATE: Section Review Tracking
+  // ---------------------------------------------------------------------------
   const [reviewedSections, setReviewedSections] = useState<SectionId[]>([])
+
+  // ---------------------------------------------------------------------------
+  // STATE: Practice Quiz
+  // ---------------------------------------------------------------------------
   const [practiceAnswers, setPracticeAnswers] = useState<{ questionId: number; selectedOption: number; isCorrect: boolean }[]>([])
   const [practiceCompleted, setPracticeCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Lesson Completion
+  // ---------------------------------------------------------------------------
   const [lessonCompleted, setLessonCompleted] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // STATE: Hydration Check
+  // ---------------------------------------------------------------------------
+  // Prevents hydration mismatch by tracking client-side mount
   const [isClient, setIsClient] = useState(false)
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true)
     const saved = localStorage.getItem('a2Lesson1Progress')
@@ -67,6 +160,9 @@ export default function A2Lesson1Page() {
     }
   }, [])
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem('a2Lesson1Progress', JSON.stringify({
@@ -78,21 +174,33 @@ export default function A2Lesson1Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, lessonCompleted, isClient])
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Mark Section Reviewed
+  // ---------------------------------------------------------------------------
   const markSectionReviewed = (sectionId: SectionId) => {
     if (!reviewedSections.includes(sectionId)) {
       setReviewedSections(prev => [...prev, sectionId])
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
   const allSectionsReviewed = sectionIds.every(id => reviewedSections.includes(id))
   const practiceScore = practiceAnswers.filter(a => a.isCorrect).length
 
+  // ---------------------------------------------------------------------------
+  // HANDLER: Complete Lesson
+  // ---------------------------------------------------------------------------
   const completeLesson = () => {
     if (allSectionsReviewed && practiceCompleted) {
       setLessonCompleted(true)
     }
   }
 
+  // ===========================================================================
+  // RENDER
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-slate-100 pb-24">
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -134,6 +242,20 @@ export default function A2Lesson1Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ *
+ * Features:
+ * - A2 Lesson 1 badge with graduation cap icon
+ * - Main title about near future (futur proche)
+ * - Blue gradient header background
+ * - Tip box with lightbulb icon
+ * - Fade-in animation on mount
+ */
 function LessonHeader() {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
@@ -157,6 +279,20 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual indicator of lesson progress.
+ *
+ * Displays:
+ * - Number of completed sections out of total (8)
+ * - Animated progress bar with gradient fill
+ * - Percentage completion
+ *
+ * @param reviewedSections - Array of section IDs that have been reviewed
+ */
 function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   const totalSections = sectionIds.length
   const completedSections = reviewedSections.length
@@ -175,11 +311,40 @@ function ProgressBar({ reviewedSections }: { reviewedSections: SectionId[] }) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionProps Interface
+// =============================================================================
+
+/**
+ * SectionProps - Common props for all lesson section components.
+ */
 interface SectionProps {
   isReviewed: boolean
   onMarkReviewed: () => void
 }
 
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Clickable header to expand/collapse content
+ * - Auto-mark-as-reviewed when opened
+ * - Icon showing review status (checkmark when reviewed)
+ * - Animated expand/collapse with AnimatePresence
+ * - Color-coded header (blue when pending, green when reviewed)
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ * @param children - Section content to display when expanded
+ * @param defaultOpen - Whether section starts expanded
+ */
 function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, children, defaultOpen = false }: {
   id: string
   title: string
@@ -220,6 +385,18 @@ function SectionCard({ id, title, icon: Icon, isReviewed, onMarkReviewed, childr
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: IntroSection
+// =============================================================================
+
+/**
+ * IntroSection - Introduction to the near future tense concept.
+ *
+ * Content:
+ * - Explanation of aller + infinitive structure
+ * - Quick examples showing the pattern
+ * - Pro tip about this being an essential everyday structure
+ */
 function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="intro" title="What is the Near Future with Aller?" icon={FaLightbulb} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -250,6 +427,18 @@ function IntroSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: FormulaSection
+// =============================================================================
+
+/**
+ * FormulaSection - Displays the grammatical formula for near future.
+ *
+ * Content:
+ * - Visual formula: Subject + aller (present) + infinitive
+ * - Grid of 6 example sentences with different subjects
+ * - Reminder that aller changes but the second verb stays infinitive
+ */
 function FormulaSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="formula" title="Formula and Structure" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -278,6 +467,18 @@ function FormulaSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ConjugationSection
+// =============================================================================
+
+/**
+ * ConjugationSection - Table showing aller conjugation in present tense.
+ *
+ * Content:
+ * - 3-column table: Pronoun, Form, Full
+ * - All 6 subject pronouns with their forms
+ * - Visual reference for using aller in near future
+ */
 function ConjugationSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="conjugation" title="Conjugation Recap of Aller" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -303,6 +504,18 @@ function ConjugationSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: InfinitivesSection
+// =============================================================================
+
+/**
+ * InfinitivesSection - Grid of common verbs to use after aller.
+ *
+ * Content:
+ * - 10 common infinitives in a 2-3 column grid
+ * - Each shows French infinitive and English meaning
+ * - Everyday actions like manger, parler, étudier, etc.
+ */
 function InfinitivesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="infinitives" title="Common Infinitives with Aller" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -322,6 +535,18 @@ function InfinitivesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ComparisonSection
+// =============================================================================
+
+/**
+ * ComparisonSection - Side-by-side present vs near future comparison.
+ *
+ * Content:
+ * - 3 comparison cards showing present and near future versions
+ * - Each card shows French and English for both tenses
+ * - Key difference explanation box
+ */
 function ComparisonSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="comparison" title="Present vs Near Future" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -357,6 +582,18 @@ function ComparisonSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ExamplesSection
+// =============================================================================
+
+/**
+ * ExamplesSection - Full near future sentences with audio buttons.
+ *
+ * Content:
+ * - 6 guided example sentences
+ * - French sentence with English translation
+ * - Audio playback button for each example
+ */
 function ExamplesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="examples" title="Guided Examples" icon={FaBookOpen} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -377,6 +614,18 @@ function ExamplesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: MistakesSection
+// =============================================================================
+
+/**
+ * MistakesSection - Shows common errors learners make.
+ *
+ * Content:
+ * - 4 common mistakes with wrong/correct comparison
+ * - Visual distinction: red for wrong, green for correct
+ * - Explanation of why each mistake is wrong
+ */
 function MistakesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   return (
     <SectionCard id="mistakes" title="Common Beginner Mistakes" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed}>
@@ -409,6 +658,29 @@ function MistakesSection({ isReviewed, onMarkReviewed }: SectionProps) {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: PracticeSection
+// =============================================================================
+
+/**
+ * PracticeSection - Interactive 15-question quiz with feedback.
+ *
+ * Features:
+ * - Multiple-choice questions with 4 options each
+ * - Visual feedback on selection (blue highlight)
+ * - Correct/incorrect indication after submission (green/red)
+ * - Random encouraging feedback messages
+ * - Progress bar showing quiz progress
+ * - Results screen with score and performance message
+ * - Retake option for low scores
+ * - Continue anyway option
+ *
+ * @param isReviewed - Whether practice section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ * @param practiceAnswers - Array of user's submitted answers
+ * @param setPracticeAnswers - Setter for practice answers state
+ * @param onComplete - Callback when user completes/continues from practice
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -591,6 +863,26 @@ function PracticeSection({
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: CompletionSection
+// =============================================================================
+
+/**
+ * CompletionSection - Lesson completion UI with score display.
+ *
+ * Features:
+ * - Two states: incomplete (prompts to complete sections) vs complete (shows results)
+ * - Score display with percentage calculation
+ * - Success message about what was learned
+ * - Navigation buttons: Review Lessons or Continue to Lesson 2
+ * - "Mark Lesson Complete" button when sections and practice are done
+ *
+ * @param isComplete - Whether the lesson is marked as complete
+ * @param canComplete - Whether all sections and practice are done (enables complete button)
+ * @param score - Number of correct practice answers
+ * @param total - Total number of practice questions (15)
+ * @param onComplete - Callback to mark lesson as complete
+ */
 function CompletionSection({
   isComplete,
   canComplete,

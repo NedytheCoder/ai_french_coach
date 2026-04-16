@@ -1,6 +1,59 @@
-// A2 Lesson 12 — Relative Pronouns: Qui, Que, Où
-// Data and content for the lesson
+/**
+ * A2 Lesson 12 - Relative Pronouns: Qui, Que, Où
+ * ==================================================
+ *
+ * This file contains all lesson data for A2 Lesson 12, focusing on the
+ * French relative pronouns qui, que, and où used to join sentences and
+ * avoid repetition.
+ *
+ * **Lesson Content:**
+ * - Understanding qui (replaces subject)
+ * - Understanding que (replaces direct object)
+ * - Understanding où (replaces place/time)
+ * - Qui vs Que comparison
+ * - How to join sentences using relative pronouns
+ * - 18 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Qui = who/that (subject of second clause)
+ * - Que = whom/that (direct object of second clause)
+ * - Où = where/when (place or time)
+ * - Join two sentences by replacing the repeated noun
+ * - Que becomes qu' before vowel/silent h
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. quiExamples - Examples using qui
+ * 3. queExamples - Examples using que
+ * 4. ouExamples - Examples using où
+ * 5. quiVsQueComparisons - Qui vs Que side-by-side
+ * 6. joiningSteps - How to join sentences
+ * 7. guidedExamples - Example sentences for study
+ * 8. commonMistakes - Common errors to avoid
+ * 9. practiceQuestions - 18 quiz questions
+ * 10. getPerformanceMessage - Score-based feedback
+ */
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to relative pronouns
+ * 2. what-are-relative - Understanding relative pronouns
+ * 3. understanding-qui - How to use qui
+ * 4. understanding-que - How to use que
+ * 5. understanding-ou - How to use où
+ * 6. qui-vs-que - Comparing qui and que
+ * 7. joining-sentences - How to join sentences
+ * 8. guided-examples - Example sentences
+ * 9. mistakes - Common errors
+ * 10. practice - Interactive quiz
+ * 11. completion - Lesson completion
+ */
 export const sectionIds = [
   "intro",
   "what-are-relative",
@@ -15,7 +68,18 @@ export const sectionIds = [
   "completion",
 ];
 
-// Section 2 — Understanding qui
+// =============================================================================
+// UNDERSTANDING QUI (Section 2)
+// =============================================================================
+
+/**
+ * quiExamples - Examples of sentences using the relative pronoun qui.
+ *
+ * Qui is used when the repeated noun is the SUBJECT of the second clause.
+ * It replaces who/that/which in English.
+ *
+ * Pattern: Noun + qui + verb (the noun does the action)
+ */
 export const quiExamples = [
   {
     before: "Voici le professeur. Le professeur parle.",
@@ -37,7 +101,19 @@ export const quiExamples = [
   },
 ];
 
-// Section 3 — Understanding que
+// =============================================================================
+// UNDERSTANDING QUE (Section 3)
+// =============================================================================
+
+/**
+ * queExamples - Examples of sentences using the relative pronoun que.
+ *
+ * Que is used when the repeated noun is the DIRECT OBJECT of the second clause.
+ * It replaces whom/that/which in English.
+ * Before a vowel or silent h, que becomes qu'.
+ *
+ * Pattern: Noun + que/qu' + subject + verb (the noun receives the action)
+ */
 export const queExamples = [
   {
     before: "Je connais la femme. Tu regardes la femme.",
@@ -65,7 +141,20 @@ export const queExamples = [
   },
 ];
 
-// Section 4 — Understanding où
+// =============================================================================
+// UNDERSTANDING OÙ (Section 4)
+// =============================================================================
+
+/**
+ * ouExamples - Examples of sentences using the relative pronoun où.
+ *
+ * Où is used when the repeated noun refers to a PLACE or TIME.
+ * It replaces where/when in English.
+ *
+ * Used for:
+ * - Places (ville, restaurant, maison)
+ * - Times (jour, moment, année)
+ */
 export const ouExamples = [
   {
     before: "Voici la ville. J'habite dans cette ville.",
@@ -87,7 +176,20 @@ export const ouExamples = [
   },
 ];
 
-// Section 5 — Qui vs Que comparison
+// =============================================================================
+// QUI VS QUE COMPARISON (Section 5)
+// =============================================================================
+
+/**
+ * quiVsQueComparisons - Side-by-side comparison of qui and que.
+ *
+ * Key distinction:
+ * - Qui = subject (who/that does the action)
+ * - Que = direct object (who/that receives the action)
+ *
+ * Ask: Who is doing the action? If it's the repeated noun, use qui.
+ * If the repeated noun receives the action, use que.
+ */
 export const quiVsQueComparisons = [
   {
     sentenceWithQui: "Le garçon qui parle est mon frère.",
@@ -106,7 +208,19 @@ export const quiVsQueComparisons = [
   },
 ];
 
-// Section 6 — How relative pronouns join sentences
+// =============================================================================
+// HOW RELATIVE PRONOUNS JOIN SENTENCES (Section 6)
+// =============================================================================
+
+/**
+ * joiningSteps - Step-by-step guide to joining sentences with relative pronouns.
+ *
+ * Steps:
+ * 1. Identify the two sentences with the repeated noun
+ * 2. Determine if the repeated noun is subject, object, or place/time
+ * 3. Choose the appropriate relative pronoun (qui, que, où)
+ * 4. Replace the repeated noun with the pronoun
+ */
 export const joiningSteps = [
   {
     type: "qui",
@@ -131,7 +245,15 @@ export const joiningSteps = [
   },
 ];
 
-// Section 7 — Guided examples
+// =============================================================================
+// GUIDED EXAMPLES (Section 7)
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing qui, que, and où in natural French sentences.
+ */
 export const guidedExamples = [
   {
     french: "J'ai un voisin qui joue du piano.",
@@ -159,7 +281,21 @@ export const guidedExamples = [
   },
 ];
 
-// Section 8 — Common mistakes
+// =============================================================================
+// COMMON MISTAKES (Section 8)
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Common errors:
+ * - Using que instead of qui for subjects
+ * - Using qui instead of que for objects
+ * - Using que instead of où for places
+ * - Forgetting que becomes qu' before vowels
+ *
+ * Each mistake shows wrong form, correct form, and explanation.
+ */
 export const commonMistakes = [
   {
     wrong: "Le professeur que parle est gentil.",
@@ -183,7 +319,27 @@ export const commonMistakes = [
   },
 ];
 
-// Section 9 — Practice questions
+// =============================================================================
+// PRACTICE QUESTIONS (Section 9) - 18 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 18-question quiz for Lesson 12.
+ *
+ * Topics covered:
+ * - qui (1-6): Using qui for subjects
+ * - que (7-11): Using que for direct objects
+ * - ou (12-15): Using où for places and times
+ * - mixed (16-18): Choosing the correct pronoun
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   {
     id: 1,
@@ -391,7 +547,22 @@ export const practiceQuestions = [
   },
 ];
 
-// Performance messages based on score
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/18: "Good effort" - suggests review of qui, que, où distinction
+ * - 8-13/18: "Nice progress" - encourages continued learning
+ * - 14-18/18: "Great job" - celebrates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (18)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) {
     return {

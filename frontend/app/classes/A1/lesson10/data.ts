@@ -1,3 +1,43 @@
+/**
+ * A1 Lesson 10 - Negation Data
+ * ==============================
+ *
+ * This file contains all lesson data for A1 Lesson 10, focusing on French negation.
+ * The lesson covers:
+ * - ne...pas (not) - the most common negation
+ * - Other negations: jamais, plus, rien, personne, guerre
+ * - Negation in passé composé (around the auxiliary)
+ * - Important patterns: ne → n', de replacing un/une/des
+ *
+ * Data Categories:
+ * ----------------
+ * 1. nePasExamples (3 items) - Positive to negative sentence transformations
+ * 2. negations (5 items) - Other common negation forms with meanings and examples
+ * 3. passeComposeNegation (3 items) - Negation in passé composé examples
+ * 4. guidedExamples (8 items) - Full sentences with tense tags
+ * 5. practiceQuestions (20 items) - Multiple-choice quiz questions
+ *
+ * Practice Topics:
+ * ----------------
+ * - nepas: ne...pas usage and placement (6 questions)
+ * - other: Other negations jamais/plus/rien/personne/guerre (6 questions)
+ * - passe-compose: Negation in passé composé (4 questions)
+ * - structure: General structure recognition (4 questions)
+ */
+
+// =============================================================================
+// NE...PAS EXAMPLES
+// =============================================================================
+
+/**
+ * nePasExamples - Shows how affirmative sentences become negative.
+ *
+ * Demonstrates:
+ * - Basic ne...pas wrapping around the verb
+ * - ne → n' before vowels (n'aime)
+ * - ne → n' before silent h (n'habite)
+ * - de replacing un/une/des in negatives (pas de chien)
+ */
 export const nePasExamples = [
   {
     french: "Je parle français.",
@@ -16,6 +56,20 @@ export const nePasExamples = [
   }
 ]
 
+// =============================================================================
+// OTHER NEGATION FORMS
+// =============================================================================
+
+/**
+ * negations - Collection of other common French negation forms.
+ *
+ * All follow the same ne...[word] structure as ne...pas:
+ * - ne...jamais = never
+ * - ne...plus = no longer / no more
+ * - ne...rien = nothing
+ * - ne...personne = nobody / no one
+ * - ne...guerre = hardly / barely (less common)
+ */
 export const negations = [
   {
     form: "ne...jamais",
@@ -44,14 +98,44 @@ export const negations = [
   }
 ]
 
+// =============================================================================
+// PASSÉ COMPOSÉ NEGATION
+// =============================================================================
+
+/**
+ * passeComposeNegation - Examples of negation in passé composé.
+ *
+ * Key rule: Negation wraps around the auxiliary (avoir/être), NOT the past participle.
+ * Pattern: ne + auxiliary + negation word + past participle
+ */
 export const passeComposeNegation = [
   { french: "Je n’ai pas mangé.", english: "I did not eat." },
   { french: "Elle n’est jamais arrivée.", english: "She never arrived." },
   { french: "Nous n’avons rien vu.", english: "We saw nothing." }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * GuidedExample Type
+ * ------------------
+ * French sentence with English translation and tense classification.
+ */
 export type GuidedExample = { french: string; english: string; tag: 'present' | 'passe-compose' }
 
+/**
+ * guidedExamples - Full sentences demonstrating negation patterns.
+ *
+ * Mix of present tense and passé composé examples showing:
+ * - ne...pas in present (Je ne parle pas)
+ * - ne...jamais (Elle n'aime jamais)
+ * - ne...plus (Nous ne travaillons plus)
+ * - ne...rien (Je ne vois rien)
+ * - Passé composé with avoir (Je n'ai pas mangé)
+ * - Passé composé with être (Elle n'est jamais arrivée)
+ */
 export const guidedExamples: GuidedExample[] = [
   { french: "Je ne parle pas français.", english: "I do not speak French.", tag: "present" },
   { french: "Elle n’aime jamais le café.", english: "She never likes coffee.", tag: "present" },
@@ -63,8 +147,25 @@ export const guidedExamples: GuidedExample[] = [
   { french: "Je n’ai plus travaillé.", english: "I didn’t work anymore / I no longer worked.", tag: "passe-compose" }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * PracticeTopic Types
+ * -------------------
+ * - nepas: ne...pas usage and placement
+ * - other: Other negations (jamais, plus, rien, personne, guerre)
+ * - passe-compose: Negation in passé composé
+ * - structure: General negation structure recognition
+ */
 export type PracticeTopic = "nepas" | "other" | "passe-compose" | "structure"
 
+/**
+ * PracticeQuestion Type
+ * ---------------------
+ * Multiple-choice question for negation concepts.
+ */
 export type PracticeQuestion = {
   id: number
   topic: PracticeTopic
@@ -74,6 +175,15 @@ export type PracticeQuestion = {
   explanation: string
 }
 
+/**
+ * practiceQuestions - 20 questions testing negation knowledge.
+ *
+ * Question distribution:
+ * - IDs 1-6: ne...pas usage and placement
+ * - IDs 7-12: Other negations (jamais, plus, rien, personne, guerre)
+ * - IDs 13-16: Passé composé negation
+ * - IDs 17-20: General structure recognition
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   // 6 ne...pas usage
   {

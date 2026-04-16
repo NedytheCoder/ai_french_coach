@@ -1,16 +1,73 @@
+/**
+ * A1 Lesson 8 - French Adjectives and Adverbs Page
+ * ==================================================
+ *
+ * This page implements A1 Lesson 8, teaching French adjectives and adverbs.
+ * The lesson covers common adjectives with gender agreement, adjective placement,
+ * common adverbs, and the distinction between adjectives and adverbs.
+ *
+ * Page Structure:
+ * ---------------
+ * 1. Header with back navigation and lesson title
+ * 2. Progress bar showing lesson completion (sticky)
+ * 3. Eight collapsible content sections:
+ *    - What is an adjective?
+ *    - Common A1 adjectives (with audio)
+ *    - Adjective agreement (masculine/feminine)
+ *    - Adjective placement (before/after noun)
+ *    - What is an adverb?
+ *    - Common A1 adverbs
+ *    - Compare: Adjectives vs Adverbs
+ *    - Guided examples with audio
+ * 4. Interactive Practice (16 questions)
+ * 5. Completion section with score display
+ *
+ * State Management:
+ * -----------------
+ * - reviewedSections: Record tracking which sections have been opened
+ * - currentlyPlaying: ID of currently playing audio
+ * - currentPracticeIndex: Current question in practice quiz
+ * - practiceAnswers: User's answers with correctness tracking
+ * - selectedOption: Currently selected option in practice
+ * - showFeedback: Whether to show answer feedback
+ * - showResults: Whether to show practice results
+ * - showCompletion: Whether to show lesson completion card
+ *
+ * Key Features:
+ * -------------
+ * - Audio playback for adjectives and examples
+ * - Collapsible sections that auto-mark as reviewed when opened
+ * - Interactive practice quiz with immediate feedback
+ * - Topic-based question categorization
+ * - Progress tracking with visual progress bar
+ */
+
 'use client'
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and memoization
 import { useMemo, useRef, useState } from 'react'
+
+// Framer Motion for smooth animations
 import { motion, AnimatePresence } from 'framer-motion'
+
+// Font Awesome icons for UI elements
 import {
-  FaArrowRight,
-  FaCheck,
-  FaChevronRight,
-  FaHome,
-  FaPlay,
-  FaRedoAlt
+  FaArrowRight,   // Navigation and action buttons
+  FaCheck,        // Completion checkmarks
+  FaChevronRight, // Navigation arrows
+  FaHome,         // Back to lessons link
+  FaPlay,         // Audio play button
+  FaRedoAlt       // Retake practice
 } from 'react-icons/fa'
+
+// Next.js navigation
 import Link from 'next/link'
+
+// Lesson data imports
 import {
   adjectives,
   adverbs,
@@ -21,25 +78,58 @@ import {
   type PracticeTopic
 } from './data'
 
-type SectionKey =
-  | 'whatAdj'
-  | 'commonAdj'
-  | 'agreement'
-  | 'placement'
-  | 'whatAdv'
-  | 'commonAdv'
-  | 'compare'
-  | 'guided'
+// =============================================================================
+// TYPE DEFINITIONS
+// =============================================================================
 
+/**
+ * SectionKey - Union type of all section identifiers.
+ * Used for tracking which sections have been reviewed.
+ */
+type SectionKey =
+  | 'whatAdj'      // What is an adjective?
+  | 'commonAdj'    // Common A1 adjectives
+  | 'agreement'    // Adjective agreement
+  | 'placement'    // Adjective placement
+  | 'whatAdv'      // What is an adverb?
+  | 'commonAdv'    // Common A1 adverbs
+  | 'compare'      // Compare adjectives vs adverbs
+  | 'guided'       // Guided examples
+
+/**
+ * SectionReview - Record type mapping section keys to review status.
+ */
 type SectionReview = Record<SectionKey, boolean>
 
+/**
+ * PracticeAnswer - Structure for a single practice answer.
+ */
 type PracticeAnswer = {
   questionId: number
   selectedOption: number
   isCorrect: boolean
 }
 
+/**
+ * A1Lesson8Page - Main component for A1 Lesson 8: Adjectives and Adverbs
+ *
+ * Manages the complete lesson flow including 8 content sections,
+ * audio playback, and an interactive 16-question practice quiz.
+ */
+/**
+ * A1Lesson8Page - Main component implementation
+ *
+ * Manages lesson state, audio playback, practice quiz, and completion tracking.
+ */
 export default function A1Lesson8Page() {
+  // ===========================================================================
+  // STATE: Section Review Tracking
+  // ===========================================================================
+
+  /**
+   * reviewedSections - Tracks which of the 8 sections have been opened/reviewed.
+   * Each section is initially false and set to true when expanded.
+   */
   const [reviewedSections, setReviewedSections] = useState<SectionReview>({
     whatAdj: false,
     commonAdj: false,
@@ -51,22 +141,81 @@ export default function A1Lesson8Page() {
     guided: false
   })
 
+  // ===========================================================================
+  // STATE: Audio Playback
+  // ===========================================================================
+
+  /**
+   * currentlyPlaying - ID of the audio currently playing (null if none).
+   * Used to show playing state on audio buttons.
+   */
   const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null)
+
+  /**
+   * audioRef - Ref to the currently playing HTMLAudioElement.
+   * Used to pause audio when switching to a new one.
+   */
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // ===========================================================================
+  // STATE: Practice Quiz
+  // ===========================================================================
+
+  /**
+   * currentPracticeIndex - Index of the current practice question (0-15).
+   */
   const [currentPracticeIndex, setCurrentPracticeIndex] = useState(0)
+
+  /**
+   * practiceAnswers - Array of user's answers to practice questions.
+   * Stores question ID, selected option, and correctness.
+   */
   const [practiceAnswers, setPracticeAnswers] = useState<PracticeAnswer[]>([])
+
+  /**
+   * selectedOption - Index of the currently selected option in practice.
+   * Null if no option selected yet.
+   */
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
+
+  /**
+   * showFeedback - Whether to show answer feedback (correct/incorrect).
+   * Set to true after submitting an answer.
+   */
   const [showFeedback, setShowFeedback] = useState(false)
 
+  /**
+   * showResults - Whether to show the practice results screen.
+   * Set to true after completing all 16 questions.
+   */
   const [showResults, setShowResults] = useState(false)
+
+  /**
+   * showCompletion - Whether to show the lesson completion card.
+   * Set to true when user chooses to continue from results.
+   */
   const [showCompletion, setShowCompletion] = useState(false)
 
+  // ===========================================================================
+  // COMPUTED: Progress and Scores
+  // ===========================================================================
+
+  /** True when all 8 sections have been reviewed */
   const allSectionsReviewed = Object.values(reviewedSections).every(Boolean)
+
+  /** True when all 16 practice questions have been answered */
   const practiceComplete = practiceAnswers.length === practiceQuestions.length
+
+  /** Count of correct answers from the practice quiz */
   const correctAnswers = practiceAnswers.filter(a => a.isCorrect).length
+
+  /** Percentage score (0-100) based on correct answers */
   const percentage = Math.round((correctAnswers / practiceQuestions.length) * 100)
 
+  /**
+   * topicCounts - Memoized count of answered questions by topic.
+   * Used to show topic breakdown in practice metadata.
+   */
   const topicCounts = useMemo(() => {
     return practiceAnswers.reduce<Record<PracticeTopic, number>>(
       (acc, a) => {
@@ -79,6 +228,16 @@ export default function A1Lesson8Page() {
     )
   }, [practiceAnswers])
 
+  // ===========================================================================
+  // HANDLER: Audio Playback
+  // ===========================================================================
+
+  /**
+   * playAudio - Plays audio for a given source and tracks playing state.
+   *
+   * @param audioSrc - URL to the audio file
+   * @param id - Unique identifier for the audio (for tracking playing state)
+   */
   const playAudio = (audioSrc: string, id: string) => {
     if (audioRef.current) {
       audioRef.current.pause()
@@ -96,15 +255,36 @@ export default function A1Lesson8Page() {
     audio.onended = () => setCurrentlyPlaying(null)
   }
 
+  // ===========================================================================
+  // HANDLER: Section Review
+  // ===========================================================================
+
+  /**
+   * markSectionReviewed - Marks a section as reviewed.
+   *
+   * @param section - The section key to mark as reviewed
+   */
   const markSectionReviewed = (section: SectionKey) => {
     setReviewedSections(prev => ({ ...prev, [section]: true }))
   }
 
+  // ===========================================================================
+  // HANDLERS: Practice Quiz
+  // ===========================================================================
+
+  /**
+   * handlePracticeAnswer - Selects an option in the practice quiz.
+   *
+   * @param optionIndex - Index of the selected option
+   */
   const handlePracticeAnswer = (optionIndex: number) => {
     if (showFeedback) return
     setSelectedOption(optionIndex)
   }
 
+  /**
+   * submitAnswer - Submits the selected answer and shows feedback.
+   */
   const submitAnswer = () => {
     if (selectedOption === null) return
     const currentQuestion = practiceQuestions[currentPracticeIndex]
@@ -116,6 +296,9 @@ export default function A1Lesson8Page() {
     setShowFeedback(true)
   }
 
+  /**
+   * nextQuestion - Advances to the next practice question or shows results.
+   */
   const nextQuestion = () => {
     const nextIndex = currentPracticeIndex + 1
     setSelectedOption(null)
@@ -124,6 +307,9 @@ export default function A1Lesson8Page() {
     if (nextIndex >= practiceQuestions.length) setShowResults(true)
   }
 
+  /**
+   * retakePractice - Resets the practice quiz to start over.
+   */
   const retakePractice = () => {
     setCurrentPracticeIndex(0)
     setPracticeAnswers([])
@@ -133,17 +319,31 @@ export default function A1Lesson8Page() {
     setShowCompletion(false)
   }
 
+  /**
+   * continueFromResults - Continues from results screen to completion card.
+   */
   const continueFromResults = () => {
     setShowResults(false)
     setShowCompletion(true)
   }
 
+  // ===========================================================================
+  // COMPUTED: Lesson Completion
+  // ===========================================================================
+
+  /** True when all sections reviewed and practice completed */
   const lessonReadyToComplete = allSectionsReviewed && practiceComplete
+
+  /** True when lesson is ready and completion card is shown */
   const lessonComplete = lessonReadyToComplete && showCompletion
 
+  // ===========================================================================
+  // RENDER: Main Page Layout
+  // ===========================================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50 pb-32">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Back to home */}
         <div className="mb-6">
           <Link
             href="/classes/A1"
@@ -154,15 +354,26 @@ export default function A1Lesson8Page() {
           </Link>
         </div>
 
+        {/* ---------------------------------------------------------------
+            HEADER: Lesson title and description
+            --------------------------------------------------------------- */}
         <LessonHeader />
 
+        {/* ---------------------------------------------------------------
+            PROGRESS BAR: Visual progress indicator (sticky)
+            Shows section review count and practice progress
+            --------------------------------------------------------------- */}
         <ProgressBar
           reviewedSections={reviewedSections}
           practiceProgress={practiceAnswers.length}
           totalPractice={practiceQuestions.length}
         />
 
-        {/* 2. What is an adjective? */}
+        {/* ---------------------------------------------------------------
+            CONTENT SECTIONS: 8 collapsible lesson sections
+            --------------------------------------------------------------- */}
+
+        {/* Section 1: What is an adjective? */}
         <SectionCard
           title="What is an adjective?"
           subtitle="Words that describe nouns"
@@ -194,7 +405,7 @@ export default function A1Lesson8Page() {
           </div>
         </SectionCard>
 
-        {/* 3. Common A1 adjectives */}
+        {/* Section 2: Common A1 adjectives */}
         <SectionCard
           title="Common A1 adjectives"
           subtitle="Masculine + feminine forms"
@@ -219,7 +430,7 @@ export default function A1Lesson8Page() {
           </div>
         </SectionCard>
 
-        {/* 4. Agreement */}
+        {/* Section 3: Adjective agreement */}
         <SectionCard
           title="Adjective agreement"
           subtitle="Masculine/feminine + singular/plural (basic)"
@@ -266,7 +477,7 @@ export default function A1Lesson8Page() {
           </div>
         </SectionCard>
 
-        {/* 5. Placement */}
+        {/* Section 4: Adjective placement */}
         <SectionCard
           title="Adjective placement"
           subtitle="Before vs after the noun"
@@ -288,7 +499,7 @@ export default function A1Lesson8Page() {
           </div>
         </SectionCard>
 
-        {/* 6. What is an adverb? */}
+        {/* Section 5: What is an adverb? */}
         <SectionCard
           title="What is an adverb?"
           subtitle="Words that modify verbs"
@@ -379,7 +590,7 @@ export default function A1Lesson8Page() {
           </div>
         </SectionCard>
 
-        {/* 9. Guided examples */}
+        {/* Section 8: Guided examples with audio */}
         <SectionCard
           title="Guided examples"
           subtitle="Read, notice patterns, then copy"
@@ -403,7 +614,9 @@ export default function A1Lesson8Page() {
           </div>
         </SectionCard>
 
-        {/* 10. Practice */}
+        {/* ---------------------------------------------------------------
+            PRACTICE SECTION: Interactive 16-question quiz
+            --------------------------------------------------------------- */}
         <div className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md">
@@ -426,7 +639,7 @@ export default function A1Lesson8Page() {
                   totalQuestions={practiceQuestions.length}
                   selectedOption={selectedOption}
                   showFeedback={showFeedback}
-                  onSelectOption={handlePracticeAnswer}
+                  onSelect={handlePracticeAnswer}
                   onSubmit={submitAnswer}
                   onNext={nextQuestion}
                 />
@@ -556,6 +769,14 @@ export default function A1Lesson8Page() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: LessonHeader
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title, badge, and description.
+ * Features a gradient banner with lesson info.
+ */
 function LessonHeader() {
   return (
     <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
@@ -575,6 +796,20 @@ function LessonHeader() {
   )
 }
 
+// =============================================================================
+// SUB-COMPONENT: ProgressBar
+// =============================================================================
+
+/**
+ * ProgressBar - Visual progress indicator for lesson completion.
+ *
+ * Props:
+ * - reviewedSections: Record of reviewed section statuses
+ * - practiceProgress: Number of practice questions answered
+ * - totalPractice: Total number of practice questions
+ *
+ * Features sticky positioning at top of viewport.
+ */
 function ProgressBar({
   reviewedSections,
   practiceProgress,
@@ -620,22 +855,42 @@ function ProgressBar({
   )
 }
 
+/**
+ * SectionCard - Reusable collapsible card wrapper for lesson sections.
+ *
+ * Props:
+ * - title: Section title
+ * - subtitle: Section subtitle
+ * - icon: Emoji icon for the section
+ * - isReviewed: Whether section has been reviewed
+ * - onMarkReviewed: Callback when section is marked as reviewed
+ * - children: Section content
+ * - defaultOpen: Whether section starts expanded
+ * - index: Index for animation delay
+ *
+ * Features:
+ * - Auto-marks as reviewed when expanded
+ * - Animated expand/collapse
+ * - Visual review status indicator
+ */
 function SectionCard({
   title,
   subtitle,
   icon,
   isReviewed,
   onMarkReviewed,
-  index,
-  children
+  children,
+  defaultOpen = false,
+  index
 }: {
   title: string
   subtitle: string
   icon: string
   isReviewed: boolean
   onMarkReviewed: () => void
-  index: number
   children: React.ReactNode
+  defaultOpen?: boolean
+  index: number
 }) {
   const colors = [
     'from-purple-500 to-pink-500',
@@ -679,6 +934,27 @@ function SectionCard({
   )
 }
 
+// =============================================================================
+// HELPER COMPONENT: AdjectiveCard
+// =============================================================================
+
+/**
+ * AdjectiveCard - Displays an adjective with masculine/feminine forms.
+ *
+ * Props:
+ * - masculine: Masculine form of the adjective
+ * - feminine: Feminine form of the adjective
+ * - english: English translation
+ * - example: Example phrase using the adjective
+ * - isPlaying: Whether audio is currently playing
+ * - onPlay: Callback to play audio
+ * - index: Index for color cycling
+ *
+ * Features:
+ * - Color-coded by index
+ * - Audio playback button
+ * - Shows gender forms and example
+ */
 function AdjectiveCard({
   masculine,
   feminine,
@@ -770,6 +1046,17 @@ function WordCard({
   )
 }
 
+// =============================================================================
+// HELPER COMPONENT: ExampleCard
+// =============================================================================
+
+/**
+ * ExampleCard - Displays a set of example phrases for a grammar rule.
+ *
+ * Props:
+ * - title: Title of the example set
+ * - examples: Array of French/English example pairs
+ */
 function ExampleCard({
   title,
   examples
@@ -792,6 +1079,18 @@ function ExampleCard({
   )
 }
 
+// =============================================================================
+// HELPER COMPONENT: PlacementCard
+// =============================================================================
+
+/**
+ * PlacementCard - Displays an adjective placement example.
+ *
+ * Props:
+ * - french: French example phrase
+ * - english: English translation
+ * - index: Index for animation delay
+ */
 function PlacementCard({ french, english, index }: { french: string; english: string; index: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }} className="bg-white rounded-2xl p-5 border border-slate-200">
@@ -801,6 +1100,20 @@ function PlacementCard({ french, english, index }: { french: string; english: st
   )
 }
 
+// =============================================================================
+// HELPER COMPONENT: CompareCard
+// =============================================================================
+
+/**
+ * CompareCard - Side-by-side comparison card for adjectives vs adverbs.
+ *
+ * Props:
+ * - title: Title of the card (Adjective or Adverb)
+ * - bullets: List of characteristic bullet points
+ * - exampleFrench: French example sentence
+ * - exampleEnglish: English translation
+ * - accent: Color theme ('purple' or 'blue')
+ */
 function CompareCard({
   title,
   bullets,
@@ -845,6 +1158,21 @@ function CompareCard({
   )
 }
 
+// =============================================================================
+// HELPER COMPONENT: GuidedExampleCard
+// =============================================================================
+
+/**
+ * GuidedExampleCard - Individual guided example display with audio.
+ *
+ * Props:
+ * - french: French example sentence
+ * - english: English translation
+ * - focus: Focus point explaining the grammar concept
+ * - isPlaying: Whether audio is currently playing
+ * - onPlay: Callback to play audio
+ * - index: Index for animation delay
+ */
 function GuidedExampleCard({
   french,
   english,
@@ -885,6 +1213,18 @@ function GuidedExampleCard({
   )
 }
 
+// =============================================================================
+// HELPER COMPONENT: PracticeMetaRow
+// =============================================================================
+
+/**
+ * PracticeMetaRow - Displays practice progress and topic breakdown.
+ *
+ * Props:
+ * - answered: Number of questions answered
+ * - total: Total number of questions
+ * - counts: Record of answered questions by topic
+ */
 function PracticeMetaRow({
   answered,
   total,
@@ -909,6 +1249,16 @@ function PracticeMetaRow({
   )
 }
 
+// =============================================================================
+// HELPER COMPONENT: Chip
+// =============================================================================
+
+/**
+ * Chip - Small badge component for topic labels.
+ *
+ * Props:
+ * - label: Text to display in the chip
+ */
 function Chip({ label }: { label: string }) {
   return (
     <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">
@@ -917,13 +1267,26 @@ function Chip({ label }: { label: string }) {
   )
 }
 
+/**
+ * PracticeCard - Individual practice question card with options and feedback.
+ *
+ * Props:
+ * - question: Current practice question data
+ * - questionNumber: Current question number (1-16)
+ * - totalQuestions: Total number of questions (16)
+ * - selectedOption: Index of selected option (null if none)
+ * - showFeedback: Whether to show answer feedback
+ * - onSelect: Callback when an option is selected
+ * - onSubmit: Callback to submit answer
+ * - onNext: Callback to advance to next question
+ */
 function PracticeCard({
   question,
   questionNumber,
   totalQuestions,
   selectedOption,
   showFeedback,
-  onSelectOption,
+  onSelect,
   onSubmit,
   onNext
 }: {
@@ -932,7 +1295,7 @@ function PracticeCard({
   totalQuestions: number
   selectedOption: number | null
   showFeedback: boolean
-  onSelectOption: (index: number) => void
+  onSelect: (index: number) => void
   onSubmit: () => void
   onNext: () => void
 }) {
@@ -961,7 +1324,7 @@ function PracticeCard({
         {question.options.map((option, idx) => (
           <button
             key={idx}
-            onClick={() => onSelectOption(idx)}
+            onClick={() => onSelect(idx)}
             disabled={showFeedback}
             className={`w-full p-4 rounded-xl border-2 text-left font-medium transition-all ${
               showFeedback
@@ -1035,6 +1398,15 @@ function PracticeCard({
   )
 }
 
+/**
+ * ResultsCard - Displays practice quiz results with score and feedback.
+ *
+ * Props:
+ * - score: Number of correct answers
+ * - total: Total number of questions
+ * - onRetake: Callback to retake the practice
+ * - onContinue: Callback to continue to completion
+ */
 function ResultsCard({
   score,
   total,
@@ -1101,6 +1473,17 @@ function ResultsCard({
   )
 }
 
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
+
+/**
+ * exampleForAdjective - Generates an example phrase for an adjective.
+ *
+ * @param masc - Masculine form of the adjective
+ * @param fem - Feminine form of the adjective
+ * @returns Example phrase showing both forms
+ */
 function exampleForAdjective(masc: string, fem: string) {
   if (masc === 'grand') return `un grand livre → une ${fem} maison`
   if (masc === 'petit') return `un petit chat → une ${fem} maison`
@@ -1115,18 +1498,26 @@ function exampleForAdjective(masc: string, fem: string) {
   return `un ${masc} ... → une ${fem} ...`
 }
 
+/**
+ * exampleForAdverb - Returns an example sentence for an adverb.
+ *
+ * @param word - The adverb to get an example for
+ * @returns Example sentence using the adverb
+ */
 function exampleForAdverb(word: string) {
-  if (word === 'bien') return 'Elle travaille bien.'
-  if (word === 'mal') return 'Il chante mal.'
-  if (word === 'vite') return 'Je marche vite.'
-  if (word === 'lentement') return 'Il parle lentement.'
-  if (word === 'souvent') return 'Je viens souvent.'
-  if (word === 'toujours') return 'Elle est toujours ici.'
-  if (word === 'parfois') return 'Nous sortons parfois.'
-  if (word === 'ici') return 'Je suis ici.'
-  if (word === 'là') return 'Le livre est là.'
-  if (word === 'très') return 'C’est très facile.'
-  return `... ${word}.`
+  const examples: Record<string, string> = {
+    bien: 'Elle travaille bien.',
+    mal: 'Il chante mal.',
+    vite: 'Il court vite.',
+    lentement: 'Elle parle lentement.',
+    souvent: 'Nous allons souvent au parc.',
+    toujours: 'Il est toujours ponctuel.',
+    parfois: 'Nous mangeons parfois tard.',
+    ici: 'Je suis ici.',
+    là: 'Il est là.',
+    très: 'C’est très bon.'
+  }
+  return examples[word] || ''
 }
 
 

@@ -1,9 +1,60 @@
+/**
+ * B1 Lesson 4 - Reported Speech (Le Discours Rapporté)
+ * =====================================================
+ *
+ * This page teaches B1 learners how to report what others say in French,
+ * covering indirect speech transformations.
+ *
+ * **Lesson Structure:**
+ * 1. LessonHeader - Title and introduction using lessonMeta
+ * 2. DirectVsReportedSection - Comparison of direct and reported speech
+ * 3. ReportingVerbsSection - Common reporting verbs (dire que, demander si)
+ * 4. StatementsSection - How to report statements
+ * 5. QuestionsSection - How to report questions (yes/no and WH)
+ * 6. TenseSection - Tense consistency rules
+ * 7. MistakesSection - Common errors to avoid
+ * 8. PracticeSection - Interactive quiz (15 questions)
+ * 9. CompletionSection - Lesson completion with recap
+ *
+ * **Key Concepts:**
+ * - Use "que" for statements, "si" for yes/no questions
+ * - Pronouns change: je → il/elle, nous → ils/elles
+ * - Remove quotation marks in reported speech
+ * - WH-questions keep their question word
+ *
+ * **Features:**
+ * - Uses shared B1 components (SectionCard, ProgressBar, PracticeSection, etc.)
+ * - Teal accent color theme
+ * - localStorage persistence for progress
+ * - 15-question interactive quiz
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations
 import { motion } from "framer-motion";
-import { FaQuoteLeft, FaExchangeAlt, FaQuestionCircle, FaComments, FaBalanceScale, FaExclamationTriangle } from "react-icons/fa";
+
+// React Icons for UI elements
+import {
+  FaQuoteLeft,      // Statements section
+  FaExchangeAlt,    // Direct vs reported section
+  FaQuestionCircle, // Questions section
+  FaComments,       // Reporting verbs section
+  FaBalanceScale,   // Tense section
+  FaExclamationTriangle, // Mistakes section
+} from "react-icons/fa";
+
+// Shared B1 components
 import { SectionCard, ProgressBar, PracticeSection, CompletionSection, LessonNav } from "../components";
+
+// Lesson data imports
 import {
   sectionIds,
   lessonMeta,
@@ -17,6 +68,16 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Uses lessonMeta from data.ts for dynamic title and subtitle.
+ * Features teal/cyan gradient background.
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-teal-500 to-cyan-400 rounded-2xl p-8 text-white shadow-lg">
@@ -29,6 +90,14 @@ function LessonHeader() {
   );
 }
 
+/**
+ * DirectVsReportedSection - Comparison of direct and reported speech.
+ *
+ * Content:
+ * - Side-by-side examples showing transformation
+ * - Pronoun changes and tense adjustments
+ * - Visual distinction between direct and reported forms
+ */
 function DirectVsReportedSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="direct-vs-reported" title="Direct vs Reported Speech" icon={FaExchangeAlt} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -55,6 +124,16 @@ function DirectVsReportedSection({ isReviewed, onMarkReviewed }: { isReviewed: b
   );
 }
 
+/**
+ * ReportingVerbsSection - Common verbs used for reporting speech.
+ *
+ * Content:
+ * - dire que (say that)
+ * - expliquer que (explain that)
+ * - demander si (ask if)
+ * - demander pourquoi (ask why)
+ * - savoir si (know if)
+ */
 function ReportingVerbsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="reporting-verbs" title="Common Reporting Verbs" icon={FaComments} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -76,6 +155,15 @@ function ReportingVerbsSection({ isReviewed, onMarkReviewed }: { isReviewed: boo
   );
 }
 
+/**
+ * StatementsSection - How to report statements.
+ *
+ * Content:
+ * - Use dire que + statement
+ * - Pronoun changes (je → il/elle, nous → ils/elles)
+ * - Remove quotation marks
+ * - Examples with notes
+ */
 function StatementsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="reporting-statements" title="Reporting Statements" icon={FaQuoteLeft} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -100,6 +188,14 @@ function StatementsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * QuestionsSection - How to report questions.
+ *
+ * Content:
+ * - Yes/No questions: use si
+ * - WH-questions: keep question word (pourquoi, quand, etc.)
+ * - Examples of both types
+ */
 function QuestionsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="reporting-questions" title="Reporting Questions" icon={FaQuestionCircle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -122,6 +218,14 @@ function QuestionsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean;
   );
 }
 
+/**
+ * TenseSection - Tense consistency in reported speech.
+ *
+ * Content:
+ * - Present reporting verb: tense usually stays the same
+ * - Past reporting verb: present → imparfait
+ * - B1 level focuses on present tense reporting
+ */
 function TenseSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="tense-changes" title="Tense Changes" icon={FaBalanceScale} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -144,6 +248,15 @@ function TenseSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onM
   );
 }
 
+/**
+ * MistakesSection - Common errors in reported speech.
+ *
+ * Content:
+ * - Forgetting to use "que"
+ * - Using "que" instead of "si" for questions
+ * - Not changing pronouns
+ * - Keeping quotation marks
+ */
 function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="mistakes" title="Common Mistakes" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -162,12 +275,37 @@ function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson4Page - Main component for B1 Lesson 4.
+ *
+ * Manages:
+ * - Section review state
+ * - Practice quiz score and completion
+ * - Progress persistence to localStorage
+ * - Uses shared B1 components with teal accent color
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson4Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("b1Lesson4Progress");
@@ -177,34 +315,70 @@ export default function Lesson4Page() {
         setReviewedSections(parsed.reviewedSections || []);
         setPracticeScore(parsed.practiceScore || 0);
         setPracticeCompleted(parsed.practiceCompleted || false);
-      } catch {}
+      } catch {
+        // Invalid saved data, ignore
+      }
     }
   }, []);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("b1Lesson4Progress", JSON.stringify({ reviewedSections, practiceScore, practiceCompleted }));
     }
   }, [reviewedSections, practiceScore, practiceCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => { setReviewedSections((prev) => (prev.includes(id) ? prev : [...prev, id])); };
+
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => { setPracticeScore(score); setPracticeCompleted(true); };
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => Math.round((reviewedSections.length / sectionIds.length) * 100), [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) return <div className="min-h-screen bg-gradient-to-br from-teal-50 to-slate-50 flex items-center justify-center"><div className="text-teal-600">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Navigation */}
         <LessonNav backPath="/classes/B1" />
+
+        {/* Lesson Header with title from lessonMeta */}
         <LessonHeader />
+
+        {/* Progress Bar */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100"><ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" accentColor="teal" /></div>
+
+        {/* Lesson Sections - In Order of Instruction */}
         <DirectVsReportedSection isReviewed={reviewedSections.includes("direct-vs-reported")} onMarkReviewed={handleMarkReviewed} />
         <ReportingVerbsSection isReviewed={reviewedSections.includes("reporting-verbs")} onMarkReviewed={handleMarkReviewed} />
         <StatementsSection isReviewed={reviewedSections.includes("reporting-statements")} onMarkReviewed={handleMarkReviewed} />
         <QuestionsSection isReviewed={reviewedSections.includes("reporting-questions")} onMarkReviewed={handleMarkReviewed} />
         <TenseSection isReviewed={reviewedSections.includes("tense-changes")} onMarkReviewed={handleMarkReviewed} />
         <MistakesSection isReviewed={reviewedSections.includes("mistakes")} onMarkReviewed={handleMarkReviewed} />
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-teal-50 to-white">
             <h2 className="text-xl font-semibold text-slate-800">Guided Interactive Practice</h2>
@@ -213,6 +387,8 @@ export default function Lesson4Page() {
             <PracticeSection questions={practiceQuestions} isReviewed={reviewedSections.includes("practice")} onMarkReviewed={handleMarkReviewed} onComplete={handlePracticeComplete} getPerformanceMessage={getPerformanceMessage} accentColor="teal" />
           </div>
         </div>
+
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection lessonNumber={4} lessonTitle={lessonMeta.title} practiceScore={practiceScore} totalQuestions={practiceQuestions.length} nextLessonPath="/classes/B1/lesson5" recapItems={["Direct vs reported speech", "Using dire que for statements", "Using demander si for yes/no questions", "Pronoun changes", "Common reporting verbs"]} accentColor="teal" />
         )}

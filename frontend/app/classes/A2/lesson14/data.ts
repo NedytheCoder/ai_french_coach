@@ -1,6 +1,56 @@
-// A2 Lesson 14 — Adverbs of Frequency, Quantity, and Manner
+/**
+ * A2 Lesson 14 - Adverbs of Frequency, Quantity, and Manner
+ * =============================================================
+ *
+ * This file contains all lesson data for A2 Lesson 14, focusing on using
+ * adverbs to add detail and precision to French sentences.
+ *
+ * **Lesson Content:**
+ * - Frequency adverbs (toujours, souvent, parfois, rarement, jamais)
+ * - Quantity adverbs (très, trop, beaucoup, assez, peu, presque)
+ * - Manner adverbs (lentement, rapidement, bien, mal)
+ * - Position of adverbs in sentences
+ * - Adjective vs adverb formation (-ment suffix)
+ * - Common mistakes to avoid
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Adverbs modify verbs, adjectives, or other adverbs
+ * - Many French adverbs end in -ment (from -e or -ement)
+ * - Position: usually after the verb they modify
+ * - Frequency adverbs often come before the main verb
+ *
+ * **Data Categories:**
+ * 1. frequencyAdverbs
+ * 2. quantityAdverbs
+ * 3. mannerAdverbs
+ * 4. positionExamples
+ * 5. adjectiveToAdverbExamples
+ * 6. commonMistakes
+ * 7. practiceQuestions
+ * 8. sectionIds / SectionId
+ * 9. getPerformanceMessage
+ */
+
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ */
 export const sectionIds = ["intro", "what-is-adverb", "frequency", "quantity", "manner", "position", "adjective-vs-adverb", "guided-examples", "mistakes", "practice", "completion"];
 
+// =============================================================================
+// FREQUENCY ADVERBS
+// =============================================================================
+
+/**
+ * frequencyAdverbs - Common adverbs expressing how often something happens.
+ *
+ * These adverbs answer the question "how often?" and typically
+ * come near the verb they modify.
+ */
 export const frequencyAdverbs = [
   { word: "toujours", english: "always", example: "Je suis toujours en retard.", exampleEnglish: "I am always late." },
   { word: "souvent", english: "often", example: "Nous allons souvent au cinéma.", exampleEnglish: "We often go to the cinema." },
@@ -10,6 +60,16 @@ export const frequencyAdverbs = [
   { word: "jamais", english: "never", example: "Il ne boit jamais de café.", exampleEnglish: "He never drinks coffee." },
 ];
 
+// =============================================================================
+// QUANTITY ADVERBS
+// =============================================================================
+
+/**
+ * quantityAdverbs - Common adverbs expressing amount or degree.
+ *
+ * These adverbs answer the question "how much?" or "to what degree?"
+ * and can modify verbs, adjectives, or other adverbs.
+ */
 export const quantityAdverbs = [
   { word: "très", english: "very", example: "Elle est très gentille.", exampleEnglish: "She is very kind." },
   { word: "trop", english: "too / too much", example: "Tu travailles trop.", exampleEnglish: "You work too much." },
@@ -20,6 +80,16 @@ export const quantityAdverbs = [
   { word: "environ", english: "about / approximately", example: "Il y a environ vingt personnes.", exampleEnglish: "There are about twenty people." },
 ];
 
+// =============================================================================
+// MANNER ADVERBS
+// =============================================================================
+
+/**
+ * mannerAdverbs - Common adverbs expressing how something is done.
+ *
+ * These adverbs answer the question "how?" and typically come after
+ * the verb they modify. Many end in -ment (from adjective + ment).
+ */
 export const mannerAdverbs = [
   { word: "lentement", english: "slowly", example: "Il marche lentement.", exampleEnglish: "He walks slowly." },
   { word: "rapidement", english: "quickly", example: "Elle répond rapidement.", exampleEnglish: "She answers quickly." },
@@ -30,6 +100,19 @@ export const mannerAdverbs = [
   { word: "mal", english: "badly", example: "Je dors mal ici.", exampleEnglish: "I sleep badly here." },
 ];
 
+// =============================================================================
+// POSITION PATTERNS
+// =============================================================================
+
+/**
+ * positionPatterns - Common patterns for adverb placement in French sentences.
+ *
+ * Key patterns:
+ * - Adverb after simple verb
+ * - Frequency adverb near the verb
+ * - Très + adjective/adverb
+ * - Auxiliary + adverb + participle (in compound tenses)
+ */
 export const positionPatterns = [
   { pattern: "verb + adverb", example: "Il parle bien.", english: "He speaks well." },
   { pattern: "frequency adverb near the verb", example: "Je vais souvent au marché.", english: "I often go to the market." },
@@ -37,11 +120,31 @@ export const positionPatterns = [
   { pattern: "auxiliary + adverb + participle", example: "Nous avons beaucoup appris.", english: "We learned a lot." },
 ];
 
+// =============================================================================
+// ADJECTIVE VS ADVERB
+// =============================================================================
+
+/**
+ * adjectiveVsAdverb - Examples showing the difference between adjectives and adverbs.
+ *
+ * Adjectives describe nouns (agree in gender/number).
+ * Adverbs describe verbs, adjectives, or other adverbs (invariable).
+ */
 export const adjectiveVsAdverb = [
   { adjectiveSentence: "C'est une voiture rapide.", adjectiveEnglish: "It is a fast car.", adverbSentence: "Elle conduit rapidement.", adverbEnglish: "She drives quickly.", explanation: "Rapide describes the noun voiture. Rapidement describes the verb conduit." },
   { adjectiveSentence: "C'est un garçon calme.", adjectiveEnglish: "He is a calm boy.", adverbSentence: "Il parle calmement.", adverbEnglish: "He speaks calmly.", explanation: "Calme is an adjective. Calmement is an adverb." },
 ];
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing adverbs in everyday French sentences,
+ * combining different types of adverbs.
+ */
 export const guidedExamples = [
   { french: "Je vais souvent à la bibliothèque.", english: "I often go to the library." },
   { french: "Elle travaille beaucoup pendant la semaine.", english: "She works a lot during the week." },
@@ -51,6 +154,21 @@ export const guidedExamples = [
   { french: "Malheureusement, le train est en retard.", english: "Unfortunately, the train is late." },
 ];
 
+// =============================================================================
+// COMMON MISTAKES
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Common errors:
+ * - Using adjective instead of adverb (bon vs bien)
+ * - Incorrect position of adverbs
+ * - Stacking adverbs incorrectly
+ * - Wrong placement in compound tenses
+ *
+ * Each mistake shows wrong form, correct form, and explanation.
+ */
 export const commonMistakes = [
   { wrong: "Il parle bon.", correct: "Il parle bien.", explanation: "Use the adverb bien, not the adjective bon, to describe how someone speaks." },
   { wrong: "Je vais au cinéma souvent toujours.", correct: "Je vais souvent au cinéma.", explanation: "Avoid stacking frequency adverbs incorrectly. Use one clear adverb in a natural position." },
@@ -58,6 +176,28 @@ export const commonMistakes = [
   { wrong: "Nous avons travaillé beaucoup.", correct: "Nous avons beaucoup travaillé.", explanation: "In compound tenses, common adverbs often go between the auxiliary and the participle." },
 ];
 
+// =============================================================================
+// PRACTICE QUESTIONS - 18 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 18-question quiz for Lesson 14.
+ *
+ * Topics covered:
+ * - frequency (1-5): Recognizing and placing frequency adverbs
+ * - quantity (6-10): Recognizing and placing quantity adverbs
+ * - manner (11-14): Recognizing and using manner adverbs correctly
+ * - position (15-16): Adverb placement in sentences
+ * - correction (17-18): Fixing common mistakes
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   { id: 1, topic: "frequency", prompt: "Which adverb means 'often'?", options: ["souvent", "jamais", "très"], correct: 0, explanation: "Souvent means often." },
   { id: 2, topic: "frequency", prompt: "Choose the correct sentence.", options: ["Je vais souvent au marché.", "Je vais au marché souvent toujours.", "Je souvent vais au marché."], correct: 0, explanation: "Souvent is correctly placed near the verb." },
@@ -79,6 +219,22 @@ export const practiceQuestions = [
   { id: 18, topic: "correction", prompt: "Choose the corrected sentence.", options: ["Nous avons travaillé beaucoup.", "Nous avons beaucoup travaillé.", "Nous beaucoup avons travaillé."], correct: 1, explanation: "In compound tenses, common adverbs often go between the auxiliary and the participle." },
 ];
 
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/18: "Good effort" - suggests review of adverb types
+ * - 8-13/18: "Nice progress" - encourages continued learning
+ * - 14-18/18: "Great job" - celebrates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (18)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) {
     return { title: "Good effort", message: "French adverbs take time because meaning and position both matter. You can retake the practice or continue the lesson. A quick review of the three adverb types will help a lot.", emoji: "📚", color: "blue" };

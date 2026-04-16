@@ -1,6 +1,60 @@
-// A2 Lesson 9 — The Passive Voice
-// Data and content for the lesson
+/**
+ * A2 Lesson 9 - The Passive Voice (La Voix Passive)
+ * ====================================================
+ *
+ * This file contains all lesson data for A2 Lesson 9, focusing on how to form
+ * and use the passive voice in French with être + past participle.
+ *
+ * **Lesson Content:**
+ * - Understanding active vs passive voice
+ * - Forming the passive: être + past participle
+ * - Past participle agreement with subject
+ * - Using "par" to indicate the agent
+ * - Passive in different tenses (present, passé composé, imparfait, future)
+ * - When to use passive voice appropriately
+ * - 15 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Passive = être + past participle (agrees with subject)
+ * - Agent introduced by "par" (when specified)
+ * - Direct object of active becomes subject of passive
+ * - Used when focus is on the action/recipient, not the doer
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. activeVsPassiveExamples - Active vs passive comparisons
+ * 3. passiveFormationSteps - Step-by-step formation guide
+ * 4. agreementExamples - Past participle agreement examples
+ * 5. agentExamples - Using "par" for the agent
+ * 6. tenseExamples - Passive in different tenses
+ * 7. passiveUses - When to use passive voice
+ * 8. guidedExamples - Example sentences for study
+ * 9. commonMistakes - Common errors to avoid
+ * 10. practiceQuestions - 15 quiz questions
+ * 11. getPerformanceMessage - Score-based feedback
+ */
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to passive voice
+ * 2. what-is-passive - Understanding passive concept
+ * 3. active-vs-passive - Side-by-side comparisons
+ * 4. formation - How to form the passive
+ * 5. agreement - Past participle agreement
+ * 6. agent - Using "par" for the agent
+ * 7. tenses - Passive in different tenses
+ * 8. when-to-use - Appropriate contexts
+ * 9. guided-examples - Example sentences
+ * 10. mistakes - Common errors
+ * 11. practice - Interactive quiz
+ * 12. completion - Lesson completion
+ */
 export const sectionIds = [
   "intro",
   "what-is-passive",
@@ -16,7 +70,18 @@ export const sectionIds = [
   "completion",
 ];
 
-// Section 2 — Active vs Passive examples
+// =============================================================================
+// ACTIVE VS PASSIVE EXAMPLES (Section 2)
+// =============================================================================
+
+/**
+ * activeVsPassiveExamples - Side-by-side active and passive sentence pairs.
+ *
+ * Shows how the same idea is expressed differently:
+ * - Active: Subject does the action
+ * - Passive: Subject receives the action
+ * - Both French and English translations provided
+ */
 export const activeVsPassiveExamples = [
   {
     active: "Le professeur explique la leçon.",
@@ -38,7 +103,20 @@ export const activeVsPassiveExamples = [
   },
 ];
 
-// Section 3 — Passive formation steps
+// =============================================================================
+// PASSIVE FORMATION STEPS (Section 3)
+// =============================================================================
+
+/**
+ * passiveFormationSteps - Step-by-step guide to forming passive sentences.
+ *
+ * Steps demonstrated:
+ * 1. Identify direct object in active sentence
+ * 2. Move it to subject position
+ * 3. Conjugate être in appropriate tense
+ * 4. Use past participle of main verb
+ * 5. Add par + agent if needed
+ */
 export const passiveFormationSteps = [
   {
     active: "Le chef prépare le repas.",
@@ -60,7 +138,23 @@ export const passiveFormationSteps = [
   },
 ];
 
-// Section 4 — Agreement examples
+// =============================================================================
+// AGREEMENT EXAMPLES (Section 4)
+// =============================================================================
+
+/**
+ * agreementExamples - Past participle agreement in passive voice.
+ *
+ * The past participle must agree with the subject in:
+ * - Gender (masculine/feminine)
+ * - Number (singular/plural)
+ *
+ * Examples show all four combinations:
+ * - Masculine singular (no ending)
+ * - Feminine singular (+e)
+ * - Masculine plural (+s)
+ * - Feminine plural (+es)
+ */
 export const agreementExamples = [
   {
     french: "Le livre est lu.",
@@ -84,7 +178,19 @@ export const agreementExamples = [
   },
 ];
 
-// Section 5 — Agent examples
+// =============================================================================
+// AGENT EXAMPLES (Section 5)
+// =============================================================================
+
+/**
+ * agentExamples - Using "par" to introduce the agent.
+ *
+ * The agent (person/thing doing the action) can be:
+ * - Omitted (when unknown or unimportant)
+ * - Included with "par" (when specifying who did it)
+ *
+ * Shows both versions with and without agent.
+ */
 export const agentExamples = [
   {
     withoutAgent: "La porte est fermée.",
@@ -100,7 +206,19 @@ export const agentExamples = [
   },
 ];
 
-// Section 6 — Tense examples
+// =============================================================================
+// TENSE EXAMPLES (Section 6)
+// =============================================================================
+
+/**
+ * tenseExamples - Passive voice in different tenses.
+ *
+ * By changing the tense of "être", the passive can appear in:
+ * - Present (est)
+ * - Imparfait (était)
+ * - Futur simple (sera)
+ * - Passé composé (a été)
+ */
 export const tenseExamples = [
   {
     tense: "present",
@@ -124,7 +242,18 @@ export const tenseExamples = [
   },
 ];
 
-// Section 7 — When to use passive
+// =============================================================================
+// WHEN TO USE PASSIVE (Section 7)
+// =============================================================================
+
+/**
+ * passiveUses - Appropriate contexts for using passive voice.
+ *
+ * Use passive when:
+ * - The result is more important than the doer
+ * - The agent is unknown
+ * - The sentence needs to sound more formal or neutral
+ */
 export const passiveUses = [
   {
     title: "The result is more important",
@@ -143,7 +272,16 @@ export const passiveUses = [
   },
 ];
 
-// Section 8 — Guided examples
+// =============================================================================
+// GUIDED EXAMPLES (Section 8)
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing passive voice in everyday French,
+ * including different tenses and with/without agents.
+ */
 export const guidedExamples = [
   {
     french: "La maison est décorée pour la fête.",
@@ -171,7 +309,20 @@ export const guidedExamples = [
   },
 ];
 
-// Section 9 — Common mistakes
+// =============================================================================
+// COMMON MISTAKES (Section 9)
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Common errors:
+ * - Forgetting être
+ * - Forgetting agreement
+ * - Wrong preposition for agent (using "de" instead of "par")
+ *
+ * Each mistake shows wrong form, correct form, and explanation.
+ */
 export const commonMistakes = [
   {
     wrong: "La lettre écrit par Marie.",
@@ -195,7 +346,28 @@ export const commonMistakes = [
   },
 ];
 
-// Section 10 — Practice questions
+// =============================================================================
+// PRACTICE QUESTIONS (Section 10) - 15 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 15-question quiz for Lesson 9.
+ *
+ * Topics covered:
+ * - recognition (1-4): Identifying passive voice
+ * - formation (5-8): Transforming active to passive
+ * - agreement (9-11): Past participle agreement
+ * - agent (12-13): Using "par"
+ * - tense (14-15): Passive in different tenses
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   {
     id: 1,
@@ -371,7 +543,22 @@ export const practiceQuestions = [
   },
 ];
 
-// Performance messages based on score
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-6/15: "Good effort" - suggests review of être + past participle
+ * - 7-11/15: "Nice progress" - encourages continued learning
+ * - 12-15/15: "Great job" - celebrates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (15)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 6) {
     return {

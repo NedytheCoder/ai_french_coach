@@ -1,11 +1,54 @@
-"use client"
-import { FaGraduationCap, FaArrowRight, FaBookOpen, FaClipboardCheck, FaStar } from 'react-icons/fa'
-import { LevelLandingPage } from '../components/LevelLandingPage'
-import { LevelHeader } from '../components/LevelHeader'
-import { LearningPointsList } from '../components/LearningPointsList'
-import { EncouragementCard } from '../components/EncouragementCard'
-import { CTASection } from '../components/CTASection'
+/**
+ * A1 Level Welcome Page
+ * ======================
+ *
+ * Purpose:
+ * --------
+ * Landing page for A1 (beginner) level French learners.
+ * Introduces foundational grammar concepts and provides navigation
+ * to continue learning, review previous content, or take placement tests.
+ *
+ * Page Structure:
+ * ---------------
+ * 1. LevelHeader - Badge, title, and subtitle with indigo-purple branding
+ * 2. Intro Section - Description of A1 level objectives
+ * 3. LearningPointsList - Grammar and vocabulary topics covered
+ * 4. EncouragementCard - Motivational messages for foundational learning
+ * 5. CTASection - Navigation buttons for lessons, review, and placement test
+ *
+ * Color Scheme:
+ * -------------
+ * - Indigo/Purple gradient for A1 branding
+ * - Indigo-600 for icons and accents
+ * - Indigo-50 for card backgrounds
+ *
+ * Navigation:
+ * -----------
+ * - "Continue Learning" → /classes/A1/lesson1
+ * - "Review previous lessons" → /classes/A0
+ * - "Take placement test" → /placement-test
+ */
 
+"use client"
+
+// React Icons - Font Awesome icons for visual elements
+import { FaGraduationCap, FaArrowRight, FaBookOpen, FaClipboardCheck, FaStar } from 'react-icons/fa'
+
+// Welcome page components from shared components folder
+import { LevelLandingPage } from '../welcome_components/LevelLandingPage'
+import { LevelHeader } from '../welcome_components/LevelHeader'
+import { LearningPointsList } from '../welcome_components/LearningPointsList'
+import { EncouragementCard } from '../welcome_components/EncouragementCard'
+import { CTASection } from '../welcome_components/CTASection'
+
+/**
+ * A1LandingPage Component
+ *
+ * The main landing page for the A1 (beginner foundation) level.
+ * Composed of reusable welcome components configured for A1 branding.
+ *
+ * @returns {JSX.Element} The rendered A1 welcome page
+ */
 export default function A1LandingPage() {
   return (
     <LevelLandingPage>
@@ -18,14 +61,13 @@ export default function A1LandingPage() {
         gradientTo="to-purple-600"
       />
 
-      {/* Intro Section */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
         <p className="text-slate-700 leading-relaxed mb-4">
-          In this level, you will <strong>begin to communicate in French</strong>. 
+          In this level, you will <strong>begin to communicate in French</strong>.
           You'll move beyond individual words and start forming complete thoughts.
         </p>
         <p className="text-slate-700 leading-relaxed">
-          You'll learn grammar, vocabulary, and sentence structure — the building blocks 
+          You'll learn grammar, vocabulary, and sentence structure — the building blocks
           that make French start to make sense.
         </p>
       </div>

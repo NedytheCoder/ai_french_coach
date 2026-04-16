@@ -1,8 +1,55 @@
+/**
+ * Listening Test Level - French Listening Comprehension Assessment
+ * =================================================================
+ *
+ * This page provides an interactive listening comprehension test to assess
+ * the user's French level. Users listen to French audio clips and answer
+ * multiple-choice comprehension questions. The test progressively increases
+ * in difficulty from A0 (complete beginner) to B2 (upper intermediate).
+ *
+ * **Test Structure:**
+ * - 8 questions total (2 per CEFR level: A0, A1, A2, B1/B2)
+ * - Audio playback with transcript
+ * - Multiple choice answers (3 options per question)
+ * - 3 replays allowed per question
+ * - Transcript revealed after answering or when replays exhausted
+ *
+ * **Scoring System:**
+ * - 0-2 correct: A0 (Complete beginner)
+ * - 3-4 correct: A1 (Beginner)
+ * - 5-6 correct: A2 (Elementary)
+ * - 7 correct: B1 (Intermediate)
+ * - 8 correct: B2 (Upper intermediate)
+ *
+ * **Components:**
+ * - AudioPlayer: Custom audio player with replay controls
+ * - Main Quiz Interface: Question display, options, feedback
+ * - Results Screen: Level badge, score, motivational message
+ *
+ * **Features:**
+ * - Framer Motion animations for smooth transitions
+ * - Color-coded feedback (green for correct, red for incorrect)
+ * - Progress tracking and score display
+ * - Transcript toggle for learning support
+ * - Restart option to retake the test
+ */
+
 "use client"
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and audio refs
 import { useState, useRef, useEffect } from "react"
+// Animation library for smooth transitions and interactions
 import { motion, AnimatePresence } from "framer-motion"
+// Next.js navigation for back link and results CTA
 import Link from "next/link"
+
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
 
 /**
  * Question interface for listening comprehension test
@@ -175,16 +222,31 @@ const getFeedbackMessage = (isCorrect: boolean): string => {
   return messages[Math.floor(Math.random() * messages.length)]
 }
 
+// =============================================================================
+// AUDIO PLAYER COMPONENT
+// =============================================================================
+
 /**
- * AudioPlayer component - handles audio playback with replay limit
- * @property src - audio file source path
- * @property replaysLeft - number of replays remaining
- * @property onReplay - callback when replay is used
+ * AudioPlayer - Custom audio player with playback and replay controls.
+ *
+ * Features:
+ * - Play/pause toggle with visual feedback
+ * - Replay button with limited uses (3 per question)
+ * - Visual indicators for playing state and remaining replays
+ * - Preload audio for smoother playback
+ *
+ * @param src - Audio file source path
+ * @param replaysLeft - Number of replays remaining (0-3)
+ * @param onReplay - Callback when replay is used
  */
 function AudioPlayer({ src, replaysLeft, onReplay }: { src: string; replaysLeft: number; onReplay: () => void }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
+  /**
+   * Toggle play/pause of audio.
+   * Pausing resets audio to beginning.
+   */
   const handlePlay = () => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -198,6 +260,10 @@ function AudioPlayer({ src, replaysLeft, onReplay }: { src: string; replaysLeft:
     }
   }
 
+  /**
+   * Handle replay button click.
+   * Only works if replays are available and audio is not playing.
+   */
   const handleReplay = () => {
     if (replaysLeft > 0 && audioRef.current) {
       audioRef.current.currentTime = 0
@@ -207,10 +273,17 @@ function AudioPlayer({ src, replaysLeft, onReplay }: { src: string; replaysLeft:
     }
   }
 
+  /**
+   * Handle audio playback ended.
+   * Updates UI state to show audio is no longer playing.
+   */
   const handleEnded = () => {
     setIsPlaying(false)
   }
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
   return (
     <div className="bg-slate-50 rounded-xl p-4 mb-6">
       {/* Hidden audio element */}
@@ -273,42 +346,83 @@ function AudioPlayer({ src, replaysLeft, onReplay }: { src: string; replaysLeft:
   )
 }
 
-/**
- * Main Listening Test Component
- * French listening comprehension quiz with audio playback
- */
-export default function ListenTestLevel() {
-  // Quiz state management
-  const [currentIndex, setCurrentIndex] = useState(0)           // Current question index (0-7)
-  const [score, setScore] = useState(0)                       // Number of correct answers
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)  // Selected option
-  const [hasAnswered, setHasAnswered] = useState(false)         // Whether question is answered
-  const [isCorrect, setIsCorrect] = useState<boolean | null>(null)  // Answer correctness
-  const [showResult, setShowResult] = useState(false)           // Show results screen
-  const [feedback, setFeedback] = useState("")                // Feedback message
-  const [replaysLeft, setReplaysLeft] = useState(3)             // Replays for current question
-  const [showTranscript, setShowTranscript] = useState(false)   // Toggle transcript visibility
+// =============================================================================
+// MAIN LISTENING TEST COMPONENT
+// =============================================================================
 
+/**
+ * ListenTestLevel - Main listening comprehension quiz component.
+ *
+ * Manages the complete test flow:
+ * - 8 questions with progressive difficulty
+  * - Audio playback with limited replays
+  * - Answer selection with instant feedback
+  * - Results screen with level determination
+  *
+  * @returns JSX.Element - The listening test interface
+  */
+export default function ListenTestLevel() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+
+  // Current question index (0-7)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  // Number of correct answers so far
+  const [score, setScore] = useState(0)
+  // Currently selected answer option (null if none selected)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  // Whether current question has been answered
+  const [hasAnswered, setHasAnswered] = useState(false)
+  // Whether the selected answer was correct (null if not answered)
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
+  // Whether to show the results screen
+  const [showResult, setShowResult] = useState(false)
+  // Feedback message after answering (randomized encouraging message)
+  const [feedback, setFeedback] = useState("")
+  // Remaining replays for current question (resets to 3 each question)
+  const [replaysLeft, setReplaysLeft] = useState(3)
+  // Whether transcript is visible (available after answering or replays exhausted)
+  const [showTranscript, setShowTranscript] = useState(false)
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+
+  // Current question data from questions array
   const currentQuestion = questions[currentIndex]
+  // Progress percentage for progress bar (0-100)
   const progress = ((currentIndex + 1) / questions.length) * 100
 
+  // ---------------------------------------------------------------------------
+  // EFFECTS
+  // ---------------------------------------------------------------------------
+
   /**
-   * Reset replays when question changes
+   * Reset replays and hide transcript when question changes.
+   * Each new question starts fresh with 3 replays and hidden transcript.
    */
   useEffect(() => {
     setReplaysLeft(3)
     setShowTranscript(false)
   }, [currentIndex])
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+
   /**
-   * Handles using a replay
+   * Handle replay usage.
+   * Decrements replay counter (minimum 0).
    */
   const handleReplay = () => {
     setReplaysLeft(prev => Math.max(0, prev - 1))
   }
 
   /**
-   * Handles selecting an answer option
+   * Handle answer selection.
+   * Checks if answer is correct, updates score, shows feedback.
+   * Prevents changing answer after selection.
    */
   const handleSelectAnswer = (optionIndex: number) => {
     if (hasAnswered) return
@@ -325,7 +439,8 @@ export default function ListenTestLevel() {
   }
 
   /**
-   * Advances to next question or shows results
+   * Handle next button click.
+   * Advances to next question or shows results screen if last question.
    */
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
@@ -340,7 +455,8 @@ export default function ListenTestLevel() {
   }
 
   /**
-   * Restarts the quiz from beginning
+   * Handle restart button click.
+   * Resets all state to initial values to start quiz from beginning.
    */
   const handleRestart = () => {
     setCurrentIndex(0)
@@ -354,7 +470,11 @@ export default function ListenTestLevel() {
     setShowTranscript(false)
   }
 
-  // Results screen
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+
+  // Results screen - shown after all questions answered
   if (showResult) {
     const result = getLevelFromScore(score)
 
@@ -423,7 +543,7 @@ export default function ListenTestLevel() {
     )
   }
 
-  // Main quiz interface
+  // Main quiz interface - question card with audio and options
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-lg">

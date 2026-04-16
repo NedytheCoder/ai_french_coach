@@ -1,27 +1,74 @@
+/**
+ * A2 Lesson 8 - Advanced Prepositions (Prépositions Avancées)
+ * ================================================================
+ *
+ * This page teaches A2 learners advanced French prepositions including time
+ * prepositions (depuis, pendant, pour), and other complex prepositional usage.
+ *
+ * **Lesson Structure:**
+ * 1. IntroSection - Introduction to advanced prepositions
+ * 2. WhyHarderSection - Why these prepositions are challenging
+ * 3. TimePrepositionsSection - depuis, pendant, pour distinctions
+ * 4. LimitPrepositionsSection - jusqu'à, à partir de, avant, après
+ * 5. MovementPlaceSection - Prepositions of movement and location
+ * 6. PurposeReasonSection - pour, à cause de, grâce à
+ * 7. AdvancedExpressionsSection - Fixed prepositional phrases
+ * 8. ConfusingPairsSection - Commonly confused prepositions
+ * 9. GuidedExamplesSection - Full example sentences
+ * 10. MistakesSection - Common errors to avoid
+ * 11. PracticeSection - Interactive quiz (15 questions)
+ * 12. CompletionSection - Lesson completion UI
+ *
+ * **Key Concepts:**
+ * - depuis = since/for (action still continuing)
+ * - pendant = during/for (completed duration)
+ * - pour = for (future duration/intention)
+ * - Many prepositions have multiple meanings based on context
+ *
+ * **Features:**
+ * - Collapsible sections with auto-mark-as-reviewed
+ * - Progress persistence to localStorage
+ * - 15-question interactive quiz with feedback
+ * - Performance-based personalized messages
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations and transitions
 import { motion, AnimatePresence } from "framer-motion";
+
+// Next.js Link for navigation
 import Link from "next/link";
+
+// React Icons for UI elements
 import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaCheckCircle,
-  FaLightbulb,
-  FaClock,
-  FaMapMarkerAlt,
-  FaWalking,
-  FaBullseye,
-  FaList,
-  FaBalanceScale,
-  FaBookOpen,
-  FaExclamationTriangle,
-  FaQuestionCircle,
-  FaTrophy,
-  FaRedo,
-  FaArrowAltCircleRight,
-  FaInfoCircle,
+  FaArrowLeft,              // Back navigation
+  FaArrowRight,             // Continue/Next buttons
+  FaCheckCircle,            // Reviewed status
+  FaLightbulb,              // Introduction/tips
+  FaClock,                  // Time prepositions
+  FaMapMarkerAlt,           // Place/movement prepositions
+  FaWalking,                // Movement
+  FaBullseye,               // Purpose/target
+  FaList,                   // Lists/categories
+  FaBalanceScale,           // Comparisons/distinctions
+  FaBookOpen,               // Lesson content
+  FaExclamationTriangle,    // Mistakes/warnings
+  FaQuestionCircle,         // Practice questions
+  FaTrophy,                 // Completion badge
+  FaRedo,                   // Retake practice
+  FaArrowAltCircleRight,    // Continue navigation
+  FaInfoCircle,             // Additional info
 } from "react-icons/fa";
+
+// Lesson data imports
 import {
   sectionIds,
   timePrepositions,
@@ -37,7 +84,13 @@ import {
   getPerformanceMessage,
 } from "./data";
 
-// Types
+// =============================================================================
+// TYPES
+// =============================================================================
+
+/**
+ * SectionCardProps - Props for the collapsible section card component.
+ */
 interface SectionCardProps {
   id: string;
   title: string;
@@ -47,7 +100,26 @@ interface SectionCardProps {
   onMarkReviewed: (id: string) => void;
 }
 
-// Components
+// =============================================================================
+// SUB-COMPONENT: SectionCard
+// =============================================================================
+
+/**
+ * SectionCard - Collapsible wrapper for lesson content sections.
+ *
+ * Features:
+ * - Expandable/collapsible content with animated transitions
+ * - Auto-mark-as-reviewed when opened
+ * - Icon and title in gradient header
+ * - Visual indicator for reviewed status
+ *
+ * @param id - Section identifier
+ * @param title - Section title displayed in header
+ * @param icon - React icon component for the section
+ * @param children - Section content to display when expanded
+ * @param isReviewed - Whether this section has been reviewed
+ * @param onMarkReviewed - Callback to mark section as reviewed
+ */
 function SectionCard({
   id,
   title,
@@ -124,6 +196,15 @@ function SectionCard({
   );
 }
 
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Shows:
+ * - A2 Lesson 8 badge
+ * - Main title: "More Advanced Prepositions"
+ * - Brief description of lesson content
+ * - Instructions for learners
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-violet-600 to-purple-500 rounded-2xl p-8 text-white shadow-lg">
@@ -145,6 +226,13 @@ function LessonHeader() {
   );
 }
 
+/**
+ * ProgressBar - Visual indicator of lesson completion.
+ *
+ * @param current - Number of sections reviewed
+ * @param total - Total number of sections
+ * @param label - Label to display (e.g., "Lesson Progress")
+ */
 function ProgressBar({
   current,
   total,
@@ -174,7 +262,18 @@ function ProgressBar({
   );
 }
 
-// Section Components
+// =============================================================================
+// SECTION COMPONENTS
+// =============================================================================
+
+/**
+ * WhyHarderSection - Explains why prepositions get harder at A2 level.
+ *
+ * Content:
+ * - Comparison of beginner vs A2 prepositions
+ * - Context-dependent nature of advanced prepositions
+ * - Tips for learning prepositions through examples
+ */
 function WhyHarderSection({
   isReviewed,
   onMarkReviewed,
@@ -218,6 +317,15 @@ function WhyHarderSection({
   );
 }
 
+/**
+ * TimePrepositionsSection - depuis, pendant, pour distinctions.
+ *
+ * Content:
+ * - depuis: since/for (ongoing action)
+ * - pendant: for/during (completed duration)
+ * - pour: for (intended duration)
+ * - Visual comparison with examples
+ */
 function TimePrepositionsSection({
   isReviewed,
   onMarkReviewed,
@@ -280,6 +388,14 @@ function TimePrepositionsSection({
   );
 }
 
+/**
+ * LimitPrepositionsSection - jusqu'à, vers, envers for endpoints.
+ *
+ * Content:
+ * - jusqu'à: until/up to/as far as
+ * - vers: toward/around (direction or time)
+ * - envers: toward (attitude/behavior, not physical)
+ */
 function LimitPrepositionsSection({
   isReviewed,
   onMarkReviewed,
@@ -328,6 +444,16 @@ function LimitPrepositionsSection({
   );
 }
 
+/**
+ * MovementPlaceSection - chez, entre, parmi, à travers, au fond de.
+ *
+ * Content:
+ * - chez: at/to the home of (people, professionals)
+ * - entre: between (two or more items)
+ * - parmi: among (inside a group)
+ * - à travers: through/across (movement)
+ * - au fond de: at the back/bottom of
+ */
 function MovementPlaceSection({
   isReviewed,
   onMarkReviewed,
@@ -372,6 +498,16 @@ function MovementPlaceSection({
   );
 }
 
+/**
+ * PurposeReasonSection - pour, afin de, grâce à, à cause de.
+ *
+ * Content:
+ * - pour: for/in order to (purpose, goal, recipient)
+ * - afin de: in order to (more formal)
+ * - grâce à: thanks to (positive cause)
+ * - à cause de: because of (negative cause)
+ * - Key contrast between grâce à and à cause de
+ */
 function PurposeReasonSection({
   isReviewed,
   onMarkReviewed,
@@ -436,6 +572,17 @@ function PurposeReasonSection({
   );
 }
 
+/**
+ * AdvancedExpressionsSection - Compound preposition expressions.
+ *
+ * Content:
+ * - loin de: far from
+ * - près de: near/close to
+ * - autour de: around
+ * - au lieu de: instead of
+ * - en face de: opposite/facing
+ * - auprès de: with/near (formal)
+ */
 function AdvancedExpressionsSection({
   isReviewed,
   onMarkReviewed,
@@ -474,6 +621,15 @@ function AdvancedExpressionsSection({
   );
 }
 
+/**
+ * ConfusingPairsSection - Comparison of similar prepositions.
+ *
+ * Pairs covered:
+ * - depuis vs pendant (ongoing vs completed)
+ * - pour vs pendant (intended vs actual)
+ * - vers vs jusqu'à (direction vs endpoint)
+ * - grâce à vs à cause de (positive vs negative)
+ */
 function ConfusingPairsSection({
   isReviewed,
   onMarkReviewed,
@@ -517,6 +673,11 @@ function ConfusingPairsSection({
   );
 }
 
+/**
+ * GuidedExamplesSection - Collection of example sentences for study.
+ *
+ * Various contexts showing advanced prepositions in everyday French.
+ */
 function GuidedExamplesSection({
   isReviewed,
   onMarkReviewed,
@@ -555,6 +716,14 @@ function GuidedExamplesSection({
   );
 }
 
+/**
+ * MistakesSection - Common errors and how to avoid them.
+ *
+ * Content:
+ * - Warning about English-French differences
+ * - Wrong vs correct examples
+ * - Detailed explanations for each mistake
+ */
 function MistakesSection({
   isReviewed,
   onMarkReviewed,
@@ -604,6 +773,24 @@ function MistakesSection({
   );
 }
 
+/**
+ * PracticeSection - Interactive quiz for Lesson 8.
+ *
+ * Features:
+ * - 18 questions testing advanced preposition knowledge
+ * - Multiple choice format
+ * - Immediate feedback with explanations
+ * - Score tracking and performance message
+ * - Option to retake or continue
+ *
+ * State:
+ * - currentQuestion - Index of current question (0-17)
+ * - selectedOption - Currently selected answer index
+ * - hasSubmitted - Whether answer has been submitted
+ * - isCorrect - Whether submitted answer was correct
+ * - score - Total correct answers
+ * - showResults - Whether to show final results screen
+ */
 function PracticeSection({
   isReviewed,
   onMarkReviewed,
@@ -878,6 +1065,17 @@ function PracticeSection({
   );
 }
 
+/**
+ * CompletionSection - Lesson completion celebration and summary.
+ *
+ * Content:
+ * - Trophy icon and congratulations message
+ * - Practice score display
+ * - Summary of learned skills
+ * - Link to next lesson
+ *
+ * @param practiceScore - Score achieved in practice quiz
+ */
 function CompletionSection({
   practiceScore,
 }: {
@@ -928,16 +1126,41 @@ function CompletionSection({
   );
 }
 
-// Main Page Component
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson8Page - Main component for A2 Lesson 8.
+ *
+ * Manages:
+ * - Section review state (which sections have been reviewed)
+ * - Practice quiz answers and score
+ * - Lesson completion status
+ * - Progress persistence to localStorage
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson8Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Practice answers map (questionId -> selectedOption)
   const [practiceAnswers, setPracticeAnswers] = useState<Record<number, number>>({});
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether entire lesson is marked complete
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
-  // Load progress from localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("a2Lesson8Progress");
@@ -955,7 +1178,9 @@ export default function Lesson8Page() {
     }
   }, []);
 
-  // Save progress to localStorage
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem(
@@ -971,23 +1196,44 @@ export default function Lesson8Page() {
     }
   }, [reviewedSections, practiceAnswers, practiceCompleted, practiceScore, lessonCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => {
     setReviewedSections((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
   };
 
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => {
     setPracticeScore(score);
     setPracticeCompleted(true);
   };
 
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => {
     const totalSections = sectionIds.length;
     const completed = reviewedSections.length;
     return Math.round((completed / totalSections) * 100);
   }, [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 to-slate-50 flex items-center justify-center">
@@ -999,7 +1245,7 @@ export default function Lesson8Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Navigation */}
+        {/* Back Navigation */}
         <div className="flex items-center gap-4">
           <Link
             href="/classes/A2"
@@ -1010,10 +1256,10 @@ export default function Lesson8Page() {
           </Link>
         </div>
 
-        {/* Header */}
+        {/* Lesson Header */}
         <LessonHeader />
 
-        {/* Progress */}
+        {/* Progress Bar - Section Review Progress */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
           <ProgressBar
             current={reviewedSections.length}
@@ -1022,7 +1268,7 @@ export default function Lesson8Page() {
           />
         </div>
 
-        {/* Sections */}
+        {/* Lesson Sections - In Order of Instruction */}
         <WhyHarderSection
           isReviewed={reviewedSections.includes("why-harder")}
           onMarkReviewed={handleMarkReviewed}
@@ -1068,7 +1314,7 @@ export default function Lesson8Page() {
           onMarkReviewed={handleMarkReviewed}
         />
 
-        {/* Practice */}
+        {/* Practice Section - 18 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-violet-50 to-white">
             <div className="flex items-center gap-4">
@@ -1089,7 +1335,7 @@ export default function Lesson8Page() {
           </div>
         </div>
 
-        {/* Completion */}
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection practiceScore={practiceScore} />
         )}

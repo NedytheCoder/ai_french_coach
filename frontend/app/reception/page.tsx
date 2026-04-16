@@ -1,8 +1,49 @@
+/**
+ * Reception Page - Manual Level Selection
+ * ==========================================
+ *
+ * This page allows users to manually select their starting French CEFR level
+ * (A0 through B2) without taking a placement test. It provides an alternative
+ * onboarding path for users who already know their proficiency level.
+ *
+ * **Page Structure:**
+ * 1. PageHeader - Introductory headline and description
+ * 2. Level selection grid - 5 selectable LevelCard components
+ * 3. ActionBar - Continue button and placement test link
+ *
+ * **Components:**
+ * - LevelCard: Animated selectable card displaying level info with selection states
+ * - PageHeader: Centered header with title and description
+ * - ActionBar: Primary CTA button and secondary navigation options
+ *
+ * **Features:**
+ * - Single-select level cards with visual feedback (purple theme when selected)
+ * - Staggered entrance animations using framer-motion
+ * - Disabled state handling for continue button
+ * - Link to placement test as alternative
+ * - Responsive design for mobile and desktop
+ *
+ * **Navigation:**
+ * - Continue → /onboarding?level={selectedLevel}
+ * - Placement test → /reception/tests/read_test_level
+ */
+
 "use client"
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React state hook
 import { useState } from "react"
+// Animation library for entrance effects and interactions
 import { motion } from "framer-motion"
+// Next.js navigation
 import Link from "next/link"
+
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
 
 /**
  * Level data interface
@@ -212,13 +253,16 @@ export default function LevelSelectionPage() {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8 sm:py-12">
       <div className="w-full max-w-2xl">
-        {/* Page header */}
+        {/* Page header with title and description */}
         <PageHeader />
 
-        {/* Level selection grid */}
+        {/* Level selection grid with staggered entrance animations */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -241,7 +285,7 @@ export default function LevelSelectionPage() {
           ))}
         </motion.div>
 
-        {/* Action bar */}
+        {/* Action bar with continue button and placement test link */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

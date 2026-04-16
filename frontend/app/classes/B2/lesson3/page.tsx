@@ -1,9 +1,63 @@
+/**
+ * B2 Lesson 3 - Historic Past (Passé Simple) & Anterior Past (Passé Antérieur)
+ * =============================================================================
+ *
+ * This page teaches B2 learners to recognize and understand literary tenses
+ * used in formal writing, literature, and journalism.
+ *
+ * **Lesson Structure:**
+ * 1. LessonNav - Navigation back to B2 lessons
+ * 2. LessonHeader - Title with stone accent color
+ * 3. ProgressBar - Lesson completion progress
+ * 4. Literary Tenses Section - Introduction via introSections
+ * 5. Passé Simple Section - Formation rules in table format
+ * 6. Recognition Examples Section - Authentic text examples
+ * 7. Passé Antérieur Section - Formation and timeline examples
+ * 8. Literary Usage Section - Where these tenses appear (table)
+ * 9. Timeline Comparison Section - All past tenses compared (table)
+ * 10. PracticeSection - Interactive quiz (15 questions)
+ * 11. CompletionSection - Lesson completion with recap
+ *
+ * **Key Concepts:**
+ * - Passé simple: Narrative past for written French only
+ * - Passé antérieur: Action completed before another past action
+ * - Recognition matters more than production at B2 level
+ * - Common irregulars: fut, eut, fit, vit, naquit, mourut
+ *
+ * **Features:**
+ * - Uses shared B2 components (SectionCard, LessonHeader, etc.)
+ * - Stone accent color theme
+ * - localStorage persistence for progress
+ * - 15-question interactive quiz
+ * - Multiple tables for formation rules and comparisons
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations
 import { motion } from "framer-motion";
-import { FaBookOpen, FaFeather, FaClock, FaHistory, FaTheaterMasks, FaBalanceScale } from "react-icons/fa";
+
+// React Icons for UI elements
+import {
+  FaBookOpen,        // Literary Tenses section
+  FaFeather,         // Passé Simple section
+  FaClock,           // Passé Antérieur section
+  FaHistory,         // Recognition Examples section
+  FaTheaterMasks,    // Literary Usage section
+  FaBalanceScale,    // Timeline Comparison section
+} from "react-icons/fa";
+
+// Shared B2 components
 import { SectionCard, ProgressBar, PracticeSection, CompletionSection, LessonNav, LessonHeader } from "../components";
+
+// Lesson data imports
 import {
   sectionIds,
   lessonMeta,
@@ -18,6 +72,21 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson3Page - Main component for B2 Lesson 3.
+ *
+ * Manages:
+ * - Section review state
+ * - Practice quiz score and completion
+ * - Progress persistence to localStorage
+ * - Uses shared B2 components with stone accent color
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson3Page() {
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
   const [practiceScore, setPracticeScore] = useState(0);
@@ -52,12 +121,19 @@ export default function Lesson3Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Navigation */}
         <LessonNav backPath="/classes/B2" />
+
+        {/* Lesson Header with title from lessonMeta */}
         <LessonHeader lessonNumber={3} title={lessonMeta.title} subtitle={lessonMeta.subtitle} accentColor="stone" />
+
+        {/* Progress Bar */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-stone-200">
           <ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" accentColor="stone" />
         </div>
 
+        {/* Lesson Sections - In Order of Instruction */}
+        {/* Literary Tenses - Introduction to why these tenses matter */}
         <SectionCard id="intro" title="Literary Tenses" icon={FaBookOpen} isReviewed={reviewedSections.includes("intro")} onMarkReviewed={handleMarkReviewed} accentColor="stone">
           <div className="space-y-6">
             {introSections.map((section, idx) => (
@@ -69,6 +145,7 @@ export default function Lesson3Page() {
           </div>
         </SectionCard>
 
+        {/* Passé Simple - Formation rules displayed in table */}
         <SectionCard id="what-is-passe-simple" title={passeSimpleInfo.title} icon={FaFeather} isReviewed={reviewedSections.includes("what-is-passe-simple")} onMarkReviewed={handleMarkReviewed} accentColor="stone">
           <div className="space-y-4">
             <p className="text-slate-700 leading-relaxed">{passeSimpleInfo.explanation}</p>
@@ -83,6 +160,7 @@ export default function Lesson3Page() {
           </div>
         </SectionCard>
 
+        {/* Recognition Examples - Authentic French text examples with passé simple */}
         <SectionCard id="recognition" title="Recognition Examples" icon={FaHistory} isReviewed={reviewedSections.includes("recognition")} onMarkReviewed={handleMarkReviewed} accentColor="stone">
           <div className="space-y-3">
             {recognitionExamples.map((ex, idx) => (
@@ -97,6 +175,7 @@ export default function Lesson3Page() {
           </div>
         </SectionCard>
 
+        {/* Passé Antérieur - Formation and timeline examples */}
         <SectionCard id="passif-anterieur" title={passeAntérieurInfo.title} icon={FaClock} isReviewed={reviewedSections.includes("passif-anterieur")} onMarkReviewed={handleMarkReviewed} accentColor="stone">
           <div className="space-y-4">
             <p className="text-slate-700">{passeAntérieurInfo.explanation}</p>
@@ -113,6 +192,7 @@ export default function Lesson3Page() {
           </div>
         </SectionCard>
 
+        {/* Literary Usage - Where passé simple appears in French writing (table) */}
         <SectionCard id="literary-usage" title="Where You Will Encounter These Tenses" icon={FaTheaterMasks} isReviewed={reviewedSections.includes("literary-usage")} onMarkReviewed={handleMarkReviewed} accentColor="stone">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -124,6 +204,7 @@ export default function Lesson3Page() {
           </div>
         </SectionCard>
 
+        {/* Timeline Comparison - All past tenses compared (table) */}
         <SectionCard id="comparison" title="Timeline Comparison" icon={FaBalanceScale} isReviewed={reviewedSections.includes("comparison")} onMarkReviewed={handleMarkReviewed} accentColor="stone">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -135,6 +216,7 @@ export default function Lesson3Page() {
           </div>
         </SectionCard>
 
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-stone-50 to-white">
             <h2 className="text-xl font-semibold text-slate-800">Guided Interactive Practice</h2>
@@ -144,6 +226,7 @@ export default function Lesson3Page() {
           </div>
         </div>
 
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection lessonNumber={3} lessonTitle={lessonMeta.title} practiceScore={practiceScore} totalQuestions={practiceQuestions.length} nextLessonPath="/classes/B2/lesson4" recapItems={["Passé simple formation", "Common irregular forms: fut, eut, fit, vit", "Passé antérieur structure", "Recognition in literary texts", "Timeline understanding"]} accentColor="stone" />
         )}

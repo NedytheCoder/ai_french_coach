@@ -1,8 +1,48 @@
+/**
+ * A1 Lesson 9 - Passé Composé (Past Tense) Data
+ * =============================================
+ *
+ * This file contains all lesson data for A1 Lesson 9, focusing on the
+ * passé composé, the French compound past tense. The lesson covers:
+ * - How the passé composé is formed (auxiliary + past participle)
+ * - Verbs using AVOIR as auxiliary
+ * - Verbs using ÊTRE as auxiliary (DR MRS VANDERTRAMP)
+ * - Gender agreement with être verbs
+ * - Distinguishing between avoir and être usage
+ *
+ * Data Categories:
+ * ----------------
+ * 1. Avoir Examples (5 items) - Verbs conjugated with avoir
+ * 2. Être Verbs (16 items) - DR MRS VANDERTRAMP verbs
+ * 3. Agreement Examples (4 items) - Gender/number agreement patterns
+ * 4. Comparison Examples (4 items) - Avoir vs être contrast
+ * 5. Guided Examples (6 items) - Full sentences for practice
+ * 6. Practice Questions (16 items) - Passé composé recognition quiz
+ *
+ * Key Concepts:
+ * -------------
+ * - Passé composé = auxiliary verb (avoir/être) + past participle
+ * - Most verbs use AVOIR as auxiliary
+ * - 16 verbs use ÊTRE (movement/state change verbs)
+ * - Être verbs agree in gender/number with subject
+ * - DR MRS VANDERTRAMP mnemonic for être verbs
+ */
+
+// =============================================================================
+// AVOIR EXAMPLES
+// =============================================================================
+
+/**
+ * Avoir Examples - Passé composé sentences using AVOIR auxiliary.
+ *
+ * Most French verbs form the passé composé with avoir.
+ * Pattern: subject + avoir conjugated + past participle
+ */
 export const avoirExamples = [
   {
     id: 1,
     infinitive: "parler",
-    sentence: "J’ai parlé français.",
+    sentence: "J'ai parlé français.",
     english: "I spoke French."
   },
   {
@@ -31,6 +71,33 @@ export const avoirExamples = [
   }
 ]
 
+// =============================================================================
+// ÊTRE VERBS (DR MRS VANDERTRAMP)
+// =============================================================================
+
+/**
+ * Être Verbs - The 16 verbs that use ÊTRE in passé composé.
+ *
+ * DR MRS VANDERTRAMP Mnemonic:
+ * D - Devenir (to become)
+ * R - Revenir (to come back)
+ * M - Monter (to go up)
+ * R - Rester (to stay)
+ * S - Sortir (to go out)
+ * V - Venir (to come)
+ * A - Aller (to go)
+ * N - Naître (to be born)
+ * D - Descendre (to go down)
+ * E - Entrer (to enter)
+ * R - Rentrer (to return home)
+ * T - Tomber (to fall)
+ * R - Retourner (to return)
+ * A - Arriver (to arrive)
+ * M - Mourir (to die)
+ * P - Partir (to leave)
+ *
+ * These verbs express movement or state changes.
+ */
 export const etreVerbs = [
   { letter: "D", infinitive: "devenir", english: "to become" },
   { letter: "R", infinitive: "revenir", english: "to come back" },
@@ -50,6 +117,19 @@ export const etreVerbs = [
   { letter: "P", infinitive: "partir", english: "to leave" }
 ]
 
+// =============================================================================
+// AGREEMENT EXAMPLES
+// =============================================================================
+
+/**
+ * Agreement Examples - Gender and number agreement with être verbs.
+ *
+ * Être verbs require the past participle to agree with the subject:
+ * - Masculine singular: no change (allé)
+ * - Feminine singular: add -e (allée)
+ * - Masculine plural: add -s (allés)
+ * - Feminine plural: add -es (allées)
+ */
 export const agreementExamples = [
   {
     id: 1,
@@ -77,10 +157,20 @@ export const agreementExamples = [
   }
 ]
 
+// =============================================================================
+// COMPARISON EXAMPLES
+// =============================================================================
+
+/**
+ * Comparison Examples - Side-by-side avoir vs être usage.
+ *
+ * Shows how the same action can use different auxiliaries
+ * depending on the verb's inherent meaning.
+ */
 export const comparisonExamples = [
   {
     type: "avoir",
-    sentence: "J’ai mangé.",
+    sentence: "J'ai mangé.",
     english: "I ate."
   },
   {
@@ -100,9 +190,19 @@ export const comparisonExamples = [
   }
 ]
 
+// =============================================================================
+// GUIDED EXAMPLES
+// =============================================================================
+
+/**
+ * Guided Examples - Full sentences demonstrating passé composé in context.
+ *
+ * Examples mix avoir and être verbs to help learners
+ * recognize and practice both auxiliary types.
+ */
 export const guidedExamples = [
   {
-    french: "J’ai parlé avec mon professeur.",
+    french: "J'ai parlé avec mon professeur.",
     english: "I spoke with my teacher."
   },
   {
@@ -127,8 +227,25 @@ export const guidedExamples = [
   }
 ]
 
+// =============================================================================
+// PRACTICE QUESTIONS
+// =============================================================================
+
+/**
+ * Practice Topic Types
+ * --------------------
+ * - recognition: Identifying passé composé structure
+ * - auxiliary: Choosing between avoir/être
+ * - vandertramp: DR MRS VANDERTRAMP verb identification
+ * - agreement: Gender/number agreement with être verbs
+ */
 export type PracticeTopic = "recognition" | "auxiliary" | "vandertramp" | "agreement"
 
+/**
+ * PracticeQuestion Type
+ * ---------------------
+ * Multiple-choice question for passé composé concepts.
+ */
 export type PracticeQuestion = {
   id: number
   topic: PracticeTopic
@@ -138,6 +255,15 @@ export type PracticeQuestion = {
   explanation: string
 }
 
+/**
+ * Practice Questions - 16 questions testing passé composé knowledge.
+ *
+ * Question distribution:
+ * - IDs 1-4: Recognition of passé composé structure
+ * - IDs 5-8: Auxiliary verb selection (avoir vs être)
+ * - IDs 9-12: DR MRS VANDERTRAMP verb identification
+ * - IDs 13-16: Gender/number agreement with être verbs
+ */
 export const practiceQuestions: PracticeQuestion[] = [
   {
     id: 1,

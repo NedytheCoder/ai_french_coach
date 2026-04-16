@@ -1,6 +1,63 @@
-// A2 Lesson 13 — Advanced Relative Pronouns
-// Data and content for the lesson
+/**
+ * A2 Lesson 13 - Advanced Relative Pronouns (Pronoms Relatifs Complexes)
+ * =========================================================================
+ *
+ * This file contains all lesson data for A2 Lesson 13, focusing on advanced
+ * French relative pronouns including ce qui, ce que, ce à quoi, ce dont,
+ * and the lequel family of pronouns.
+ *
+ * **Lesson Content:**
+ * - Understanding ce qui (subject of clause, refers to idea/action)
+ * - Understanding ce que (object of clause, refers to idea/action)
+ * - Understanding ce à quoi (with verbs taking à)
+ * - Understanding ce dont (with verbs taking de)
+ * - The lequel forms (auquel, duquel, etc.) with gender/number agreement
+ * - Comparing different forms and when to use each
+ * - 18 practice quiz questions
+ *
+ * **Key Concepts:**
+ * - Ce qui = what/which (subject)
+ * - Ce que = what/which (object), becomes ce qu' before vowels
+ * - Ce à quoi = what (with à-expressions like penser à)
+ * - Ce dont = what (with de-expressions like parler de, avoir besoin de)
+ * - Lequel/laquelle/lesquels/lesquelles + à/de contractions
+ *
+ * **Data Categories:**
+ * 1. sectionIds - Lesson section identifiers
+ * 2. ceQuiExamples - Ce qui usage examples
+ * 3. ceQueExamples - Ce que usage examples
+ * 4. ceAQuoiExamples - Ce à quoi usage examples
+ * 5. ceDontExamples - Ce dont usage examples
+ * 6. lequelForms - Lequel pronoun declension table
+ * 7. lequelExamples - Lequel usage examples
+ * 8. comparisonExamples - Side-by-side comparisons
+ * 9. guidedExamples - Example sentences for study
+ * 10. commonMistakes - Common errors to avoid
+ * 11. practiceQuestions - 18 quiz questions
+ * 12. getPerformanceMessage - Score-based feedback
+ */
 
+// =============================================================================
+// SECTION IDENTIFIERS
+// =============================================================================
+
+/**
+ * sectionIds - Array of all lesson section identifiers.
+ *
+ * Sections:
+ * 1. intro - Introduction to advanced relative pronouns
+ * 2. what-makes-advanced - Understanding the complexity
+ * 3. ce-qui - Using ce qui for subjects
+ * 4. ce-que - Using ce que for objects
+ * 5. ce-a-quoi - Using ce à quoi with à
+ * 6. ce-dont - Using ce dont with de
+ * 7. lequel-forms - The lequel pronoun family
+ * 8. comparison - Comparing different forms
+ * 9. guided-examples - Example sentences
+ * 10. mistakes - Common errors
+ * 11. practice - Interactive quiz
+ * 12. completion - Lesson completion
+ */
 export const sectionIds = [
   "intro",
   "what-makes-advanced",
@@ -16,7 +73,18 @@ export const sectionIds = [
   "completion",
 ];
 
-// Section 2 — Understanding ce qui
+// =============================================================================
+// UNDERSTANDING CE QUI (Section 2)
+// =============================================================================
+
+/**
+ * ceQuiExamples - Examples using ce qui as a relative pronoun.
+ *
+ * Ce qui means "what" or "which" and refers to an idea or action.
+ * It is used when the "what" is the SUBJECT of the relative clause.
+ *
+ * Pattern: Ce qui + verb (what does the action)
+ */
 export const ceQuiExamples = [
   {
     french: "Je comprends ce qui se passe.",
@@ -28,7 +96,19 @@ export const ceQuiExamples = [
   },
 ];
 
-// Section 3 — Understanding ce que / ce qu'
+// =============================================================================
+// UNDERSTANDING CE QUE (Section 3)
+// =============================================================================
+
+/**
+ * ceQueExamples - Examples using ce que as a relative pronoun.
+ *
+ * Ce que means "what" and refers to an idea or action.
+ * It is used when the "what" is the DIRECT OBJECT of the relative clause.
+ * Before a vowel or silent h, ce que becomes ce qu'.
+ *
+ * Pattern: Ce que/qu' + subject + verb (what receives the action)
+ */
 export const ceQueExamples = [
   {
     french: "Je sais ce que tu fais.",
@@ -40,7 +120,18 @@ export const ceQueExamples = [
   },
 ];
 
-// Section 4 — Understanding ce à quoi
+// =============================================================================
+// UNDERSTANDING CE À QUOI (Section 4)
+// =============================================================================
+
+/**
+ * ceAQuoiExamples - Examples using ce à quoi as a relative pronoun.
+ *
+ * Ce à quoi is used with verbs that take the preposition à.
+ * It means "what" or "to what" and refers to the object of à.
+ *
+ * Used with verbs like: penser à, réfléchir à, s'intéresser à
+ */
 export const ceAQuoiExamples = [
   {
     french: "Je pense à quelque chose.",
@@ -53,7 +144,18 @@ export const ceAQuoiExamples = [
   },
 ];
 
-// Section 5 — Understanding ce dont
+// =============================================================================
+// UNDERSTANDING CE DONT (Section 5)
+// =============================================================================
+
+/**
+ * ceDontExamples - Examples using ce dont as a relative pronoun.
+ *
+ * Ce dont is used with verbs and expressions that take the preposition de.
+ * It means "what" or "of which" and refers to the object of de.
+ *
+ * Used with expressions like: parler de, avoir besoin de, rêver de
+ */
 export const ceDontExamples = [
   {
     french: "Je parle de quelque chose.",
@@ -66,7 +168,23 @@ export const ceDontExamples = [
   },
 ];
 
-// Section 6 — Lequel forms
+// =============================================================================
+// LEQUEL FORMS (Section 6)
+// =============================================================================
+
+/**
+ * lequelForms - The declension table for the lequel relative pronoun.
+ *
+ * Lequel agrees in gender and number with the noun it replaces:
+ * - Masculine singular: lequel
+ * - Feminine singular: laquelle
+ * - Masculine plural: lesquels
+ * - Feminine plural: lesquelles
+ *
+ * When combined with à or de, they contract:
+ * - à + lequel = auquel, à + laquelle, auxquels, auxquelles
+ * - de + lequel = duquel, de laquelle, desquels, desquelles
+ */
 export const lequelForms = [
   {
     base: "lequel",
@@ -87,6 +205,12 @@ export const lequelForms = [
   },
 ];
 
+/**
+ * lequelExamples - Examples using lequel family pronouns.
+ *
+ * Shows practical usage of lequel/laquelle with à and de contractions.
+ * These pronouns replace specific nouns and must agree in gender/number.
+ */
 export const lequelExamples = [
   {
     french: "La table à laquelle je pense",
@@ -102,7 +226,16 @@ export const lequelExamples = [
   },
 ];
 
-// Section 7 — Simple comparison
+// =============================================================================
+// COMPARISON EXAMPLES (Section 7)
+// =============================================================================
+
+/**
+ * comparisonExamples - Side-by-side comparison of different forms.
+ *
+ * Shows when to use ce qui vs ce que, and ce à quoi vs ce dont.
+ * Helps learners distinguish between similar-looking structures.
+ */
 export const comparisonExamples = [
   {
     ceQui: "Je comprends ce qui se passe.",
@@ -116,7 +249,15 @@ export const comparisonExamples = [
   },
 ];
 
-// Section 8 — Guided examples
+// =============================================================================
+// GUIDED EXAMPLES (Section 8)
+// =============================================================================
+
+/**
+ * guidedExamples - Collection of example sentences for study.
+ *
+ * Various contexts showing advanced relative pronouns in everyday French.
+ */
 export const guidedExamples = [
   {
     french: "Ce qui me plaît, c'est la musique.",
@@ -140,7 +281,21 @@ export const guidedExamples = [
   },
 ];
 
-// Section 9 — Common mistakes
+// =============================================================================
+// COMMON MISTAKES (Section 9)
+// =============================================================================
+
+/**
+ * commonMistakes - Examples of errors learners often make.
+ *
+ * Common errors:
+ * - Using ce que instead of ce qui for subjects
+ * - Using ce qui instead of ce que for objects
+ * - Using ce que instead of ce dont with de expressions
+ * - Wrong preposition with penser (à not de)
+ *
+ * Each mistake shows wrong form, correct form, and explanation.
+ */
 export const commonMistakes = [
   {
     wrong: "Je comprends ce que se passe.",
@@ -164,7 +319,27 @@ export const commonMistakes = [
   },
 ];
 
-// Section 10 — Practice questions
+// =============================================================================
+// PRACTICE QUESTIONS (Section 10) - 18 total
+// =============================================================================
+
+/**
+ * practiceQuestions - 18-question quiz for Lesson 13.
+ *
+ * Topics covered:
+ * - ce qui / ce que (1-5): Choosing between subject and object forms
+ * - ce dont / ce à quoi (6-10): Using correct preposition forms
+ * - lequel forms (11-14): Gender/number agreement with à and de
+ * - mixed (15-18): Choosing the correct advanced relative pronoun
+ *
+ * Each question has:
+ * - id: unique identifier
+ * - topic: category for grouping
+ * - prompt: question text
+ * - options: array of 3 possible answers
+ * - correct: index of correct option (0-2)
+ * - explanation: detailed explanation of answer
+ */
 export const practiceQuestions = [
   {
     id: 1,
@@ -364,7 +539,22 @@ export const practiceQuestions = [
   },
 ];
 
-// Performance messages based on score
+// =============================================================================
+// PERFORMANCE FEEDBACK
+// =============================================================================
+
+/**
+ * getPerformanceMessage - Returns personalized feedback based on quiz score.
+ *
+ * Score ranges:
+ * - 0-7/18: "Good effort" - suggests focus on à vs de and subject vs object
+ * - 8-13/18: "Nice progress" - encourages continued learning
+ * - 14-18/18: "Great job" - celebrates mastery
+ *
+ * @param score - Number of correct answers
+ * @param total - Total number of questions (18)
+ * @returns Object with title, message, emoji, and color
+ */
 export function getPerformanceMessage(score: number, total: number) {
   if (score <= 7) {
     return {

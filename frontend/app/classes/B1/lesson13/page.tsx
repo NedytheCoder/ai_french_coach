@@ -1,9 +1,63 @@
+/**
+ * B1 Lesson 13 - Indirect Speech: Tense Changes (Discours Indirect)
+ * ===================================================================
+ *
+ * This page teaches B1 learners how tenses change in indirect/reported speech
+ * (discours indirect) in French.
+ *
+ * **Lesson Structure:**
+ * 1. LessonHeader - Title and introduction using lessonMeta
+ * 2. PresentSection - Reporting with present tense verb (no change)
+ * 3. PastSection - Reporting with past tense verb (tense shifts back)
+ * 4. ConsonanceSection - Consonance des temps with side-by-side examples
+ * 5. ExceptionsSection - Special cases (general truths)
+ * 6. MistakesSection - Common errors to avoid
+ * 7. PracticeSection - Interactive quiz (15 questions)
+ * 8. CompletionSection - Lesson completion with recap
+ *
+ * **Key Concepts:**
+ * - Present reporting: no tense change (Il dit qu'il est malade)
+ * - Past reporting: tense shifts back in time
+ *   - Présent → imparfait
+ *   - Passé composé → plus-que-parfait
+ *   - Futur → conditionnel
+ * - Consonance des temps: logical tense relationship
+ * - General truths stay present (la Terre est ronde)
+ *
+ * **Features:**
+ * - Uses shared B1 components (SectionCard, ProgressBar, PracticeSection, etc.)
+ * - Teal accent color theme
+ * - localStorage persistence for progress
+ * - 15-question interactive quiz
+ * - Comparison tables for tense changes
+ */
+
 "use client";
 
+// =============================================================================
+// IMPORTS
+// =============================================================================
+
+// React hooks for state management and side effects
 import React, { useState, useEffect, useMemo } from "react";
+
+// Framer Motion for animations
 import { motion } from "framer-motion";
-import { FaClock, FaCalendarCheck, FaBalanceScale, FaList, FaStar, FaExclamationTriangle } from "react-icons/fa";
+
+// React Icons for UI elements
+import {
+  FaClock,           // Present section
+  FaCalendarCheck,   // Past section
+  FaBalanceScale,    // Consonance section
+  FaList,            // List icon
+  FaStar,            // Exceptions section
+  FaExclamationTriangle, // Mistakes section
+} from "react-icons/fa";
+
+// Shared B1 components
 import { SectionCard, ProgressBar, PracticeSection, CompletionSection, LessonNav } from "../components";
+
+// Lesson data imports
 import {
   sectionIds,
   lessonMeta,
@@ -17,6 +71,16 @@ import {
   getPerformanceMessage,
 } from "./data";
 
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
+
+/**
+ * LessonHeader - Displays the lesson title and introduction.
+ *
+ * Uses lessonMeta from data.ts for dynamic title and subtitle.
+ * Features teal/cyan gradient background.
+ */
 function LessonHeader() {
   return (
     <div className="bg-gradient-to-br from-teal-600 to-cyan-500 rounded-2xl p-8 text-white shadow-lg">
@@ -29,6 +93,15 @@ function LessonHeader() {
   );
 }
 
+/**
+ * PresentSection - Reporting with present tense verb.
+ *
+ * Content:
+ * - When reporting verb is present (dire), tenses stay the same
+ * - Present → present
+ * - Imparfait → imparfait
+ * - Passé composé → passé composé
+ */
 function PresentSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="present-reporting" title="Reporting with Present Tense" icon={FaClock} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -48,6 +121,15 @@ function PresentSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; o
   );
 }
 
+/**
+ * PastSection - Reporting with past tense verb.
+ *
+ * Content displayed in table format:
+ * - Présent → imparfait
+ * - Passé composé → plus-que-parfait
+ * - Futur → conditionnel
+ * - Imparfait → imparfait (stays same)
+ */
 function PastSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="past-reporting" title="Reporting with Past Tense" icon={FaCalendarCheck} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -78,6 +160,15 @@ function PastSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMa
   );
 }
 
+/**
+ * ConsonanceSection - Consonance des temps (tense harmony).
+ *
+ * Content:
+ * - Explanation of consonance des temps concept
+ * - Side-by-side comparison examples:
+ *   - Present reporting vs Past reporting
+ *   - Shows how tenses shift when reporting verb is past
+ */
 function ConsonanceSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="consonance" title="Consonance des Temps" icon={FaBalanceScale} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -99,6 +190,13 @@ function ConsonanceSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * ExceptionsSection - Special cases that don't follow normal rules.
+ *
+ * Content:
+ * - General truths stay present (la Terre est ronde)
+ * - Very recent past can stay present if situation still current
+ */
 function ExceptionsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="exceptions" title="Exceptions" icon={FaStar} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -117,6 +215,14 @@ function ExceptionsSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean
   );
 }
 
+/**
+ * MistakesSection - Common errors with indirect speech tense changes.
+ *
+ * Content:
+ * - Not changing present to imparfait in past reporting
+ * - Not changing passé composé to plus-que-parfait
+ * - Not changing futur to conditionnel
+ */
 function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; onMarkReviewed: (id: string) => void }) {
   return (
     <SectionCard id="mistakes" title="Common Mistakes" icon={FaExclamationTriangle} isReviewed={isReviewed} onMarkReviewed={onMarkReviewed} accentColor="teal">
@@ -135,12 +241,37 @@ function MistakesSection({ isReviewed, onMarkReviewed }: { isReviewed: boolean; 
   );
 }
 
+// =============================================================================
+// MAIN PAGE COMPONENT
+// =============================================================================
+
+/**
+ * Lesson13Page - Main component for B1 Lesson 13.
+ *
+ * Manages:
+ * - Section review state
+ * - Practice quiz score and completion
+ * - Progress persistence to localStorage
+ * - Uses shared B1 components with teal accent color
+ *
+ * @returns JSX.Element - The lesson page
+ */
 export default function Lesson13Page() {
+  // ---------------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------------
+  // List of reviewed section IDs
   const [reviewedSections, setReviewedSections] = useState<string[]>([]);
+  // Score achieved in practice quiz
   const [practiceScore, setPracticeScore] = useState(0);
+  // Whether practice quiz is completed
   const [practiceCompleted, setPracticeCompleted] = useState(false);
+  // Hydration flag to prevent SSR/localStorage mismatch
   const [isClient, setIsClient] = useState(false);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Load Progress from localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     setIsClient(true);
     const saved = localStorage.getItem("b1Lesson13Progress");
@@ -150,33 +281,69 @@ export default function Lesson13Page() {
         setReviewedSections(parsed.reviewedSections || []);
         setPracticeScore(parsed.practiceScore || 0);
         setPracticeCompleted(parsed.practiceCompleted || false);
-      } catch {}
+      } catch {
+        // Invalid saved data, ignore
+      }
     }
   }, []);
 
+  // ---------------------------------------------------------------------------
+  // EFFECT: Save Progress to localStorage
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("b1Lesson13Progress", JSON.stringify({ reviewedSections, practiceScore, practiceCompleted }));
     }
   }, [reviewedSections, practiceScore, practiceCompleted, isClient]);
 
+  // ---------------------------------------------------------------------------
+  // HANDLERS
+  // ---------------------------------------------------------------------------
+  /**
+   * handleMarkReviewed - Marks a section as reviewed.
+   * @param id - Section identifier
+   */
   const handleMarkReviewed = (id: string) => { setReviewedSections((prev) => (prev.includes(id) ? prev : [...prev, id])); };
+
+  /**
+   * handlePracticeComplete - Updates practice score and marks as completed.
+   * @param score - Final score achieved
+   */
   const handlePracticeComplete = (score: number) => { setPracticeScore(score); setPracticeCompleted(true); };
+
+  // ---------------------------------------------------------------------------
+  // DERIVED STATE
+  // ---------------------------------------------------------------------------
+  /**
+   * progress - Calculated percentage of sections reviewed.
+   */
   const progress = useMemo(() => Math.round((reviewedSections.length / sectionIds.length) * 100), [reviewedSections]);
 
+  // ---------------------------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------------------------
+  // Show loading state during SSR hydration
   if (!isClient) return <div className="min-h-screen bg-gradient-to-br from-teal-50 to-slate-50 flex items-center justify-center"><div className="text-teal-600">Loading...</div></div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Navigation */}
         <LessonNav backPath="/classes/B1" />
+
+        {/* Lesson Header with title from lessonMeta */}
         <LessonHeader />
+
+        {/* Progress Bar */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100"><ProgressBar current={reviewedSections.length} total={sectionIds.length} label="Lesson Progress" accentColor="teal" /></div>
+
+        {/* Lesson Sections - In Order of Instruction */}
         <PresentSection isReviewed={reviewedSections.includes("present-reporting")} onMarkReviewed={handleMarkReviewed} />
         <PastSection isReviewed={reviewedSections.includes("past-reporting")} onMarkReviewed={handleMarkReviewed} />
         <ConsonanceSection isReviewed={reviewedSections.includes("consonance")} onMarkReviewed={handleMarkReviewed} />
         <ExceptionsSection isReviewed={reviewedSections.includes("exceptions")} onMarkReviewed={handleMarkReviewed} />
         <MistakesSection isReviewed={reviewedSections.includes("mistakes")} onMarkReviewed={handleMarkReviewed} />
+        {/* Practice Section - 15 Question Quiz */}
         <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
           <div className="p-6 bg-gradient-to-r from-teal-50 to-white">
             <h2 className="text-xl font-semibold text-slate-800">Guided Interactive Practice</h2>
@@ -185,6 +352,8 @@ export default function Lesson13Page() {
             <PracticeSection questions={practiceQuestions} isReviewed={reviewedSections.includes("practice")} onMarkReviewed={handleMarkReviewed} onComplete={handlePracticeComplete} getPerformanceMessage={getPerformanceMessage} accentColor="teal" />
           </div>
         </div>
+
+        {/* Completion Section - Shown when practice is done */}
         {(practiceCompleted || reviewedSections.includes("practice")) && (
           <CompletionSection lessonNumber={13} lessonTitle={lessonMeta.title} practiceScore={practiceScore} totalQuestions={practiceQuestions.length} nextLessonPath="/classes/B1/lesson14" recapItems={["Present reporting: no tense change", "Past reporting: tense shift", "Présent→imparfait, Passé composé→plus-que-parfait, Futur→conditionnel", "Consonance des temps", "Exceptions for general truths"]} accentColor="teal" />
         )}
