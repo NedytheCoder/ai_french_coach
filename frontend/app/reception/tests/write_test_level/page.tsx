@@ -1,75 +1,37 @@
 /**
- * Write Test Level - French Writing Skills Assessment
- * ======================================================
+ * Writing Test Level - Gamified French Writing Assessment
+ * =========================================================
  *
- * This page provides an interactive writing test to assess the user's French
- * writing skills. Users complete various writing tasks ranging from simple
- * copying to essay writing. The test progressively increases in difficulty
- * from A0 (complete beginner) to B2 (upper intermediate).
- *
- * **Test Structure:**
- * - 8 writing tasks total with progressive difficulty
- * - Task types by level:
- *   - A0: Copy (exact word copying), Fill (complete sentences)
- *   - A1: Short sentence writing, Medium paragraph writing
- *   - A2: Long story/essay writing
- *   - B1: Email writing, Book review writing
- *   - B2: Extended essay writing
- *
- * **Scoring System:**
- * - 0-2 correct: A0 (Beginner)
- * - 3-4 correct: A1 (Elementary)
- * - 5-6 correct: A2 (Pre-intermediate)
- * - 7 correct: B1 (Intermediate)
- * - 8 correct: B2 (Upper-intermediate)
- *
- * **Validation Types:**
- * - copy: Exact match validation (case-insensitive)
- * - fill: Keyword matching in answer
- * - short/medium/long: Word count validation
- *
- * **Components:**
- * - WritingTestLevel: Main quiz component managing state and flow
- * - Results Screen: Level badge, score, progress bar, motivational message
- * - Writing Card: Task prompt, text input, word counter, submit/feedback
+ * A fully gamified, guided writing exam with:
+ * - Structure helpers to reduce blank-page anxiety
+ * - Rich, comfortable writing space with focus effects
+ * - Real-time word count with progress indicator
+ * - Interactive guidance cards
+ * - Smooth Framer Motion animations
  *
  * **Features:**
- * - Dynamic input fields (text input for short tasks, textarea for long)
- * - Real-time word counter for medium/long tasks
- * - Color-coded feedback (green for correct, red for incorrect)
- * - Detailed validation explanations
- * - Restart option to retake the test
+ * - Two-column layout: guidance left, writing right
+ * - Word count progress bar
+ * - Structure suggestions based on task type
+ * - Encouragement messages during typing
+ * - XP system and gamified feedback
  */
 
 "use client"
 
-// =============================================================================
-// IMPORTS
-// =============================================================================
-
-// React state hook for quiz management
-import { useState } from "react"
-// Animation library for smooth transitions and interactions
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-// Next.js navigation for results CTA and back link
 import Link from "next/link"
+import {
+  FaPen, FaArrowRight, FaCheckCircle, FaLightbulb,
+  FaStar, FaTrophy, FaChevronRight, FaPencilAlt,
+  FaAlignLeft, FaParagraph, FaBook
+} from "react-icons/fa"
 
 // =============================================================================
-// TYPES & INTERFACES
+// TYPES & DATA
 // =============================================================================
 
-/**
- * Question interface for writing test
- * @property id - unique identifier for the question
- * @property level - CEFR level (A0, A1, A2, B1, B2)
- * @property type - type of writing task (copy, fill, short, medium, long)
- * @property prompt - instructions for the user
- * @property text - additional text or context for the question
- * @property placeholder - placeholder text for input field
- * @property expectedAnswer - exact answer expected (for copy type)
- * @property expectedKeywords - keywords that should be in answer (for fill type)
- * @property validation - validation rule (non-empty, min-words-X)
- */
 interface Question {
   id: number
   level: string
@@ -80,6 +42,7 @@ interface Question {
   expectedAnswer?: string
   expectedKeywords?: string[]
   validation?: string
+  guidance?: string[]
 }
 
 const write_questions: Question[] = [
@@ -89,81 +52,84 @@ const write_questions: Question[] = [
     type: "copy",
     prompt: "Copy the following word:",
     text: "Bonjour",
-    placeholder: "Type 'Bonjour'",
+    placeholder: "Type 'Bonjour' here...",
     expectedAnswer: "Bonjour",
-    validation: "non-empty"
+    validation: "non-empty",
+    guidance: ["Look at the word carefully", "Type it exactly as shown", "Check your spelling"]
   },
   {
     id: 2,
     level: "A0",
     type: "fill",
-    prompt: "Fill in the blank with the correct word:",
-    text: "Je m'appelle Marie. J'ai 25 ans. J'habite à Paris.",
-    placeholder: "Enter your name",
+    prompt: "Fill in the blank:",
+    text: "Je m'appelle _____. J'ai 25 ans. J'habite à Paris.",
+    placeholder: "Write the missing name...",
     expectedKeywords: ["Marie", "25", "Paris"],
-    validation: "min-words-3"
+    validation: "min-words-3",
+    guidance: ["Read the sentence", "What's the missing name?", "The answer is 'Marie'"]
   },
   {
     id: 3,
     level: "A1",
     type: "short",
-    prompt: "Write a short sentence about yourself:",
-    text: "Example: I live in France.",
-    placeholder: "Write your sentence...",
-    validation: "min-words-2"
+    prompt: "Write a sentence about yourself:",
+    text: "Tell us your name and where you're from.",
+    placeholder: "Example: My name is John. I am from London.",
+    validation: "min-words-3",
+    guidance: ["Start with your name", "Add where you're from", "Keep it simple!"]
   },
   {
     id: 4,
     level: "A1",
     type: "medium",
-    prompt: "Write a paragraph about your daily routine:",
-    text: "Example: I wake up at 7 AM. I eat breakfast. I go to work.",
-    placeholder: "Write your paragraph...",
-    validation: "min-words-10"
+    prompt: "Describe your daily routine:",
+    text: "Write 2-3 sentences about what you do every day.",
+    placeholder: "I wake up at... Then I... After that...",
+    validation: "min-words-10",
+    guidance: ["Start with morning activities", "Add afternoon tasks", "Finish with evening routine"]
   },
   {
     id: 5,
     level: "A2",
     type: "long",
-    prompt: "Write a short story about your last vacation:",
-    text: "Example: Last summer, I went to Spain. I visited Barcelona...",
-    placeholder: "Write your story...",
-    validation: "min-words-20"
+    prompt: "Write about your last vacation:",
+    text: "Describe where you went, what you did, and how you felt.",
+    placeholder: "Last summer, I went to... I visited... It was...",
+    validation: "min-words-20",
+    guidance: ["Where did you go?", "What did you do there?", "How was your experience?"]
   },
   {
     id: 6,
     level: "B1",
-    type: "short",
-    prompt: "Write a short email to a friend:",
-    text: "Example: Hi Sarah, How are you? I'm doing well...",
-    placeholder: "Write your email...",
-    validation: "min-words-5"
+    type: "medium",
+    prompt: "Write an email to a friend:",
+    text: "Ask how they are and share your news.",
+    placeholder: "Hi [name], How are you? I'm doing well...",
+    validation: "min-words-15",
+    guidance: ["Start with a greeting", "Ask about your friend", "Share your news", "End with a closing"]
   },
   {
     id: 7,
     level: "B1",
     type: "medium",
-    prompt: "Write a review of a book you read:",
-    text: "Example: I read 'The Alchemist' by Paulo Coelho. It was amazing...",
-    placeholder: "Write your review...",
-    validation: "min-words-15"
+    prompt: "Write a book review:",
+    text: "Choose a book and share your opinion about it.",
+    placeholder: "I read [book title] by [author]. I think...",
+    validation: "min-words-15",
+    guidance: ["Name the book and author", "Give your opinion", "Explain why you liked/disliked it"]
   },
   {
     id: 8,
     level: "B2",
     type: "long",
-    prompt: "Write an essay about your favorite hobby:",
-    text: "Example: My favorite hobby is reading. I love books...",
-    placeholder: "Write your essay...",
-    validation: "min-words-30"
+    prompt: "Write about your favorite hobby:",
+    text: "Explain why you enjoy it and how it enriches your life.",
+    placeholder: "My favorite hobby is... I started when... It makes me feel...",
+    validation: "min-words-30",
+    guidance: ["Introduce your hobby", "When/how did you start?", "Why do you enjoy it?", "How does it benefit you?"]
   }
 ]
 
-/**
- * Determines user's French level based on writing test score
- * @param score - number of correct answers (0-8)
- * @returns Object with level, motivational message, and color scheme
- */
 const getLevelFromScore = (score: number): { level: string; message: string; color: string } => {
   if (score <= 2) {
     return {
@@ -200,23 +166,8 @@ const getLevelFromScore = (score: number): { level: string; message: string; col
   }
 }
 
-/**
- * Generates encouraging feedback message based on task progression
- * @param taskIndex - current task number (0-7)
- * @param isCorrect - whether the answer passed validation
- * @returns Encouraging message for the user
- */
 const getFeedbackMessage = (taskIndex: number, isCorrect: boolean): string => {
-  const messages = [
-    "Nice start 😏",
-    "Good job!",
-    "You're warming up 🔥",
-    "That works!",
-    "Now it gets interesting...",
-    "Keep going!",
-    "Almost there!",
-    "Great effort!"
-  ]
+  const messages = ["Nice start 😏", "Good job!", "You're warming up 🔥", "That works!", "Now it gets interesting...", "Keep going!", "Almost there!", "Great effort!"]
   
   if (!isCorrect) {
     return "Keep trying! Every attempt helps you learn 💪"
@@ -225,12 +176,6 @@ const getFeedbackMessage = (taskIndex: number, isCorrect: boolean): string => {
   return messages[taskIndex] || "Well done!"
 }
 
-/**
- * Validates user answer based on question type and validation rules
- * @param question - the question being answered
- * @param answer - user's submitted answer
- * @returns boolean indicating if answer is correct
- */
 const validateAnswer = (question: Question, answer: string): boolean => {
   const trimmedAnswer = answer.trim()
   
@@ -238,11 +183,9 @@ const validateAnswer = (question: Question, answer: string): boolean => {
   
   switch (question.type) {
     case "copy":
-      // Exact match, case-insensitive, ignoring leading/trailing spaces
       return trimmedAnswer.toLowerCase() === question.expectedAnswer?.toLowerCase()
     
     case "fill":
-      // Check if answer contains expected keywords (case-insensitive)
       if (question.expectedKeywords) {
         return question.expectedKeywords.some(keyword => 
           trimmedAnswer.toLowerCase().includes(keyword.toLowerCase())
@@ -251,7 +194,6 @@ const validateAnswer = (question: Question, answer: string): boolean => {
       return false
     
     case "short":
-      // Check expected keywords or non-empty validation
       if (question.expectedKeywords) {
         return question.expectedKeywords.some(keyword => 
           trimmedAnswer.toLowerCase().includes(keyword.toLowerCase())
@@ -261,13 +203,14 @@ const validateAnswer = (question: Question, answer: string): boolean => {
     
     case "medium":
     case "long":
-      // Word count validation
       if (question.validation) {
         const wordCount = trimmedAnswer.split(/\s+/).length
         if (question.validation === "min-words-3") return wordCount >= 3
         if (question.validation === "min-words-5") return wordCount >= 5
-        if (question.validation === "min-words-12") return wordCount >= 12
+        if (question.validation === "min-words-10") return wordCount >= 10
+        if (question.validation === "min-words-15") return wordCount >= 15
         if (question.validation === "min-words-20") return wordCount >= 20
+        if (question.validation === "min-words-30") return wordCount >= 30
       }
       return trimmedAnswer.length > 0
     
@@ -276,36 +219,21 @@ const validateAnswer = (question: Question, answer: string): boolean => {
   }
 }
 
-/**
- * Gets explanation for why answer passed or failed
- * @param question - the question being answered
- * @param isCorrect - whether the answer was correct
- * @returns Explanation string
- */
 const getValidationExplanation = (question: Question, isCorrect: boolean): string => {
   if (isCorrect) {
     switch (question.type) {
-      case "copy":
-        return "Perfect! You copied it exactly right."
-      case "fill":
-        return "Correct! That's the right word."
-      case "short":
-        return "Good! That's a valid answer."
-      case "medium":
-        return "Nice! You wrote enough. Keep practicing!"
-      case "long":
-        return "Excellent! You expressed your ideas well."
-      default:
-        return "Good job!"
+      case "copy": return "Perfect! You copied it exactly right."
+      case "fill": return "Correct! That's the right answer."
+      case "short": return "Good! That's a valid answer."
+      case "medium": return "Nice! You wrote enough. Keep practicing!"
+      case "long": return "Excellent! You expressed your ideas well."
+      default: return "Good job!"
     }
   } else {
     switch (question.type) {
-      case "copy":
-        return `Try copying exactly: "${question.expectedAnswer}"`
-      case "fill":
-        return "The missing word is 'appelle'. Try again!"
-      case "short":
-        return "Please write something - any answer is a good start!"
+      case "copy": return `Try copying exactly: "${question.expectedAnswer}"`
+      case "fill": return "Check the text again. What name is missing?"
+      case "short": return "Please write a few words. Any answer is a good start!"
       case "medium":
       case "long":
         if (question.validation) {
@@ -313,79 +241,619 @@ const getValidationExplanation = (question: Question, isCorrect: boolean): strin
           return `Try writing at least ${minWords} words. You've got this!`
         }
         return "Please write a bit more to complete this task."
-      default:
-        return "Give it another try!"
+      default: return "Give it another try!"
     }
   }
 }
 
-/**
- * Counts words in a string
- * @param text - text to count words in
- * @returns number of words
- */
 const countWords = (text: string): number => {
   return text.trim().split(/\s+/).filter(word => word.length > 0).length
 }
 
+const getMinWords = (validation?: string): number => {
+  if (!validation) return 0
+  const match = validation.match(/min-words-(\d+)/)
+  return match ? parseInt(match[1]) : 0
+}
+
 // =============================================================================
-// MAIN WRITING TEST COMPONENT
+// ANIMATED BACKGROUND
 // =============================================================================
 
-/**
- * WritingTestLevel - Main writing skills quiz component.
- *
- * Manages the complete test flow:
- * - 8 writing tasks with progressive difficulty (A0 to B2)
- * - Text input with validation (exact match, keywords, word count)
- * - Results screen with level determination
- * - Animated transitions between tasks
- *
- * @returns JSX.Element - The writing test interface
- */
+function AnimatedBackground() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(4)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full blur-3xl"
+          style={{
+            width: `${120 + i * 40}px`,
+            height: `${120 + i * 40}px`,
+            left: `${10 + i * 22}%`,
+            top: `${15 + (i % 2) * 35}%`,
+            background: `linear-gradient(135deg, ${
+              i % 2 === 0
+                ? "rgba(245,158,11,0.08) 0%, rgba(59,130,246,0.06) 100%"
+                : "rgba(16,185,129,0.06) 0%, rgba(59,130,246,0.04) 100%"
+            })`,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            x: [0, 10, 0],
+            scale: [1, 1.05, 1],
+          }}
+          transition={{
+            duration: 6 + i * 1.5,
+            repeat: Infinity,
+            delay: i * 0.5,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute w-2 h-2 rounded-full bg-gradient-to-br from-amber-400/10 to-blue-400/10"
+          style={{
+            left: `${15 + Math.random() * 70}%`,
+            top: `${20 + Math.random() * 60}%`,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.1, 0.25, 0.1],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 2,
+            repeat: Infinity,
+            delay: Math.random() * 2,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// =============================================================================
+// HEADER COMPONENT
+// =============================================================================
+
+function WritingHeader({
+  currentTask,
+  totalTasks,
+  progress,
+  score,
+  level
+}: {
+  currentTask: number
+  totalTasks: number
+  progress: number
+  score: number
+  level: string
+}) {
+  return (
+    <motion.div
+      className="mb-6"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Top row */}
+      <div className="flex items-center justify-between mb-4">
+        <Link href="/reception/tests">
+          <motion.button
+            className="text-slate-500 hover:text-slate-700 font-medium text-sm flex items-center gap-1 transition-colors"
+            whileHover={{ x: -3 }}
+          >
+            <FaChevronRight className="w-4 h-4 rotate-180" />
+            Back
+          </motion.button>
+        </Link>
+
+        <div className="flex items-center gap-3">
+          {/* Section badge */}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 rounded-full">
+            <FaPen className="w-4 h-4 text-amber-600" />
+            <span className="text-sm font-bold text-amber-700">Writing</span>
+          </div>
+
+          {/* XP display */}
+          <motion.div
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 rounded-full"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring" }}
+          >
+            <FaStar className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-bold text-blue-700">{score * 15} XP</span>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Progress card */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-slate-100">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-slate-600">
+              Task {currentTask} of {totalTasks}
+            </span>
+            <span className="px-2 py-0.5 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 rounded-full text-xs font-bold">
+              {level}
+            </span>
+          </div>
+          <span className="text-sm font-bold text-amber-600">
+            {Math.round(progress)}%
+          </span>
+        </div>
+
+        <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// PROMPT CARD
+// =============================================================================
+
+function PromptCard({ prompt, text, type }: { prompt: string; text: string; type: string }) {
+  const typeIcons = {
+    copy: FaPencilAlt,
+    fill: FaAlignLeft,
+    short: FaPen,
+    medium: FaParagraph,
+    long: FaBook
+  }
+  
+  const TypeIcon = typeIcons[type as keyof typeof typeIcons] || FaPen
+  
+  const typeLabels = {
+    copy: "Copy Task",
+    fill: "Fill in Blank",
+    short: "Short Answer",
+    medium: "Paragraph",
+    long: "Essay Writing"
+  }
+
+  return (
+    <motion.div
+      className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      {/* Header */}
+      <div className="px-6 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <TypeIcon className="w-4 h-4 text-amber-600" />
+          <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">
+            {typeLabels[type as keyof typeof typeLabels] || "Writing Task"}
+          </span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        <h2 className="text-xl font-bold text-slate-900 mb-3">
+          {prompt}
+        </h2>
+        {text && (
+          <div className="p-4 bg-slate-50 rounded-xl border-l-4 border-amber-400">
+            <p className="text-slate-700 font-medium text-lg leading-relaxed">
+              {text}
+            </p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// GUIDANCE CARD
+// =============================================================================
+
+function GuidanceCard({ guidance }: { guidance?: string[] }) {
+  if (!guidance || guidance.length === 0) return null
+
+  return (
+    <motion.div
+      className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-5 mt-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <FaLightbulb className="w-5 h-5 text-blue-500" />
+        <span className="text-sm font-bold text-blue-700">Structure Guide</span>
+      </div>
+      
+      <ul className="space-y-2">
+        {guidance.map((step, index) => (
+          <motion.li
+            key={index}
+            className="flex items-start gap-2 text-sm text-slate-600"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 + index * 0.1 }}
+          >
+            <span className="w-5 h-5 rounded-full bg-blue-200 text-blue-700 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+              {index + 1}
+            </span>
+            <span>{step}</span>
+          </motion.li>
+        ))}
+      </ul>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// WRITING AREA
+// =============================================================================
+
+function WritingArea({
+  value,
+  onChange,
+  placeholder,
+  type,
+  isSubmitted,
+  isCorrect,
+  wordCount,
+  minWords
+}: {
+  value: string
+  onChange: (value: string) => void
+  placeholder: string
+  type: string
+  isSubmitted: boolean
+  isCorrect: boolean
+  wordCount: number
+  minWords: number
+}) {
+  const [isFocused, setIsFocused] = useState(false)
+  
+  const isShortInput = type === "copy" || type === "fill" || type === "short"
+  
+  const getInputStyles = () => {
+    if (isSubmitted) {
+      return isCorrect
+        ? "border-emerald-500 bg-emerald-50/50"
+        : "border-red-400 bg-red-50/50"
+    }
+    return isFocused
+      ? "border-amber-400 bg-white ring-4 ring-amber-100"
+      : "border-slate-200 bg-slate-50 hover:border-amber-300"
+  }
+
+  return (
+    <motion.div
+      className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <FaPencilAlt className="w-4 h-4 text-slate-400" />
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Answer</span>
+        </div>
+        
+        {/* Word counter for longer tasks */}
+        {!isShortInput && minWords > 0 && (
+          <div className="flex items-center gap-2">
+            <span className={`text-sm font-medium ${
+              wordCount >= minWords ? "text-emerald-600" : "text-slate-500"
+            }`}>
+              {wordCount} / {minWords} words
+            </span>
+            
+            {/* Mini progress bar */}
+            <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+              <motion.div
+                className={`h-full rounded-full ${
+                  wordCount >= minWords ? "bg-emerald-500" : "bg-amber-400"
+                }`}
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min((wordCount / minWords) * 100, 100)}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Input field */}
+      {isShortInput ? (
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          disabled={isSubmitted}
+          className={`w-full p-4 rounded-xl border-2 text-lg transition-all duration-300 outline-none ${getInputStyles()}`}
+        />
+      ) : (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          disabled={isSubmitted}
+          rows={type === "medium" ? 4 : 6}
+          className={`w-full p-4 rounded-xl border-2 text-lg leading-relaxed transition-all duration-300 outline-none resize-none ${getInputStyles()}`}
+        />
+      )}
+
+      {/* Encouragement message */}
+      {!isSubmitted && !isShortInput && wordCount > 0 && (
+        <motion.div
+          className="mt-3 text-sm text-amber-600 font-medium"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          key={wordCount}
+        >
+          {wordCount < minWords * 0.3 && "💭 Good start, keep going!"}
+          {wordCount >= minWords * 0.3 && wordCount < minWords * 0.6 && "✍️ You're making progress!"}
+          {wordCount >= minWords * 0.6 && wordCount < minWords && "🔥 Almost there, keep writing!"}
+          {wordCount >= minWords && "🎉 Great job! You've met the minimum."}
+        </motion.div>
+      )}
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// SUBMIT BUTTON
+// =============================================================================
+
+function SubmitButton({
+  onClick,
+  disabled,
+  wordCount,
+  minWords,
+  type
+}: {
+  onClick: () => void
+  disabled: boolean
+  wordCount: number
+  minWords: number
+  type: string
+}) {
+  const isShortInput = type === "copy" || type === "fill" || type === "short"
+  
+  return (
+    <motion.button
+      onClick={onClick}
+      disabled={disabled}
+      className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all ${
+        disabled
+          ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+          : "bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white shadow-lg shadow-amber-500/30 hover:shadow-xl"
+      }`}
+      whileHover={!disabled ? { scale: 1.02 } : {}}
+      whileTap={!disabled ? { scale: 0.98 } : {}}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <span className="flex items-center justify-center gap-2">
+        {!isShortInput && wordCount < minWords && wordCount > 0 ? (
+          <>
+            <span>Keep Writing</span>
+            <span className="text-sm opacity-80">({minWords - wordCount} more words)</span>
+          </>
+        ) : (
+          <>
+            <FaCheckCircle className="w-5 h-5" />
+            <span>Submit Answer</span>
+          </>
+        )}
+      </span>
+    </motion.button>
+  )
+}
+
+// =============================================================================
+// FEEDBACK CARD
+// =============================================================================
+
+function FeedbackCard({
+  isCorrect,
+  message,
+  explanation,
+  onNext,
+  isLast
+}: {
+  isCorrect: boolean
+  message: string
+  explanation: string
+  onNext: () => void
+  isLast: boolean
+}) {
+  return (
+    <motion.div
+      className="mt-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <div className={`p-5 rounded-xl mb-4 ${
+        isCorrect
+          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+          : "bg-red-100 text-red-800 border border-red-200"
+      }`}>
+        <p className="font-bold text-center text-lg mb-1">{message}</p>
+        <p className="text-sm text-center opacity-80">{explanation}</p>
+      </div>
+
+      <motion.button
+        onClick={onNext}
+        className="w-full py-4 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2"
+        whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(245,158,11,0.4)" }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <span>{isLast ? "See Results" : "Next Task"}</span>
+        <motion.div
+          animate={{ x: [0, 5, 0] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          <FaArrowRight className="w-5 h-5" />
+        </motion.div>
+      </motion.button>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// RESULTS SCREEN
+// =============================================================================
+
+function ResultsScreen({
+  score,
+  totalTasks,
+  onRestart
+}: {
+  score: number
+  totalTasks: number
+  onRestart: () => void
+}) {
+  const result = getLevelFromScore(score)
+
+  return (
+    <motion.div
+      className="min-h-screen flex items-center justify-center px-4 py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 text-center"
+        initial={{ opacity: 0, scale: 0.9, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, type: "spring" }}
+      >
+        {/* Level badge */}
+        <motion.div
+          className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${result.color} flex items-center justify-center shadow-xl`}
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+        >
+          <span className="text-4xl font-bold text-white">{result.level}</span>
+        </motion.div>
+
+        <motion.h2
+          className="text-2xl font-bold text-slate-900 mb-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          Your French Level
+        </motion.h2>
+
+        {/* Score */}
+        <motion.div
+          className="mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="text-5xl font-bold text-slate-800 mb-1">{score}/{totalTasks}</div>
+          <p className="text-slate-500">tasks completed correctly</p>
+        </motion.div>
+
+        {/* XP earned */}
+        <motion.div
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-6"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.5, type: "spring" }}
+        >
+          <FaStar className="w-5 h-5 text-blue-600" />
+          <span className="text-lg font-bold text-blue-700">+{score * 15} XP Earned</span>
+        </motion.div>
+
+        {/* Progress bar */}
+        <motion.div
+          className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${(score / totalTasks) * 100}%` }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
+          />
+        </motion.div>
+
+        {/* Message */}
+        <motion.p
+          className="text-slate-700 mb-8 leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          {result.message}
+        </motion.p>
+
+        {/* Buttons */}
+        <motion.div
+          className="flex gap-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <button
+            onClick={onRestart}
+            className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
+          >
+            Try Again
+          </button>
+          <Link href="/home" className="flex-1">
+            <button className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all">
+              Start Learning
+            </button>
+          </Link>
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
 export default function WritingTestLevel() {
-  // ---------------------------------------------------------------------------
-  // STATE
-  // ---------------------------------------------------------------------------
-
-  // Current task index (0-7)
   const [currentIndex, setCurrentIndex] = useState(0)
-  // User's answers for all tasks
   const [answers, setAnswers] = useState<string[]>(Array(write_questions.length).fill(""))
-  // Whether each task has been submitted
   const [hasSubmitted, setHasSubmitted] = useState<boolean[]>(Array(write_questions.length).fill(false))
-  // Whether each submitted answer was correct
   const [isCorrect, setIsCorrect] = useState<boolean[]>(Array(write_questions.length).fill(false))
-  // Whether to show the results screen
   const [showResult, setShowResult] = useState(false)
-  // Number of correct answers so far
   const [score, setScore] = useState(0)
 
-  // ---------------------------------------------------------------------------
-  // DERIVED STATE
-  // ---------------------------------------------------------------------------
-
-  // Current question data from write_questions array
   const currentQuestion = write_questions[currentIndex]
-  // Progress percentage for progress bar (0-100)
-  const progress = ((currentIndex + 1) / write_questions.length) * 100
-  // Current task's answer
+  const progress = ((currentIndex + (hasSubmitted[currentIndex] ? 1 : 0)) / write_questions.length) * 100
   const currentAnswer = answers[currentIndex]
-  // Whether current task has been submitted
   const currentSubmitted = hasSubmitted[currentIndex]
-  // Whether current submitted answer was correct
   const currentIsCorrect = isCorrect[currentIndex]
+  const wordCount = countWords(currentAnswer)
+  const minWords = getMinWords(currentQuestion.validation)
 
-  // ---------------------------------------------------------------------------
-  // HANDLERS
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Handle text input changes.
-   * Updates answer state for current task.
-   * Disabled after submission to prevent changes.
-   * @param value - new input value
-   */
   const handleInputChange = (value: string) => {
     if (currentSubmitted) return
     const newAnswers = [...answers]
@@ -393,14 +861,13 @@ export default function WritingTestLevel() {
     setAnswers(newAnswers)
   }
 
-  /**
-   * Handle submit button click.
-   * Validates answer using validateAnswer function.
-   * Updates submission state and score.
-   * Shows feedback after validation.
-   */
   const handleSubmit = () => {
     if (currentSubmitted || currentAnswer.trim() === "") return
+    
+    // For longer tasks, check minimum word count
+    if (minWords > 0 && wordCount < minWords) {
+      return // Don't allow submit if below minimum
+    }
     
     const correct = validateAnswer(currentQuestion, currentAnswer)
     
@@ -417,10 +884,6 @@ export default function WritingTestLevel() {
     }
   }
 
-  /**
-   * Handle next button click.
-   * Advances to next task or shows results screen if last task.
-   */
   const handleNext = () => {
     if (currentIndex < write_questions.length - 1) {
       setCurrentIndex(currentIndex + 1)
@@ -429,10 +892,6 @@ export default function WritingTestLevel() {
     }
   }
 
-  /**
-   * Handle restart button click.
-   * Resets all state to initial values to start quiz from beginning.
-   */
   const handleRestart = () => {
     setCurrentIndex(0)
     setAnswers(Array(write_questions.length).fill(""))
@@ -442,244 +901,95 @@ export default function WritingTestLevel() {
     setScore(0)
   }
 
-  // ---------------------------------------------------------------------------
-  // RENDER
-  // ---------------------------------------------------------------------------
-
-  // Results screen - shown after all tasks completed
   if (showResult) {
-    const result = getLevelFromScore(score)
-
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 text-center"
-        >
-          {/* Level badge */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${result.color} flex items-center justify-center`}
-          >
-            <span className="text-4xl font-bold text-white">{result.level}</span>
-          </motion.div>
-
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
-            Your French Level
-          </h2>
-          
-          {/* Score */}
-          <div className="mb-6">
-            <div className="text-5xl font-bold text-slate-800 mb-1">
-              {score}/{write_questions.length}
-            </div>
-            <p className="text-slate-500">tasks completed correctly</p>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${(score / write_questions.length) * 100}%` }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
-            />
-          </div>
-
-          {/* Motivational message */}
-          <p className="text-slate-700 mb-8 leading-relaxed">
-            {result.message}
-          </p>
-
-          {/* Action buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleRestart}
-              className="flex-1 py-3 px-6 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
-            >
-              Try Again
-            </button>
-            <Link
-              href="/home"
-              className="flex-1 py-3 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all text-center"
-            >
-              Start Learning
-            </Link>
-          </div>
-        </motion.div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 font-sans overflow-x-hidden relative">
+        <AnimatedBackground />
+        <ResultsScreen
+          score={score}
+          totalTasks={write_questions.length}
+          onRestart={handleRestart}
+        />
       </div>
     )
   }
 
-  // Main quiz interface - writing task card with input and feedback
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-lg">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <Link href="/home" className="text-slate-500 hover:text-slate-700 transition-colors text-sm">
-              ← Back to Home
-            </Link>
-            <span className="text-sm font-medium text-slate-600">
-              Task {currentIndex + 1} of {write_questions.length}
-            </span>
-          </div>
-          
-          {/* Progress bar */}
-          <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-            <motion.div
-              initial={false}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-              className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
-            />
-          </div>
-          
-          {/* Level indicator */}
-          <div className="flex items-center gap-2 mt-3">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Level
-            </span>
-            <span className="px-3 py-1 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 rounded-full text-sm font-bold">
-              {currentQuestion.level}
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 font-sans overflow-x-hidden relative">
+      <AnimatedBackground />
 
-        {/* Question Card */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+        {/* Header */}
+        <WritingHeader
+          currentTask={currentIndex + 1}
+          totalTasks={write_questions.length}
+          progress={progress}
+          score={score}
+          level={currentQuestion.level}
+        />
+
+        {/* Two-zone layout */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 sm:p-8"
+            className="grid lg:grid-cols-5 gap-6"
           >
-            {/* Prompt */}
-            <div className="mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 mb-2">
-                {currentQuestion.prompt}
-              </h2>
-              {currentQuestion.text && (
-                <p className="text-lg text-slate-700 font-medium">
-                  {currentQuestion.text}
-                </p>
-              )}
+            {/* Left: Prompt & Guidance */}
+            <div className="lg:col-span-2 order-1">
+              <PromptCard
+                prompt={currentQuestion.prompt}
+                text={currentQuestion.text}
+                type={currentQuestion.type}
+              />
+              
+              <GuidanceCard guidance={currentQuestion.guidance} />
             </div>
 
-            {/* Input field */}
-            <div className="mb-4">
-              {currentQuestion.type === "copy" || currentQuestion.type === "fill" || currentQuestion.type === "short" ? (
-                <input
-                  type="text"
-                  value={currentAnswer}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  placeholder={currentQuestion.placeholder}
-                  disabled={currentSubmitted}
-                  className={`w-full p-4 rounded-xl border-2 transition-all duration-200 ${
-                    currentSubmitted
-                      ? currentIsCorrect
-                        ? "border-emerald-500 bg-emerald-50"
-                        : "border-red-400 bg-red-50"
-                      : "border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-                  }`}
-                />
-              ) : (
-                <textarea
-                  value={currentAnswer}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  placeholder={currentQuestion.placeholder}
-                  disabled={currentSubmitted}
-                  rows={currentQuestion.type === "medium" ? 3 : 5}
-                  className={`w-full p-4 rounded-xl border-2 transition-all duration-200 resize-none ${
-                    currentSubmitted
-                      ? currentIsCorrect
-                        ? "border-emerald-500 bg-emerald-50"
-                        : "border-red-400 bg-red-50"
-                      : "border-slate-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-                  }`}
-                />
-              )}
-              
-              {/* Word counter for medium/long tasks */}
-              {(currentQuestion.type === "medium" || currentQuestion.type === "long") && (
-                <div className="text-right mt-2">
-                  <span className={`text-sm ${
-                    currentSubmitted && !currentIsCorrect ? "text-red-500" : "text-slate-400"
-                  }`}>
-                    {countWords(currentAnswer)} word{countWords(currentAnswer) !== 1 ? "s" : ""}
-                    {currentQuestion.validation && ` (min ${currentQuestion.validation.split("-")[2]} required)`}
-                  </span>
+            {/* Right: Writing Area */}
+            <div className="lg:col-span-3 order-2">
+              <WritingArea
+                value={currentAnswer}
+                onChange={handleInputChange}
+                placeholder={currentQuestion.placeholder}
+                type={currentQuestion.type}
+                isSubmitted={currentSubmitted}
+                isCorrect={currentIsCorrect}
+                wordCount={wordCount}
+                minWords={minWords}
+              />
+
+              {/* Submit button (only when not submitted) */}
+              {!currentSubmitted && (
+                <div className="mt-4">
+                  <SubmitButton
+                    onClick={handleSubmit}
+                    disabled={currentAnswer.trim() === "" || (minWords > 0 && wordCount < minWords)}
+                    wordCount={wordCount}
+                    minWords={minWords}
+                    type={currentQuestion.type}
+                  />
                 </div>
               )}
+
+              {/* Feedback */}
+              <AnimatePresence>
+                {currentSubmitted && (
+                  <FeedbackCard
+                    isCorrect={currentIsCorrect}
+                    message={getFeedbackMessage(currentIndex, currentIsCorrect)}
+                    explanation={getValidationExplanation(currentQuestion, currentIsCorrect)}
+                    onNext={handleNext}
+                    isLast={currentIndex === write_questions.length - 1}
+                  />
+                )}
+              </AnimatePresence>
             </div>
-
-            {/* Submit button */}
-            {!currentSubmitted && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                onClick={handleSubmit}
-                disabled={currentAnswer.trim() === ""}
-                className={`w-full py-4 px-6 rounded-xl font-semibold transition-all ${
-                  currentAnswer.trim() === ""
-                    ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg hover:shadow-purple-500/30"
-                }`}
-              >
-                Submit Answer
-              </motion.button>
-            )}
-
-            {/* Feedback */}
-            <AnimatePresence>
-              {currentSubmitted && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-6"
-                >
-                  {/* Feedback message */}
-                  <div className={`p-4 rounded-xl mb-4 ${
-                    currentIsCorrect ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
-                  }`}>
-                    <p className="font-semibold text-center mb-1">
-                      {getFeedbackMessage(currentIndex, currentIsCorrect)}
-                    </p>
-                    <p className="text-sm text-center">
-                      {getValidationExplanation(currentQuestion, currentIsCorrect)}
-                    </p>
-                  </div>
-                  
-                  {/* Next button */}
-                  <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    onClick={handleNext}
-                    className="w-full py-4 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all"
-                  >
-                    {currentIndex < write_questions.length - 1 ? "Next Task →" : "See Results →"}
-                  </motion.button>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </motion.div>
         </AnimatePresence>
-
-        {/* Score mini display */}
-        <div className="text-center mt-4">
-          <span className="text-sm text-slate-500">
-            Score: <span className="font-semibold text-slate-700">{score}</span> correct
-          </span>
-        </div>
       </div>
     </div>
   )

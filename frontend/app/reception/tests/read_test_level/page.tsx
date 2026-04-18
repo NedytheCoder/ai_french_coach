@@ -1,160 +1,122 @@
 /**
- * Read Test Level - French Reading Comprehension Assessment
- * ===========================================================
+ * Reading Test Level - Gamified French Reading Comprehension
+ * =============================================================
  *
- * This page provides an interactive reading comprehension test to assess
- * the user's French level. Users read French text and answer multiple-choice
- * comprehension questions. The test progressively increases in difficulty
- * from A0 (complete beginner) to B2 (upper intermediate).
- *
- * **Test Structure:**
- * - 8 questions total (2 per CEFR level: A0, A1, A2, B1/B2)
- * - Progressive difficulty from basic vocabulary to complex texts
- * - Multiple choice answers (3 options per question)
- * - Immediate feedback with color-coded responses
- *
- * **Scoring System:**
- * - 0-2 correct: A0 (Beginner)
- * - 3-4 correct: A1 (Elementary)
- * - 5-6 correct: A2 (Pre-intermediate)
- * - 7 correct: B1 (Intermediate)
- * - 8 correct: B2 (Upper-intermediate)
- *
- * **Components:**
- * - TestLevel: Main quiz component managing state and flow
- * - Results Screen: Level badge, score, progress bar, motivational message
- * - Question Card: French text display with animated options
+ * A fully gamified, interactive reading exam with two-zone layout:
+ * - Left: Reading passage with comfortable typography
+ * - Right: Question and answer area
  *
  * **Features:**
- * - Framer Motion animations for smooth transitions between questions
- * - Color-coded feedback (green for correct, red for incorrect)
- * - Progress tracking with visual progress bar
- * - Level indicator showing current CEFR difficulty
- * - Restart option to retake the test
- * - Navigation to learning dashboard after completion
+ * - Two-column responsive layout (stacked on mobile)
+ * - Animated progress tracking with XP system
+ * - Interactive answer cards with hover/tap feedback
+ * - Color-coded feedback (green/red)
+ * - Smooth Framer Motion transitions
+ * - Gamified encouragement messages
  */
 
 "use client"
 
-// =============================================================================
-// IMPORTS
-// =============================================================================
-
-// React state hook for quiz management
 import { useState } from "react"
-// Animation library for smooth transitions and interactions
 import { motion, AnimatePresence } from "framer-motion"
-// Next.js navigation for results CTA and back link
 import Link from "next/link"
+import {
+  FaBookOpen, FaArrowRight, FaCheckCircle, FaTimes,
+  FaStar, FaTrophy, FaChevronRight, FaHighlighter
+} from "react-icons/fa"
 
 // =============================================================================
-// TYPES & INTERFACES
+// TYPES & DATA
 // =============================================================================
 
-/**
- * Question interface - defines the structure for each quiz question
- * @property id - unique identifier for the question
- * @property level - CEFR level (A0, A1, A2, B1, B2)
- * @property text - the question text in French
- * @property options - array of possible answer choices
- * @property correct - index of the correct answer in options array
- */
 interface Question {
   id: number
   level: string
-  text: string
+  passage: string
+  question: string
   options: string[]
   correct: number
 }
 
-/**
- * Questions database - 8 progressive French reading comprehension questions
- * Organized by CEFR levels from A0 (beginner) to B2 (upper-intermediate)
- * Each question tests different aspects of French reading ability
- */
 const questions: Question[] = [
   {
     id: 1,
     level: "A0",
-    text: "Bonjour = ?",
+    passage: "Bonjour",
+    question: "What does \"Bonjour\" mean?",
     options: ["Goodbye", "Hello", "Please"],
     correct: 1
   },
   {
     id: 2,
     level: "A0",
-    text: "Café = ?",
+    passage: "Café",
+    question: "What does \"Café\" mean?",
     options: ["Coffee", "Car", "House"],
     correct: 0
   },
   {
     id: 3,
     level: "A1",
-    text: "Marie habite à Lyon. Où habite Marie ?",
+    passage: "Marie habite à Lyon.",
+    question: "Where does Marie live?",
     options: ["Lyon", "Paris", "Rome"],
     correct: 0
   },
   {
     id: 4,
     level: "A1",
-    text: "Paul a 25 ans. Quel âge a Paul ?",
-    options: ["20 ans", "25 ans", "30 ans"],
+    passage: "Paul a 25 ans.",
+    question: "How old is Paul?",
+    options: ["20 years", "25 years", "30 years"],
     correct: 1
   },
   {
     id: 5,
     level: "A2",
-    text: "Sophie travaille dans un café. Elle commence à 8h et finit à 16h. Elle aime parler avec les clients. Pourquoi Sophie aime son travail ?",
+    passage: "Sophie works in a café. She starts at 8am and finishes at 4pm. She likes talking with the customers.",
+    question: "Why does Sophie like her job?",
     options: [
-      "Parce qu'elle gagne beaucoup d'argent",
-      "Parce qu'elle parle avec les clients",
-      "Parce qu'elle travaille peu"
+      "Because she earns a lot of money",
+      "Because she talks with customers",
+      "Because she works little"
     ],
     correct: 1
   },
   {
     id: 6,
     level: "A2",
-    text: "Sophie travaille dans un café. Elle finit à 16h. À quelle heure finit-elle ?",
-    options: ["8h", "12h", "16h"],
+    passage: "Sophie works in a café. She finishes at 4pm.",
+    question: "What time does she finish?",
+    options: ["8am", "12pm", "4pm"],
     correct: 2
   },
   {
     id: 7,
     level: "B1",
-    text: "Beaucoup de personnes préfèrent vivre en ville parce qu'il y a plus d'activités et d'emplois. Pourquoi ?",
+    passage: "Many people prefer living in the city because there are more activities and jobs available.",
+    question: "Why do people prefer city life?",
     options: [
-      "Parce que c'est calme",
-      "Parce qu'il y a plus d'opportunités",
-      "Parce que c'est moins cher"
+      "Because it's calm",
+      "Because there are more opportunities",
+      "Because it's cheaper"
     ],
     correct: 1
   },
   {
     id: 8,
     level: "B2",
-    text: "Les réseaux sociaux permettent de communiquer rapidement, mais ils peuvent aussi créer une dépendance et diffuser des informations peu fiables. Pourquoi faut-il faire attention ?",
+    passage: "Social media allows us to communicate quickly, but they can also create addiction and spread unreliable information.",
+    question: "Why should we be careful with social media?",
     options: [
-      "Parce qu'ils sont toujours dangereux",
-      "Parce qu'ils sont seulement utiles",
-      "Parce qu'ils ont des effets positifs et négatifs"
+      "Because they are always dangerous",
+      "Because they are only useful",
+      "Because they have positive and negative effects"
     ],
     correct: 2
   }
 ]
 
-/**
- * Determines the user's French level based on their score
- * @param score - number of correct answers (0-8)
- * @returns Object containing level label, motivational message, and color scheme
- * 
- * Scoring rubric:
- * - 0-2 correct: A0 (Beginner)
- * - 3-4 correct: A1 (Elementary)
- * - 5-6 correct: A2 (Pre-intermediate)
- * - 7 correct: B1 (Intermediate)
- * - 8 correct: B2 (Upper-intermediate)
- */
 const getLevelFromScore = (score: number): { level: string; message: string; color: string } => {
   if (score <= 2) {
     return {
@@ -173,32 +135,27 @@ const getLevelFromScore = (score: number): { level: string; message: string; col
   if (score <= 6) {
     return {
       level: "A2",
-      message: "Nice progress! You can handle everyday conversations now. 🎉",
+      message: "Nice progress! You can handle everyday French now. 🎉",
       color: "from-purple-400 to-violet-500"
     }
   }
   if (score === 7) {
     return {
       level: "B1",
-      message: "Impressive! You're becoming confident in French. 🌟",
+      message: "Impressive! Your reading skills are getting strong. 🌟",
       color: "from-orange-400 to-amber-500"
     }
   }
   return {
     level: "B2",
-    message: "Excellent! You have strong reading comprehension skills. 🏆",
+    message: "Excellent! You have advanced reading comprehension skills. 🏆",
     color: "from-red-400 to-rose-500"
   }
 }
 
-/**
- * Generates encouraging feedback message based on answer correctness
- * @param isCorrect - whether the user selected the correct answer
- * @returns A randomized feedback message to keep the experience engaging
- */
 const getFeedbackMessage = (isCorrect: boolean): string => {
   if (isCorrect) {
-    const messages = ["Nice! 😏", "Too easy! 🔥", "Perfect! ✨", "Spot on! 🎯"]
+    const messages = ["Nice! 😏", "Good catch! 🔥", "Perfect! ✨", "Spot on! 🎯"]
     return messages[Math.floor(Math.random() * messages.length)]
   }
   const messages = [
@@ -211,77 +168,477 @@ const getFeedbackMessage = (isCorrect: boolean): string => {
 }
 
 // =============================================================================
-// MAIN READING TEST COMPONENT
+// ANIMATED BACKGROUND
 // =============================================================================
 
-/**
- * TestLevel - Main reading comprehension quiz component.
- *
- * Manages the complete test flow:
- * - 8 questions with progressive difficulty (A0 to B2)
- * - Answer selection with instant feedback
- * - Results screen with level determination
- * - Animated transitions between questions
- *
- * @returns JSX.Element - The reading test interface
- */
-export default function TestLevel() {
-  // ---------------------------------------------------------------------------
-  // STATE
-  // ---------------------------------------------------------------------------
+function AnimatedBackground() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(4)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full blur-3xl"
+          style={{
+            width: `${120 + i * 40}px`,
+            height: `${120 + i * 40}px`,
+            left: `${10 + i * 22}%`,
+            top: `${15 + (i % 2) * 35}%`,
+            background: `linear-gradient(135deg, ${
+              i % 2 === 0
+                ? "rgba(59,130,246,0.08) 0%, rgba(147,51,234,0.06) 100%"
+                : "rgba(34,197,94,0.06) 0%, rgba(59,130,246,0.04) 100%"
+            })`,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            x: [0, 10, 0],
+            scale: [1, 1.05, 1],
+          }}
+          transition={{
+            duration: 6 + i * 1.5,
+            repeat: Infinity,
+            delay: i * 0.5,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
 
-  // Current question index (0-7)
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute w-2 h-2 rounded-full bg-gradient-to-br from-blue-400/10 to-purple-400/10"
+          style={{
+            left: `${15 + Math.random() * 70}%`,
+            top: `${20 + Math.random() * 60}%`,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.1, 0.25, 0.1],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 2,
+            repeat: Infinity,
+            delay: Math.random() * 2,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// =============================================================================
+// HEADER COMPONENT
+// =============================================================================
+
+function ReadingHeader({
+  currentQuestion,
+  totalQuestions,
+  progress,
+  score,
+  level
+}: {
+  currentQuestion: number
+  totalQuestions: number
+  progress: number
+  score: number
+  level: string
+}) {
+  return (
+    <motion.div
+      className="mb-6"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* Top row */}
+      <div className="flex items-center justify-between mb-4">
+        <Link href="/reception/tests">
+          <motion.button
+            className="text-slate-500 hover:text-slate-700 font-medium text-sm flex items-center gap-1 transition-colors"
+            whileHover={{ x: -3 }}
+          >
+            <FaChevronRight className="w-4 h-4 rotate-180" />
+            Back
+          </motion.button>
+        </Link>
+
+        <div className="flex items-center gap-3">
+          {/* Section badge */}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-100 rounded-full">
+            <FaBookOpen className="w-4 h-4 text-emerald-600" />
+            <span className="text-sm font-bold text-emerald-700">Reading</span>
+          </div>
+
+          {/* XP display */}
+          <motion.div
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 rounded-full"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring" }}
+          >
+            <FaStar className="w-4 h-4 text-amber-600" />
+            <span className="text-sm font-bold text-amber-700">{score * 10} XP</span>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Progress card */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-slate-100">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-slate-600">
+              Question {currentQuestion} of {totalQuestions}
+            </span>
+            <span className="px-2 py-0.5 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 rounded-full text-xs font-bold">
+              {level}
+            </span>
+          </div>
+          <span className="text-sm font-bold text-emerald-600">
+            {Math.round(progress)}%
+          </span>
+        </div>
+
+        <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// PASSAGE CARD
+// =============================================================================
+
+function PassageCard({ passage }: { passage: string }) {
+  return (
+    <motion.div
+      className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden h-full"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+    >
+      {/* Header */}
+      <div className="px-6 py-3 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-100">
+        <div className="flex items-center gap-2">
+          <FaHighlighter className="w-4 h-4 text-slate-500" />
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Reading Text</span>
+        </div>
+      </div>
+
+      {/* Passage content */}
+      <div className="p-6">
+        <p className="text-lg leading-relaxed text-slate-800 font-medium">
+          {passage}
+        </p>
+      </div>
+
+      {/* Reading tip */}
+      <div className="px-6 py-3 bg-blue-50/50 border-t border-slate-100">
+        <p className="text-xs text-blue-600">
+          💡 Read carefully before selecting your answer
+        </p>
+      </div>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// QUESTION CARD
+// =============================================================================
+
+function QuestionCard({
+  question,
+  options,
+  selectedAnswer,
+  correctAnswer,
+  hasAnswered,
+  onSelect
+}: {
+  question: string
+  options: string[]
+  selectedAnswer: number | null
+  correctAnswer: number
+  hasAnswered: boolean
+  onSelect: (index: number) => void
+}) {
+  return (
+    <motion.div
+      className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      {/* Question */}
+      <h2 className="text-xl font-bold text-slate-900 mb-6 leading-relaxed">
+        {question}
+      </h2>
+
+      {/* Options */}
+      <div className="space-y-3">
+        {options.map((option, index) => {
+          const isSelected = selectedAnswer === index
+          const isCorrect = index === correctAnswer
+          
+          let buttonClass = "w-full p-4 rounded-xl border-2 text-left transition-all duration-200 "
+          
+          if (hasAnswered) {
+            if (isCorrect) {
+              buttonClass += "border-emerald-500 bg-emerald-50 text-emerald-900 shadow-md"
+            } else if (isSelected && !isCorrect) {
+              buttonClass += "border-red-400 bg-red-50 text-red-900"
+            } else {
+              buttonClass += "border-slate-200 bg-slate-50 text-slate-400"
+            }
+          } else {
+            buttonClass += isSelected
+              ? "border-emerald-500 bg-emerald-50 text-emerald-900 shadow-md"
+              : "border-slate-200 bg-white text-slate-700 hover:border-emerald-400 hover:bg-emerald-50/50"
+          }
+
+          return (
+            <motion.button
+              key={index}
+              onClick={() => onSelect(index)}
+              disabled={hasAnswered}
+              className={buttonClass}
+              whileHover={!hasAnswered ? { scale: 1.02, y: -2 } : {}}
+              whileTap={!hasAnswered ? { scale: 0.98 } : {}}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
+                  hasAnswered
+                    ? isCorrect
+                      ? "bg-emerald-500 text-white"
+                      : isSelected
+                        ? "bg-red-400 text-white"
+                        : "bg-slate-200 text-slate-400"
+                    : isSelected
+                      ? "bg-emerald-500 text-white"
+                      : "bg-slate-100 text-slate-600"
+                }`}>
+                  {hasAnswered ? (
+                    isCorrect ? <FaCheckCircle className="w-4 h-4" /> : 
+                    isSelected ? <FaTimes className="w-4 h-4" /> : 
+                    String.fromCharCode(65 + index)
+                  ) : (
+                    String.fromCharCode(65 + index)
+                  )}
+                </div>
+                <span className="font-medium">{option}</span>
+              </div>
+            </motion.button>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// FEEDBACK CARD
+// =============================================================================
+
+function FeedbackCard({
+  isCorrect,
+  message,
+  onNext,
+  isLast
+}: {
+  isCorrect: boolean
+  message: string
+  onNext: () => void
+  isLast: boolean
+}) {
+  return (
+    <motion.div
+      className="mt-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <div className={`p-4 rounded-xl mb-4 ${
+        isCorrect
+          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+          : "bg-red-100 text-red-800 border border-red-200"
+      }`}>
+        <p className="font-bold text-center text-lg">{message}</p>
+      </div>
+
+      <motion.button
+        onClick={onNext}
+        className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2"
+        whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(16,185,129,0.4)" }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <span>{isLast ? "See Results" : "Next Question"}</span>
+        <motion.div
+          animate={{ x: [0, 5, 0] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          <FaArrowRight className="w-5 h-5" />
+        </motion.div>
+      </motion.button>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// RESULTS SCREEN
+// =============================================================================
+
+function ResultsScreen({
+  score,
+  totalQuestions,
+  onRestart
+}: {
+  score: number
+  totalQuestions: number
+  onRestart: () => void
+}) {
+  const result = getLevelFromScore(score)
+
+  return (
+    <motion.div
+      className="min-h-screen flex items-center justify-center px-4 py-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 text-center"
+        initial={{ opacity: 0, scale: 0.9, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, type: "spring" }}
+      >
+        {/* Trophy icon */}
+        <motion.div
+          className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${result.color} flex items-center justify-center shadow-xl`}
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+        >
+          <span className="text-4xl font-bold text-white">{result.level}</span>
+        </motion.div>
+
+        <motion.h2
+          className="text-2xl font-bold text-slate-900 mb-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          Your French Level
+        </motion.h2>
+
+        {/* Score */}
+        <motion.div
+          className="mb-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="text-5xl font-bold text-slate-800 mb-1">{score}/{totalQuestions}</div>
+          <p className="text-slate-500">correct answers</p>
+        </motion.div>
+
+        {/* XP earned */}
+        <motion.div
+          className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full mb-6"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.5, type: "spring" }}
+        >
+          <FaStar className="w-5 h-5 text-amber-600" />
+          <span className="text-lg font-bold text-amber-700">+{score * 10} XP Earned</span>
+        </motion.div>
+
+        {/* Progress bar */}
+        <motion.div
+          className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${(score / totalQuestions) * 100}%` }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
+          />
+        </motion.div>
+
+        {/* Message */}
+        <motion.p
+          className="text-slate-700 mb-8 leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          {result.message}
+        </motion.p>
+
+        {/* Buttons */}
+        <motion.div
+          className="flex gap-3"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <button
+            onClick={onRestart}
+            className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
+          >
+            Try Again
+          </button>
+          <Link href="/home" className="flex-1">
+            <button className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition-all">
+              Start Learning
+            </button>
+          </Link>
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
+export default function ReadingTestLevel() {
   const [currentIndex, setCurrentIndex] = useState(0)
-  // Number of correct answers so far
   const [score, setScore] = useState(0)
-  // Currently selected answer option (null if none selected)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
-  // Whether current question has been answered
   const [hasAnswered, setHasAnswered] = useState(false)
-  // Whether the selected answer was correct (null if not answered)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
-  // Whether to show the results screen
   const [showResult, setShowResult] = useState(false)
-  // Feedback message after answering (randomized encouraging message)
   const [feedback, setFeedback] = useState("")
 
-  // ---------------------------------------------------------------------------
-  // DERIVED STATE
-  // ---------------------------------------------------------------------------
-
-  // Current question data from questions array
   const currentQuestion = questions[currentIndex]
-  // Progress percentage for progress bar (0-100)
-  const progress = ((currentIndex + 1) / questions.length) * 100
+  const progress = ((currentIndex + (hasAnswered ? 1 : 0)) / questions.length) * 100
 
-  // ---------------------------------------------------------------------------
-  // HANDLERS
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Handle answer selection.
-   * Checks if answer is correct, updates score, shows feedback.
-   * Prevents changing answer after selection.
-   * @param optionIndex - index of the selected option (0-2)
-   */
   const handleSelectAnswer = (optionIndex: number) => {
     if (hasAnswered) return
     setSelectedAnswer(optionIndex)
     setHasAnswered(true)
-    
+
     const correct = optionIndex === currentQuestion.correct
     setIsCorrect(correct)
     setFeedback(getFeedbackMessage(correct))
-    
+
     if (correct) {
       setScore(score + 1)
     }
   }
 
-  /**
-   * Handle next button click.
-   * Advances to next question or shows results screen if last question.
-   */
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1)
@@ -294,10 +651,6 @@ export default function TestLevel() {
     }
   }
 
-  /**
-   * Handle restart button click.
-   * Resets all state to initial values to start quiz from beginning.
-   */
   const handleRestart = () => {
     setCurrentIndex(0)
     setScore(0)
@@ -308,216 +661,73 @@ export default function TestLevel() {
     setFeedback("")
   }
 
-  // ---------------------------------------------------------------------------
-  // RENDER
-  // ---------------------------------------------------------------------------
-
-  // Results screen - shown after all questions answered
   if (showResult) {
-    const result = getLevelFromScore(score)
-    const percentage = (score / questions.length) * 100
-
     return (
-      // Full-screen container with gradient background
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8">
-        {/* Animated results card with fade-in and scale animation */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 text-center"
-        >
-          {/* Animated level badge with spring bounce effect */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${result.color} flex items-center justify-center`}
-          >
-            {/* Display CEFR level (A0, A1, A2, B1, or B2) */}
-            <span className="text-4xl font-bold text-white">{result.level}</span>
-          </motion.div>
-
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
-            Your French Level
-          </h2>
-          
-          {/* Score display - shows correct answers out of total */}
-          <div className="mb-6">
-            <div className="text-5xl font-bold text-slate-800 mb-1">
-              {score}/{questions.length}
-            </div>
-            <p className="text-slate-500">correct answers</p>
-          </div>
-
-          {/* Animated progress bar - fills based on score percentage */}
-          <div className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${percentage}%` }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
-            />
-          </div>
-
-          {/* Motivational message based on user's level */}
-          <p className="text-slate-700 mb-8 leading-relaxed">
-            {result.message}
-          </p>
-
-          {/* Action buttons - restart quiz or go to learning dashboard */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleRestart}
-              className="flex-1 py-3 px-6 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
-            >
-              Try Again
-            </button>
-            <Link
-              href="/home"
-              className="flex-1 py-3 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all text-center"
-            >
-              Start Learning
-            </Link>
-          </div>
-        </motion.div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/20 font-sans overflow-x-hidden relative">
+        <AnimatedBackground />
+        <ResultsScreen
+          score={score}
+          totalQuestions={questions.length}
+          onRestart={handleRestart}
+        />
       </div>
     )
   }
 
-  // Main quiz interface - question card with French text and options
   return (
-    // Full-screen container with soft gradient background
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-8">
-      {/* Main content wrapper - limits max width for readability */}
-      <div className="w-full max-w-lg">
-        {/* Header section - navigation and progress info */}
-        <div className="mb-6">
-          {/* Top row - back link and question counter */}
-          <div className="flex items-center justify-between mb-4">
-            <Link href="/home" className="text-slate-500 hover:text-slate-700 transition-colors text-sm">
-              ← Back to Home
-            </Link>
-            <span className="text-sm font-medium text-slate-600">
-              Question {currentIndex + 1} of {questions.length}
-            </span>
-          </div>
-          
-          {/* Progress bar - visual indicator of quiz completion */}
-          <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-            <motion.div
-              initial={false}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-              className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
-            />
-          </div>
-          
-          {/* Level indicator badge - shows current CEFR level */}
-          <div className="flex items-center gap-2 mt-3">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Level
-            </span>
-            <span className="px-3 py-1 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 rounded-full text-sm font-bold">
-              {currentQuestion.level}
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/20 font-sans overflow-x-hidden relative">
+      <AnimatedBackground />
 
-        {/* Question Card Container with AnimatePresence for smooth transitions */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+        {/* Header */}
+        <ReadingHeader
+          currentQuestion={currentIndex + 1}
+          totalQuestions={questions.length}
+          progress={progress}
+          score={score}
+          level={currentQuestion.level}
+        />
+
+        {/* Two-zone layout */}
         <AnimatePresence mode="wait">
-          {/* Animated card - slides in from right when question changes */}
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 sm:p-8"
+            className="grid lg:grid-cols-2 gap-6"
           >
-            {/* Question text - displays French reading comprehension question */}
-            <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 mb-8 leading-relaxed">
-              {currentQuestion.text}
-            </h2>
-
-            {/* Options container - displays 3 multiple choice buttons */}
-            <div className="space-y-3">
-              {currentQuestion.options.map((option, index) => {
-                // Dynamic styling based on answer state
-                let buttonClass = "w-full p-4 sm:p-5 rounded-xl border-2 text-left transition-all duration-200 "
-                
-                // Apply different styles based on whether question was answered and which option was selected
-                if (hasAnswered) {
-                  if (index === currentQuestion.correct) {
-                    // Green styling for correct answer
-                    buttonClass += "border-emerald-500 bg-emerald-50 text-emerald-900"
-                  } else if (index === selectedAnswer && index !== currentQuestion.correct) {
-                    // Red styling for incorrect user selection
-                    buttonClass += "border-red-400 bg-red-50 text-red-900"
-                  } else {
-                    // Gray styling for unselected options
-                    buttonClass += "border-slate-200 bg-slate-50 text-slate-500"
-                  }
-                } else {
-                  // Hover styling for options before selection
-                  buttonClass += "border-slate-200 hover:border-purple-400 hover:bg-purple-50 text-slate-800 cursor-pointer"
-                }
-
-                return (
-                  // Animated answer button with hover and tap effects
-                  <motion.button
-                    key={index}
-                    onClick={() => handleSelectAnswer(index)}
-                    disabled={hasAnswered}
-                    whileHover={!hasAnswered ? { scale: 1.02 } : {}}
-                    whileTap={!hasAnswered ? { scale: 0.98 } : {}}
-                    className={buttonClass}
-                  >
-                    {/* Answer option text */}
-                    <span className="font-medium">{option}</span>
-                  </motion.button>
-                )
-              })}
+            {/* Left: Reading Passage */}
+            <div className="order-1">
+              <PassageCard passage={currentQuestion.passage} />
             </div>
 
-            {/* Feedback section - shows after user answers */}
-            <AnimatePresence>
-              {hasAnswered && (
-                // Animated feedback container with fade-in effect
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-6"
-                >
-                  {/* Feedback message with color based on correctness */}
-                  <div className={`p-4 rounded-xl ${isCorrect ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>
-                    <p className="font-semibold text-center">{feedback}</p>
-                  </div>
-                  
-                  {/* Next button - fades in after delay for user to read feedback */}
-                  <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    onClick={handleNext}
-                    className="w-full mt-4 py-4 px-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all"
-                  >
-                    {/* Dynamic button text - "Next Question" or "See Results" */}
-                    {currentIndex < questions.length - 1 ? "Next Question →" : "See Results →"}
-                  </motion.button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Right: Question & Answers */}
+            <div className="order-2">
+              <QuestionCard
+                question={currentQuestion.question}
+                options={currentQuestion.options}
+                selectedAnswer={selectedAnswer}
+                correctAnswer={currentQuestion.correct}
+                hasAnswered={hasAnswered}
+                onSelect={handleSelectAnswer}
+              />
+
+              {/* Feedback */}
+              <AnimatePresence>
+                {hasAnswered && (
+                  <FeedbackCard
+                    isCorrect={isCorrect!}
+                    message={feedback}
+                    onNext={handleNext}
+                    isLast={currentIndex === questions.length - 1}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         </AnimatePresence>
-
-        {/* Live score display - shows current correct answer count */}
-        <div className="text-center mt-4">
-          <span className="text-sm text-slate-500">
-            Score: <span className="font-semibold text-slate-700">{score}</span> correct
-          </span>
-        </div>
       </div>
     </div>
   )
