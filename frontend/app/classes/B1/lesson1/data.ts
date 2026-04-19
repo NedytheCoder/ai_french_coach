@@ -196,6 +196,18 @@ export const commonMistakes = [
 // =============================================================================
 
 /**
+ * PracticeQuestion - Type definition for a single practice question.
+ */
+export type PracticeQuestion = {
+  id: number;
+  topic: string;
+  prompt: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+};
+
+/**
  * practiceQuestions - 15-question quiz for B1 Lesson 1.
  *
  * Topics covered:
@@ -215,7 +227,7 @@ export const commonMistakes = [
  * - correct: index of correct option (0-2)
  * - explanation: detailed explanation of answer
  */
-export const practiceQuestions = [
+export const practiceQuestions: PracticeQuestion[] = [
   { id: 1, topic: "formation", prompt: "How do you form the conditional?", options: ["Future stem + imparfait endings", "Present stem + future endings", "Imparfait stem + present endings"], correct: 0, explanation: "The conditional is formed with the future stem and imparfait endings." },
   { id: 2, topic: "formation", prompt: "Conjugate 'parler' for 'je':", options: ["je parlerais", "je parlerai", "je parlais"], correct: 0, explanation: "Je parlerais is the conditional form." },
   { id: 3, topic: "irregulars", prompt: "What is the conditional stem of 'aller'?", options: ["ir-", "all-", "va-"], correct: 0, explanation: "Aller becomes ir- in conditional (j'irais)." },
