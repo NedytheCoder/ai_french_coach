@@ -13,5 +13,6 @@ dependencies = [
     "openapi>=2.0.0",
     "pydub>=0.25.1",
     "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.26",
     "uvicorn>=0.42.0",
 ]
