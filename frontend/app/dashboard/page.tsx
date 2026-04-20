@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import {
@@ -16,7 +17,9 @@ import {
   MotivationalPanel,
   FloatingDecorations,
 } from "../components/dashboard"
-import { FaBell, FaUser, FaCog } from "react-icons/fa"
+import { FaUser, FaCog } from "react-icons/fa"
+import NotificationDropdown from "./components/NotificationDropdown"
+import { Notification } from "./components/NotificationItem"
 
 // Mock data for the dashboard
 const mockUserData = {
@@ -125,7 +128,57 @@ const mockMotivationalData = {
   },
 }
 
+// Mock notifications data
+const mockNotifications: Notification[] = [
+  {
+    id: 1,
+    title: "Lesson completed",
+    description: "You completed A1 Lesson 2: Basic Greetings",
+    time: "2 min ago",
+    type: "lesson",
+    read: false,
+  },
+  {
+    id: 2,
+    title: "Streak updated",
+    description: "You're on a 3-day streak! Keep it up! 🔥",
+    time: "1 hour ago",
+    type: "streak",
+    read: false,
+  },
+  {
+    id: 3,
+    title: "Achievement unlocked",
+    description: "Week Warrior: Maintain a 7-day streak",
+    time: "Yesterday",
+    type: "achievement",
+    read: true,
+  },
+  {
+    id: 4,
+    title: "XP Boost earned",
+    description: "You earned 150 XP today!",
+    time: "2 days ago",
+    type: "xp",
+    read: true,
+  },
+]
+
 export default function DashboardPage() {
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
+
+  const handleMarkAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  }
+
+  const handleNotificationClick = (notification: Notification) => {
+    // Mark as read when clicked
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notification.id ? { ...n, read: true } : n))
+    )
+    setIsNotificationOpen(false)
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden">
       <FloatingDecorations />
@@ -149,28 +202,32 @@ export default function DashboardPage() {
             </Link>
 
             <div className="flex items-center gap-4">
-              <motion.button
-                className="relative p-2 text-slate-600 hover:text-purple-600 transition-colors rounded-xl hover:bg-slate-100"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaBell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-              </motion.button>
-              <motion.button
-                className="p-2 text-slate-600 hover:text-purple-600 transition-colors rounded-xl hover:bg-slate-100"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FaCog className="w-5 h-5" />
-              </motion.button>
+              <NotificationDropdown
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                onToggle={() => setIsNotificationOpen(!isNotificationOpen)}
+                notifications={notifications}
+                onMarkAllRead={handleMarkAllRead}
+                onNotificationClick={handleNotificationClick}
+              />
+              <Link href="/dashboard/settings">
+                <motion.button
+                  className="p-2 text-slate-600 hover:text-purple-600 transition-colors rounded-xl hover:bg-slate-100"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FaCog className="w-5 h-5" />
+                </motion.button>
+              </Link>
+              <Link href="/dashboard/profile">
               <motion.div
                 className="w-9 h-9 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full flex items-center justify-center cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-              >
+                >
                 <FaUser className="w-4 h-4 text-white" />
               </motion.div>
+                </Link>
             </div>
           </div>
         </div>
