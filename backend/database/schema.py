@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     full_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
+    current_level TEXT,
+    target_level TEXT,
+    learning_goal TEXT,
+    lesson_progress TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
