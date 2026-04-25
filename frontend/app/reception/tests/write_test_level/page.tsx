@@ -186,14 +186,14 @@ const validateAnswer = (question: Question, answer: string): boolean => {
       return trimmedAnswer.toLowerCase() === question.expectedAnswer?.toLowerCase()
     
     case "fill":
-      if (question.expectedKeywords) {
-        return question.expectedKeywords.some(keyword => 
-          trimmedAnswer.toLowerCase().includes(keyword.toLowerCase())
-        )
-      }
-      return false
-    
     case "short":
+      // First check min-words validation if present
+      if (question.validation && question.validation.startsWith("min-words-")) {
+        const wordCount = trimmedAnswer.split(/\s+/).length
+        const minWords = parseInt(question.validation.split("-")[2])
+        if (wordCount < minWords) return false
+      }
+      // Then check keywords if present
       if (question.expectedKeywords) {
         return question.expectedKeywords.some(keyword => 
           trimmedAnswer.toLowerCase().includes(keyword.toLowerCase())
@@ -864,8 +864,8 @@ export default function WritingTestLevel() {
   const handleSubmit = () => {
     if (currentSubmitted || currentAnswer.trim() === "") return
     
-    // For longer tasks, check minimum word count
-    if (minWords > 0 && wordCount < minWords) {
+    // For longer tasks, check minimum word count (but allow fill/short with keywords)
+    if (minWords > 0 && wordCount < minWords && !currentQuestion.expectedKeywords) {
       return // Don't allow submit if below minimum
     }
     
@@ -967,7 +967,10 @@ export default function WritingTestLevel() {
                 <div className="mt-4">
                   <SubmitButton
                     onClick={handleSubmit}
-                    disabled={currentAnswer.trim() === "" || (minWords > 0 && wordCount < minWords)}
+                    disabled={currentAnswer.trim() === "" || (
+                      minWords > 0 && wordCount < minWords && 
+                      !currentQuestion.expectedKeywords // Allow shorter answers if keywords are expected
+                    )}
                     wordCount={wordCount}
                     minWords={minWords}
                     type={currentQuestion.type}

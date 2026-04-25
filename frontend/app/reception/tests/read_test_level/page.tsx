@@ -40,6 +40,7 @@ interface Question {
   options: string[]
   correct: number
   instructions: string
+  xp_reward: number
 }
 
 interface FeedbackMessage {
@@ -224,7 +225,7 @@ function ReadingHeader({
             transition={{ type: "spring" }}
           >
             <FaStar className="w-4 h-4 text-amber-600" />
-            <span className="text-sm font-bold text-amber-700">{score * 10} XP</span>
+            <span className="text-sm font-bold text-amber-700">{score} XP</span>
           </motion.div>
         </div>
       </div>
@@ -591,6 +592,7 @@ export default function ReadingTestLevel() {
                 question: test.question,
                 options: JSON.parse(test.options_json || '[]'),
                 correct: parseInt(test.answer, 10),
+                xp_reward: parseInt(test.xp_reward, 10),
                 instructions: test.instructions
               }))
               setQuestions(transformedQuestions)
@@ -631,7 +633,7 @@ export default function ReadingTestLevel() {
     setFeedback(getFeedbackMessage(correct, immediateQuestionFeedback))
 
     if (correct) {
-      setScore(score + 1)
+      setScore(score + currentQuestion.xp_reward)
     }
   }
 

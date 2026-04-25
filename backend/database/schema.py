@@ -143,11 +143,12 @@ CREATE TABLE IF NOT EXISTS reading_placement_tests (
     options_json TEXT NOT NULL,
     answer TEXT NOT NULL,
     instructions TEXT NOT NULL,
+    xp_reward INTEGER NOT NULL,
     sort_order INTEGER NOT NULL
 );
 
 INSERT INTO reading_placement_tests
-(level_id, passage, question, options_json, answer, instructions, sort_order)
+(level_id, passage, question, options_json, answer, instructions, xp_reward, sort_order)
 VALUES
 (
 'A0',
@@ -156,6 +157,7 @@ VALUES
 '["Goodbye", "Hello", "Please"]',
 '1',
 'Read carefully before selecting your answer',
+'10',
 '1'
 ),
 (
@@ -165,6 +167,7 @@ VALUES
 '["Coffee", "Car", "House"]',
 '0',
 'Read carefully before selecting your answer',
+'10',
 '2'
 ),
 (
@@ -174,6 +177,7 @@ VALUES
 '["Lyon", "Paris", "Rome"]',
 '0',
 'Read carefully before selecting your answer',
+'15',
 '3'
 ),
 (
@@ -183,6 +187,7 @@ VALUES
 '["20 ans", "25 ans", "30 ans"]',
 '1',
 'Read carefully before selecting your answer',
+'15',
 '4'
 ),
 (
@@ -192,6 +197,7 @@ VALUES
 '["Parce qu''elle gagne beaucoup d''argent", "Parce qu''elle parle avec les clients", "Parce qu''elle travaille peu"]',
 '1',
 'Read carefully before selecting your answer',
+'20',
 '5'
 ),
 (
@@ -201,6 +207,7 @@ VALUES
 '["8h", "12h", "16h"]',
 '2',
 'Read carefully before selecting your answer',
+'20',
 '6'
 ),
 (
@@ -210,6 +217,7 @@ VALUES
 '["Parce que c''est calme", "Parce qu''il y a plus d''opportunités", "Parce que c''est moins cher"]',
 '1',
 'Read carefully before selecting your answer',
+'25',
 '7'
 ),
 (
@@ -219,6 +227,7 @@ VALUES
 '["Parce qu''ils sont toujours dangereux", "Parce qu''ils sont seulement utiles", "Parce qu''ils ont des effets positifs et négatifs"]',
 '2',
 'Read carefully before selecting your answer',
+'30',
 '8'
 ),
 (
@@ -228,6 +237,7 @@ VALUES
 '["La proposition a été un succès global", "La proposition semblait bonne mais avait de graves problèmes cachés", "La proposition a été rejetée immédiatement"]',
 '1',
 'Read carefully before selecting your answer',
+'35',
 '9'
 ),
 (
@@ -237,21 +247,156 @@ VALUES
 '["Les gens ont du mal à accéder à l''information", "Le principal défi aujourd''hui est d''évaluer la qualité de l''information", "L''information devient de moins en moins disponible"]',
 '1',
 'Read carefully before selecting your answer',
+'40',
 '10'
 );
 
-pirhg[orj]hbq9erpjg
-orkg[rgp
-orjkf[k
-peeeeeppppppppppppppppppp]] CHECK HERE OUT TOMORROW!
--- Result Card
-CREATE TABLE IF NOT EXISTS placement_result_card (
+-- Listening Questions
+CREATE TABLE IF NOT EXISTS listening_placement_tests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    score TEXT NOT NULL,
-    feedback TEXT NOT NULL,
+    level_id TEXT NOT NULL,
+    audio_path TEXT NOT NULL,
+    question TEXT NOT NULL,
+    options_json TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    transcription TEXT NOT NULL,
+    instructions TEXT NOT NULL,
     xp_reward INTEGER NOT NULL,
+    sort_order INTEGER NOT NULL
+);
 
-    UNIQUE(score)
+INSERT INTO listening_placement_tests
+(level_id, audio_path, question, options_json, answer, transcription,instructions, xp_reward, sort_order)
+VALUES
+(
+'A0',
+'reception/audios/question1.mp3',
+'What did you hear?',
+'["Au revoir", "Bonjour", "Merci"]',
+'1',
+'Bonjour.',
+'Listen carefully and select the correct answer',
+'10',
+'1'
+),
+(
+'A0',
+'reception/audios/question2.mp3',
+'What did you hear?',
+'["S''il vous plaît", "Désolé", "Merci"]',
+'2',
+'Merci.',
+'Listen carefully and select the correct answer',
+'10',
+'2'
+),
+(
+'A1',
+'reception/audios/question3.mp3',
+'Comment s''appelle la personne?',
+'["Paul", "Marie", "Sophie"]',
+'1',
+'Salut, mon ami. Je m''appelle Marie. Enchanté.',
+'Listen carefully and select the correct answer',
+'15',
+'3'
+),
+(
+'A1',
+'reception/audios/question4.mp3',
+'Où habite la personne?',
+'["Lyon", "Marseille", "Paris"]',
+'2',
+'Bonjour. Je suis Laurent et j''habite à Paris.',
+'Listen carefully and select the correct answer',
+'15',
+'4'
+),
+(
+'A2',
+'reception/audios/question5.mp3',
+'Pourquoi la personne aime son travail ?',
+'["Parce qu''elle gagne beaucoup d''argent", "Parce qu''elle parle avec les clients", "Parce qu''elle travaille peu"]',
+'1',
+'Je travaille dans un hôpital. Je parle avec les patients tous les jours. Ils racontent leurs histoires et leurs expériences. Je trouve cela très intéressant. J’aime écouter et aider les gens dans mon travail.',
+'Listen carefully and select the correct answer',
+'20',
+'5'
+),
+(
+'A2',
+'reception/audios/question6.mp3',
+'À quelle heure finit-il?',
+'["8h", "12h", "16h"]',
+'2',
+'Je travaille dans un bureau en ville. Je commence le matin à neuf heures. Je parle avec des clients et je réponds à leurs questions. J’aime bien mon travail parce que c’est intéressant. Je travaille toute la journée et je finis à 16 heures.',
+'Listen carefully and select the correct answer',
+'20',
+'6'
+),
+(
+'B1',
+'reception/audios/question7.mp3',
+'Pourquoi les gens préfèrent la vie en ville?',
+'["Parce que c''est calme", "Parce qu''il y a plus d''opportunités", "Parce que c''est moins cher"]',
+'1',
+'Je préfère vivre en ville. J’aime sortir après le travail, aller au cinéma ou retrouver mes amis dans un café. Le week-end, je peux visiter des musées ou me promener dans différents quartiers. Il y a toujours quelque chose à faire, donc je ne m’ennuie jamais.
+
+Pour moi, c’est aussi plus pratique pour le travail. Il y a beaucoup d’entreprises et je peux facilement trouver un emploi ou changer de poste si je le souhaite. Les transports sont bien organisés, alors je peux me déplacer sans problème.
+
+La vie est plus rapide et plus animée, et c’est exactement ce que j’aime.',
+'Listen carefully and select the correct answer',
+'25',
+'7'
+),
+(
+'B2',
+'reception/audios/question8.mp3',
+'Pourquoi devrions-nous faire attention aux réseaux sociaux?',
+'["Parce qu''ils sont toujours dangereux", "Parce qu''ils sont seulement utiles", "Parce qu''ils ont des effets positifs et négatifs"]',
+'2',
+'Les réseaux sociaux nous permettent de communiquer facilement avec les autres, même à distance. On peut partager des photos, donner son avis et rester en contact avec ses proches sans difficulté. Ils font maintenant partie de notre vie quotidienne, que ce soit pour le travail ou pour les loisirs.
+
+Cependant, ils peuvent aussi créer une certaine dépendance, car on a tendance à les consulter très souvent, parfois sans vraiment s’en rendre compte. Cela peut prendre beaucoup de temps et réduire notre concentration sur d’autres activités.
+
+En plus, toutes les informations qui circulent ne sont pas forcément exactes. Il est parfois difficile de vérifier les sources, et certaines informations peuvent se diffuser rapidement sans être confirmées. C’est pour cela qu’il est important de faire attention à ce que l’on lit et de garder un esprit critique lorsqu’on utilise les réseaux sociaux.',
+'Listen carefully and select the correct answer',
+'30',
+'8'
+),
+(
+'C1',
+'reception/audios/question9.mp3',
+'Quel est l''idée principale du passage?',
+'["La proposition a été un succès global", "La proposition semblait bonne mais avait de graves problèmes cachés", "La proposition a été rejetée immédiatement"]',
+'1',
+'Au départ, la proposition se présentait de manière structurée, avec des objectifs bien définis et des pistes de solution apparemment adaptées aux enjeux identifiés. Dans un premier temps, rien ne laissait vraiment présager de difficultés particulières quant à sa mise en œuvre.
+
+Cependant, à mesure que l’analyse s’est approfondie, certains éléments ont commencé à soulever des interrogations. Plusieurs failles sous-jacentes sont apparues, notamment des incohérences internes ainsi que des hypothèses qui reposaient sur des bases relativement fragiles.
+
+De plus, certaines contraintes n’avaient pas été pleinement intégrées dans la réflexion initiale, ce qui risque de compliquer sa mise en application. À plus long terme, ces limites pourraient affecter l’équilibre général du projet et en réduire la portée.
+
+Ainsi, malgré un cadre initial apparemment solide, il semble indispensable de procéder à une réévaluation approfondie afin d’envisager une mise en œuvre réellement viable et durable.',
+'Listen carefully and select the correct answer',
+'35',
+'9'
+),
+(
+'C2',
+'reception/audios/question10.mp3',
+'Quel est l''implication de l''auteur?',
+'["Les gens ont du mal à accéder à l''information", "Le principal défi aujourd''hui est d''évaluer la qualité de l''information", "L''information devient de moins en moins disponible"]',
+'1',
+'Aujourd’hui, nous évoluons dans un environnement où les contenus circulent sans interruption, se renouvellent à un rythme soutenu et s’imposent dans notre quotidien avec une facilité déconcertante. Cette profusion constante donne parfois l’illusion d’une parfaite maîtrise, comme si le simple fait d’être exposé à une multitude de sources suffisait à garantir une bonne compréhension du monde qui nous entoure.
+
+Pourtant, à y regarder de plus près, tout ne se vaut pas. Entre les discours approximatifs, les interprétations biaisées et les informations sorties de leur contexte, il devient nécessaire d’opérer des distinctions de plus en plus fines. Cela suppose non seulement de prendre du recul, mais aussi de mobiliser des repères solides pour éviter de se laisser entraîner par ce qui paraît immédiatement plausible ou séduisant.
+
+Or, cette aptitude à naviguer avec discernement dans un tel flux ne s’acquiert pas de manière uniforme. Elle dépend largement des parcours individuels, des habitudes intellectuelles et des cadres dans lesquels chacun évolue. Certains développent plus aisément des réflexes d’analyse et de mise à distance, tandis que d’autres restent davantage exposés aux effets de saturation ou de confusion.
+
+Dans ce contexte, l’enjeu ne réside plus tant dans la possibilité d’accéder à des contenus variés que dans la manière de les appréhender, de les hiérarchiser et d’en saisir les implications. Autrement dit, il s’agit moins de recevoir que de comprendre — et surtout, de savoir sur quoi accorder sa confiance.',
+'Listen carefully and select the correct answer',
+'40',
+'10'
 );
 """
 

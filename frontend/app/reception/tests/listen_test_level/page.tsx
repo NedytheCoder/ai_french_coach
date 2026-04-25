@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import {
@@ -8,6 +9,7 @@ import {
   FaTimes, FaHeadphones, FaVolumeUp, FaClock, FaStar,
   FaTrophy, FaChevronRight, FaWaveSquare
 } from "react-icons/fa"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 // =============================================================================
 // TYPES & DATA
@@ -15,138 +17,75 @@ import {
 
 interface Question {
   id: number
-  level: string
+  level_id: string
   transcript: string
   audioSrc: string
   question: string
   options: string[]
   correct: number
+  instruction: string
+  xp_reward: number
 }
 
-const questions: Question[] = [
-  {
-    id: 1,
-    level: "A0",
-    transcript: "Bonjour !",
-    audioSrc: "/audio/q1.mp3",
-    question: "Que veut dire \"Bonjour\" ?",
-    options: ["Goodbye", "Hello", "Thank you"],
-    correct: 1
-  },
-  {
-    id: 2,
-    level: "A0",
-    transcript: "Merci",
-    audioSrc: "/audio/q2.mp3",
-    question: "Que veut dire \"Merci\" ?",
-    options: ["Please", "Sorry", "Thank you"],
-    correct: 2
-  },
-  {
-    id: 3,
-    level: "A1",
-    transcript: "Je m'appelle Marie.",
-    audioSrc: "/audio/q3.mp3",
-    question: "Comment s'appelle la personne ?",
-    options: ["Paul", "Marie", "Sophie"],
-    correct: 1
-  },
-  {
-    id: 4,
-    level: "A1",
-    transcript: "J'habite à Paris.",
-    audioSrc: "/audio/q4.mp3",
-    question: "Où habite la personne ?",
-    options: ["Lyon", "Marseille", "Paris"],
-    correct: 2
-  },
-  {
-    id: 5,
-    level: "A2",
-    transcript: "Je travaille dans un café. J'aime parler avec les clients.",
-    audioSrc: "/audio/q5.mp3",
-    question: "Pourquoi la personne aime son travail ?",
-    options: [
-      "Parce qu'elle gagne beaucoup d'argent",
-      "Parce qu'elle parle avec les clients",
-      "Parce qu'elle travaille seule"
-    ],
-    correct: 1
-  },
-  {
-    id: 6,
-    level: "A2",
-    transcript: "Je commence à 9h et je finis à 17h.",
-    audioSrc: "/audio/q6.mp3",
-    question: "À quelle heure la personne finit ?",
-    options: ["9h", "17h", "12h"],
-    correct: 1
-  },
-  {
-    id: 7,
-    level: "B1",
-    transcript: "J'aime vivre en ville parce qu'il y a beaucoup d'activités et de travail, mais c'est parfois stressant.",
-    audioSrc: "/audio/q7.mp3",
-    question: "Pourquoi la personne aime vivre en ville ?",
-    options: [
-      "Parce que c'est calme",
-      "Parce qu'il y a plus d'opportunités",
-      "Parce que c'est moins cher"
-    ],
-    correct: 1
-  },
-  {
-    id: 8,
-    level: "B2",
-    transcript: "Les réseaux sociaux sont utiles pour communiquer rapidement, mais ils peuvent aussi créer une dépendance et diffuser de fausses informations.",
-    audioSrc: "/audio/q8.mp3",
-    question: "Pourquoi faut-il faire attention aux réseaux sociaux ?",
-    options: [
-      "Parce qu'ils sont toujours dangereux",
-      "Parce qu'ils sont seulement utiles",
-      "Parce qu'ils ont des effets positifs et négatifs"
-    ],
-    correct: 2
-  }
-]
-
-const getLevelFromScore = (score: number): { level: string; message: string; color: string } => {
-  if (score <= 2) {
-    return {
-      level: "A0",
-      message: "Every expert was once a beginner. Let's start your journey! 🌱",
-      color: "from-green-400 to-emerald-500"
-    }
-  }
-  if (score <= 4) {
-    return {
-      level: "A1",
-      message: "Great start! You're building solid foundations. Keep going! 💪",
-      color: "from-blue-400 to-cyan-500"
-    }
-  }
-  if (score <= 6) {
-    return {
-      level: "A2",
-      message: "Nice progress! You can understand everyday French now. 🎉",
-      color: "from-purple-400 to-violet-500"
-    }
-  }
-  if (score === 7) {
-    return {
-      level: "B1",
-      message: "Impressive! Your listening skills are getting strong. 🌟",
-      color: "from-orange-400 to-amber-500"
-    }
-  }
-  return {
-    level: "B2",
-    message: "Excellent! You have advanced listening comprehension skills. 🏆",
-    color: "from-red-400 to-rose-500"
-  }
+interface FeedbackMessage {
+  id: number
+  feedback_type: string
+  skill: string
+  messages_json: string
 }
 
-const getFeedbackMessage = (isCorrect: boolean): string => {
+// const getLevelFromScore = (score: number): { level: string; message: string; color: string } => {
+//   if (score <= 2) {
+//     return {
+//       level: "A0",
+//       message: "Every expert was once a beginner. Let's start your journey! 🌱",
+//       color: "from-green-400 to-emerald-500"
+//     }
+//   }
+//   if (score <= 4) {
+//     return {
+//       level: "A1",
+//       message: "Great start! You're building solid foundations. Keep going! 💪",
+//       color: "from-blue-400 to-cyan-500"
+//     }
+//   }
+//   if (score <= 6) {
+//     return {
+//       level: "A2",
+//       message: "Nice progress! You can understand everyday French now. 🎉",
+//       color: "from-purple-400 to-violet-500"
+//     }
+//   }
+//   if (score === 7) {
+//     return {
+//       level: "B1",
+//       message: "Impressive! Your listening skills are getting strong. 🌟",
+//       color: "from-orange-400 to-amber-500"
+//     }
+//   }
+//   return {
+//     level: "B2",
+//     message: "Excellent! You have advanced listening comprehension skills. 🏆",
+//     color: "from-red-400 to-rose-500"
+//   }
+// }
+
+const getFeedbackMessage = (isCorrect: boolean, feedbackData: FeedbackMessage[]): string => {
+  const type = isCorrect ? "correct" : "incorrect"
+  const feedback = feedbackData.find(f => f.feedback_type === type)
+  
+  if (feedback) {
+    try {
+      const messages = JSON.parse(feedback.messages_json)
+      if (Array.isArray(messages) && messages.length > 0) {
+        return messages[Math.floor(Math.random() * messages.length)]
+      }
+    } catch {
+      // Fall through to defaults if JSON parsing fails
+    }
+  }
+  
+  // Fallback defaults
   if (isCorrect) {
     const messages = ["Nice! 😏", "Good catch! 🔥", "Perfect! ✨", "Spot on! 🎯"]
     return messages[Math.floor(Math.random() * messages.length)]
@@ -270,7 +209,7 @@ function QuizHeader({
             transition={{ type: "spring" }}
           >
             <FaStar className="w-4 h-4 text-amber-600" />
-            <span className="text-sm font-bold text-amber-700">{score * 10} XP</span>
+            <span className="text-sm font-bold text-amber-700">{score} XP</span>
           </motion.div>
         </div>
       </div>
@@ -311,26 +250,29 @@ function QuizHeader({
 function AudioPlayer({
   src,
   replaysLeft,
-  onReplay
+  onReplay,
+  instruction
 }: {
   src: string
   replaysLeft: number
   onReplay: () => void
+  instruction: string
 }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
 
   const handlePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause()
-        audioRef.current.currentTime = 0
-        setIsPlaying(false)
-      } else {
-        audioRef.current.play()
-        setIsPlaying(true)
-      }
+    if (audioRef.current && !hasStarted) {
+      audioRef.current.play()
+      setIsPlaying(true)
+      setHasStarted(true)
     }
+  }
+
+
+  const handleEnded = () => {
+    setIsPlaying(false)
   }
 
   const handleReplay = () => {
@@ -340,10 +282,6 @@ function AudioPlayer({
       setIsPlaying(true)
       onReplay()
     }
-  }
-
-  const handleEnded = () => {
-    setIsPlaying(false)
   }
 
   return (
@@ -382,16 +320,21 @@ function AudioPlayer({
         <div className="flex items-center gap-3">
           <motion.button
             onClick={handlePlay}
-            className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+            disabled={hasStarted}
+            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg ${
+              hasStarted
+                ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-blue-500/30"
+            }`}
+            whileHover={!hasStarted ? { scale: 1.1 } : {}}
+            whileTap={!hasStarted ? { scale: 0.95 } : {}}
           >
             {isPlaying ? <FaPause className="w-5 h-5" /> : <FaPlay className="w-5 h-5 ml-0.5" />}
           </motion.button>
 
           <div>
             <p className="font-semibold text-slate-800">
-              {isPlaying ? "Playing..." : "Listen to audio"}
+              {isPlaying ? "Playing..." : instruction}
             </p>
             <p className="text-xs text-slate-500">
               {replaysLeft} {replaysLeft === 1 ? "replay" : "replays"} remaining
@@ -526,7 +469,7 @@ function FeedbackCard({
         whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(139,92,246,0.4)" }}
         whileTap={{ scale: 0.98 }}
       >
-        <span>{isLast ? "See Results" : "Next Question"}</span>
+        <span>{isLast ? "Writing Test" : "Next Question"}</span>
         <motion.div
           animate={{ x: [0, 5, 0] }}
           transition={{ duration: 1, repeat: Infinity }}
@@ -542,119 +485,119 @@ function FeedbackCard({
 // RESULTS SCREEN
 // =============================================================================
 
-function ResultsScreen({
-  score,
-  totalQuestions,
-  onRestart
-}: {
-  score: number
-  totalQuestions: number
-  onRestart: () => void
-}) {
-  const result = getLevelFromScore(score)
+// function ResultsScreen({
+//   score,
+//   totalQuestions,
+//   onRestart
+// }: {
+//   score: number
+//   totalQuestions: number
+//   onRestart: () => void
+// }) {
+//   const result = getLevelFromScore(score)
 
-  return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center px-4 py-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <motion.div
-        className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 text-center"
-        initial={{ opacity: 0, scale: 0.9, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.6, type: "spring" }}
-      >
-        {/* Level badge */}
-        <motion.div
-          className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${result.color} flex items-center justify-center shadow-xl`}
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-        >
-          <span className="text-4xl font-bold text-white">{result.level}</span>
-        </motion.div>
+//   return (
+//     <motion.div
+//       className="min-h-screen flex items-center justify-center px-4 py-8"
+//       initial={{ opacity: 0 }}
+//       animate={{ opacity: 1 }}
+//       transition={{ duration: 0.5 }}
+//     >
+//       <motion.div
+//         className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 text-center"
+//         initial={{ opacity: 0, scale: 0.9, y: 30 }}
+//         animate={{ opacity: 1, scale: 1, y: 0 }}
+//         transition={{ duration: 0.6, type: "spring" }}
+//       >
+//         {/* Level badge */}
+//         <motion.div
+//           className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${result.color} flex items-center justify-center shadow-xl`}
+//           initial={{ scale: 0, rotate: -180 }}
+//           animate={{ scale: 1, rotate: 0 }}
+//           transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+//         >
+//           <span className="text-4xl font-bold text-white">{result.level}</span>
+//         </motion.div>
 
-        <motion.h2
-          className="text-2xl font-bold text-slate-900 mb-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          Your French Level
-        </motion.h2>
+//         <motion.h2
+//           className="text-2xl font-bold text-slate-900 mb-2"
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           transition={{ delay: 0.3 }}
+//         >
+//           Your French Level
+//         </motion.h2>
 
-        {/* Score */}
-        <motion.div
-          className="mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="text-5xl font-bold text-slate-800 mb-1">{score}/{totalQuestions}</div>
-          <p className="text-slate-500">correct answers</p>
-        </motion.div>
+//         {/* Score */}
+//         <motion.div
+//           className="mb-6"
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           transition={{ delay: 0.4 }}
+//         >
+//           <div className="text-5xl font-bold text-slate-800 mb-1">{score}/{totalQuestions}</div>
+//           <p className="text-slate-500">correct answers</p>
+//         </motion.div>
 
-        {/* XP earned */}
-        <motion.div
-          className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full mb-6"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.5, type: "spring" }}
-        >
-          <FaStar className="w-5 h-5 text-amber-600" />
-          <span className="text-lg font-bold text-amber-700">+{score * 10} XP Earned</span>
-        </motion.div>
+//         {/* XP earned */}
+//         <motion.div
+//           className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full mb-6"
+//           initial={{ scale: 0 }}
+//           animate={{ scale: 1 }}
+//           transition={{ delay: 0.5, type: "spring" }}
+//         >
+//           <FaStar className="w-5 h-5 text-amber-600" />
+//           <span className="text-lg font-bold text-amber-700">+{score} XP Earned</span>
+//         </motion.div>
 
-        {/* Progress bar */}
-        <motion.div
-          className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${(score / totalQuestions) * 100}%` }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
-          />
-        </motion.div>
+//         {/* Progress bar */}
+//         <motion.div
+//           className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden"
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ delay: 0.5 }}
+//         >
+//           <motion.div
+//             initial={{ width: 0 }}
+//             animate={{ width: `${(score / totalQuestions) * 100}%` }}
+//             transition={{ delay: 0.6, duration: 0.8 }}
+//             className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
+//           />
+//         </motion.div>
 
-        {/* Message */}
-        <motion.p
-          className="text-slate-700 mb-8 leading-relaxed"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          {result.message}
-        </motion.p>
+//         {/* Message */}
+//         <motion.p
+//           className="text-slate-700 mb-8 leading-relaxed"
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           transition={{ delay: 0.6 }}
+//         >
+//           {result.message}
+//         </motion.p>
 
-        {/* Buttons */}
-        <motion.div
-          className="flex gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          <button
-            onClick={onRestart}
-            className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
-          >
-            Try Again
-          </button>
-          <Link href="/home" className="flex-1">
-            <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all">
-              Start Learning
-            </button>
-          </Link>
-        </motion.div>
-      </motion.div>
-    </motion.div>
-  )
-}
+//         {/* Buttons */}
+//         <motion.div
+//           className="flex gap-3"
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           transition={{ delay: 0.7 }}
+//         >
+//           <button
+//             onClick={onRestart}
+//             className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
+//           >
+//             Try Again
+//           </button>
+//           <Link href="/home" className="flex-1">
+//             <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all">
+//               Start Learning
+//             </button>
+//           </Link>
+//         </motion.div>
+//       </motion.div>
+//     </motion.div>
+//   )
+// }
 
 // =============================================================================
 // MAIN COMPONENT
@@ -666,18 +609,71 @@ export default function ListenTestLevel() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [hasAnswered, setHasAnswered] = useState(false)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
-  const [showResult, setShowResult] = useState(false)
   const [feedback, setFeedback] = useState("")
-  const [replaysLeft, setReplaysLeft] = useState(3)
+  const router = useRouter()
+  const [replaysLeft, setReplaysLeft] = useState(2)
   const [showTranscript, setShowTranscript] = useState(false)
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<FeedbackMessage[]>([])
 
   const currentQuestion = questions[currentIndex]
+  console.log("Current question:", currentQuestion)
   const progress = ((currentIndex + (hasAnswered ? 1 : 0)) / questions.length) * 100
 
   useEffect(() => {
-    setReplaysLeft(3)
+    setReplaysLeft(2)
     setShowTranscript(false)
   }, [currentIndex])
+
+   useEffect(() => {
+          const fetchReadingTest = async () => {
+            try {
+              const response = await fetch(`${API_BASE_URL}/reception/listening-placement-tests`)
+              const data = await response.json()
+              // console.log(data.message)
+              // return
+              if (data.tests && Array.isArray(data.tests)) {
+                // console.log("Reading tests from database:", data.tests)
+                // Transform API data to match Question interface
+                const transformedQuestions: Question[] = data.tests.map((test: any, index: number) => ({
+                  id: test.id || index + 1,
+                  level_id: test.level_id,
+                  transcript: test.transcription,
+                  audioSrc: `/${test.audio_path}`,
+                  question: test.question,
+                  options: JSON.parse(test.options_json || '[]'),
+                  correct: parseInt(test.answer, 10),
+                  instruction: test.instructions,
+                  xp_reward: parseInt(test.xp_reward, 10)
+                }))
+                // console.log("Transformed questions:", transformedQuestions)
+                setQuestions(transformedQuestions)
+              } else {
+                console.log("No reading tests found or error:", data.error)
+              }
+            } catch (error) {
+              console.error("Failed to fetch reading tests:", error)
+            }
+          }
+      
+          fetchReadingTest()
+        }, [])
+  
+    useEffect(() => {
+      const fetchImmediateQuestionFeedback = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/reception/immediate-listen-question-feedback`)
+          const data = await response.json()
+          if (data.feedback && Array.isArray(data.feedback)) {
+            setImmediateQuestionFeedback(data.feedback)
+          }
+        } catch (error) {
+          console.error("Failed to fetch immediate question feedback:", error)
+        }
+      }
+      
+      fetchImmediateQuestionFeedback()
+    }, [])
 
   const handleReplay = () => {
     setReplaysLeft(prev => Math.max(0, prev - 1))
@@ -690,10 +686,10 @@ export default function ListenTestLevel() {
 
     const correct = optionIndex === currentQuestion.correct
     setIsCorrect(correct)
-    setFeedback(getFeedbackMessage(correct))
+    setFeedback(getFeedbackMessage(correct, immediateQuestionFeedback))
 
     if (correct) {
-      setScore(score + 1)
+      setScore(score + currentQuestion.xp_reward)
     }
   }
 
@@ -705,31 +701,30 @@ export default function ListenTestLevel() {
       setIsCorrect(null)
       setFeedback("")
     } else {
-      setShowResult(true)
+      // Navigate to writing test after last question
+      router.push("/reception/tests/write_test_level")
     }
   }
 
-  const handleRestart = () => {
-    setCurrentIndex(0)
-    setScore(0)
-    setSelectedAnswer(null)
-    setHasAnswered(false)
-    setIsCorrect(null)
-    setShowResult(false)
-    setFeedback("")
-    setReplaysLeft(3)
-    setShowTranscript(false)
-  }
+  // const handleRestart = () => {
+  //   setCurrentIndex(0)
+  //   setScore(0)
+  //   setSelectedAnswer(null)
+  //   setHasAnswered(false)
+  //   setIsCorrect(null)
+  //   setFeedback("")
+  //   setReplaysLeft(3)
+  //   setShowTranscript(false)
+  // }
 
-  if (showResult) {
+  // Loading state while questions fetch
+  if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 font-sans overflow-x-hidden relative">
-        <AnimatedBackground />
-        <ResultsScreen
-          score={score}
-          totalQuestions={questions.length}
-          onRestart={handleRestart}
-        />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 font-sans flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading questions...</p>
+        </div>
       </div>
     )
   }
@@ -744,7 +739,7 @@ export default function ListenTestLevel() {
           totalQuestions={questions.length}
           progress={progress}
           score={score}
-          level={currentQuestion.level}
+          level={currentQuestion.level_id}
         />
 
         <AnimatePresence mode="wait">
@@ -766,7 +761,8 @@ export default function ListenTestLevel() {
                 src={currentQuestion.audioSrc}
                 replaysLeft={replaysLeft}
                 onReplay={handleReplay}
-              />
+                instruction={currentQuestion.instruction}
+              /> 
 
               {/* Question */}
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4 leading-relaxed">
@@ -774,7 +770,7 @@ export default function ListenTestLevel() {
               </h2>
 
               {/* Transcript toggle */}
-              {(hasAnswered || replaysLeft === 0) && (
+              {hasAnswered && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
