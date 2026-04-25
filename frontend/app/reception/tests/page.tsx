@@ -2,16 +2,37 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { useState, useEffect } from "react"
 import { 
   FaBookOpen, FaHeadphones, FaPen, FaMicrophone, FaRocket,
   FaCheckCircle, FaClock, FaChartLine, FaGraduationCap,
   FaArrowRight, FaShieldAlt, FaLightbulb, FaStar,
   FaCompass, FaChevronRight
 } from "react-icons/fa"
+import { FaPencil } from "react-icons/fa6"
+import { Level } from "../../Types"
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 // =============================================================================
 // TYPES & DATA
 // =============================================================================
+interface PlacementType {
+  id: string
+  code: string
+  title: string
+}
+
+interface PlacementDescription {
+  id: string
+  code: string
+  title: string
+  description: string
+  min_questions: number
+  max_questions: number
+  min_minutes: number
+  max_minutes: number
+}
 
 interface SkillInfo {
   id: string
@@ -242,7 +263,7 @@ function PlacementHero() {
 // TEST FLOW PROGRESSION
 // =============================================================================
 
-function TestFlowSection() {
+function TestFlowSection({placementTypes}: {placementTypes: PlacementType[]}) {
   return (
     <motion.section 
       className="py-12"
@@ -286,9 +307,9 @@ function TestFlowSection() {
 
         {/* Steps */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {flowSteps.map((step, index) => (
+          {placementTypes.map((test, index) => (
             <motion.div
-              key={step.id}
+              key={test.id}
               className="relative flex flex-col items-center text-center"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -303,25 +324,28 @@ function TestFlowSection() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
               >
-                {step.id}
+                {test.id}
               </motion.div>
 
               {/* Icon circle */}
               <motion.div
                 className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${
-                  step.color === "blue" ? "from-blue-500 to-cyan-500" :
-                  step.color === "purple" ? "from-purple-500 to-violet-500" :
-                  step.color === "emerald" ? "from-emerald-500 to-teal-500" :
+                  test.code === "reading" ? "from-blue-500 to-cyan-500" :
+                  test.code === "listening" ? "from-purple-500 to-violet-500" :
+                  test.code === "writing" ? "from-emerald-500 to-teal-500" :
                   "from-orange-500 to-amber-500"
                 } flex items-center justify-center shadow-lg mb-3`}
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <step.icon className="w-7 h-7 text-white" />
+                {test.code === "reading" && <FaBookOpen className="w-7 h-7 text-white" />}
+                {test.code === "listening" && <FaHeadphones className="w-7 h-7 text-white" />}
+                {test.code === "writing" && <FaPencil className="w-7 h-7 text-white" />}
+                {test.code === "speaking" && <FaMicrophone className="w-7 h-7 text-white" />}
               </motion.div>
 
               {/* Title */}
-              <h3 className="font-bold text-slate-900">{step.title}</h3>
+              <h3 className="font-bold text-slate-900">{test.title}</h3>
             </motion.div>
           ))}
         </div>
@@ -345,9 +369,9 @@ function TestFlowSection() {
 // SKILL CARDS
 // =============================================================================
 
-function SkillCard({ skill, index }: { skill: SkillInfo; index: number }) {
+function SkillCard({ description, index }: { description: PlacementDescription; index: number }) {
   const colorVariants = {
-    blue: {
+    reading: {
       bg: "from-blue-50 to-cyan-50",
       border: "border-blue-200",
       borderHover: "hover:border-blue-300",
@@ -355,7 +379,7 @@ function SkillCard({ skill, index }: { skill: SkillInfo; index: number }) {
       accent: "text-blue-600",
       badge: "bg-blue-100 text-blue-700",
     },
-    purple: {
+    listening: {
       bg: "from-purple-50 to-violet-50",
       border: "border-purple-200",
       borderHover: "hover:border-purple-300",
@@ -363,7 +387,7 @@ function SkillCard({ skill, index }: { skill: SkillInfo; index: number }) {
       accent: "text-purple-600",
       badge: "bg-purple-100 text-purple-700",
     },
-    emerald: {
+    writing: {
       bg: "from-emerald-50 to-teal-50",
       border: "border-emerald-200",
       borderHover: "hover:border-emerald-300",
@@ -371,7 +395,7 @@ function SkillCard({ skill, index }: { skill: SkillInfo; index: number }) {
       accent: "text-emerald-600",
       badge: "bg-emerald-100 text-emerald-700",
     },
-    orange: {
+    speaking: {
       bg: "from-orange-50 to-amber-50",
       border: "border-orange-200",
       borderHover: "hover:border-orange-300",
@@ -381,7 +405,18 @@ function SkillCard({ skill, index }: { skill: SkillInfo; index: number }) {
     },
   }
 
-  const c = colorVariants[skill.color as keyof typeof colorVariants]
+  const c = colorVariants[description.code as keyof typeof colorVariants]
+
+  const icons = {
+    reading: FaBookOpen,
+    listening: FaHeadphones,
+    writing: FaPencil,
+    speaking: FaMicrophone,
+  }
+  const IconComponent = icons[description.code as keyof typeof icons] || FaBookOpen
+
+  const questionsText = `~${description.min_questions} – ${description.max_questions} questions`
+  const timeText = `~${description.min_minutes} – ${description.max_minutes} minutes`
 
   return (
     <motion.div
@@ -394,29 +429,29 @@ function SkillCard({ skill, index }: { skill: SkillInfo; index: number }) {
     >
       {/* Icon */}
       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${c.icon} flex items-center justify-center mb-4 shadow-md`}>
-        <skill.icon className="w-6 h-6 text-white" />
+        <IconComponent className="w-6 h-6 text-white" />
       </div>
 
       {/* Title */}
-      <h3 className="text-xl font-bold text-slate-900 mb-2">{skill.title}</h3>
+      <h3 className="text-xl font-bold text-slate-900 mb-2">{description.title}</h3>
 
       {/* Description */}
-      <p className="text-slate-600 text-sm mb-4">{skill.description}</p>
+      <p className="text-slate-600 text-sm mb-4">{JSON.parse(description.description)[0]}</p>
 
       {/* Details */}
       <div className="space-y-2">
         <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${c.badge}`}>
           <FaCheckCircle className="w-3 h-3" />
-          <span>{skill.format}</span>
+          <span>{JSON.parse(description.description)[1]}</span>
         </div>
-        <div className="flex items-center gap-4 text-sm text-slate-500">
+        <div className={`flex items-center gap-4 text-sm text-slate-500`}>
           <span className="flex items-center gap-1">
             <FaLightbulb className="w-4 h-4" />
-            {skill.questions}
+            {questionsText}
           </span>
           <span className="flex items-center gap-1">
             <FaClock className="w-4 h-4" />
-            {skill.time}
+            {timeText}
           </span>
         </div>
       </div>
@@ -429,7 +464,7 @@ function SkillCard({ skill, index }: { skill: SkillInfo; index: number }) {
   )
 }
 
-function SkillsSection() {
+function SkillsSection({placementTypes, placementDescription}: {placementTypes: PlacementType[], placementDescription: PlacementDescription[]}) {
   return (
     <motion.section 
       className="py-12"
@@ -451,7 +486,7 @@ function SkillsSection() {
           <span className="text-sm font-bold text-purple-700">Test Structure</span>
         </motion.div>
         <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-          Four Skills, One Goal
+          {placementTypes.length} Skills, One Goal
         </h2>
         <p className="text-slate-600 max-w-lg mx-auto">
           Each section is carefully designed to assess your abilities in a specific area
@@ -460,19 +495,20 @@ function SkillsSection() {
 
       {/* Skill cards grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {skills.map((skill, index) => (
-          <SkillCard key={skill.id} skill={skill} index={index} />
+        {placementDescription.map((description, index) => (
+          <SkillCard key={description.id} description={description} index={index} />
         ))}
       </div>
     </motion.section>
   )
 }
-
-// =============================================================================
 // TIME ESTIMATE CARD
 // =============================================================================
 
-function TimeEstimateCard() {
+function TimeEstimateCard({ placementDescription }: { placementDescription: PlacementDescription[] }) {
+  const totalMinMinutes = placementDescription.reduce((sum, desc) => sum + desc.min_minutes, 0)
+  const totalMaxMinutes = placementDescription.reduce((sum, desc) => sum + desc.max_minutes, 0)
+
   return (
     <motion.section
       className="py-12"
@@ -518,7 +554,7 @@ function TimeEstimateCard() {
 
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-5xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                ~20-30
+                ~{totalMinMinutes} – {totalMaxMinutes}
               </span>
               <span className="text-2xl text-slate-400">minutes</span>
             </div>
@@ -532,19 +568,24 @@ function TimeEstimateCard() {
     </motion.section>
   )
 }
-
-// =============================================================================
 // RESULTS PREVIEW
 // =============================================================================
 
-function ResultsPreview() {
+function ResultsPreview({levels}: {levels: Level[]}) {
+  const [highlightedLevel, setHighlightedLevel] = useState<string>("")
+
+  useEffect(() => {
+    if (levels.length > 0) {
+      const randomIndex = Math.floor(Math.random() * levels.length)
+      setHighlightedLevel(levels[randomIndex].level_code)
+    }
+  }, [levels])
+
   const benefits = [
     { icon: FaChartLine, title: "Your CEFR Level", desc: "A0 to C2 proficiency rating" },
     { icon: FaCompass, title: "Starting Point", desc: "Recommended level to begin" },
     { icon: FaRocket, title: "Learning Path", desc: "Personalized journey ahead" },
   ]
-
-  const levels = ["A0", "A1", "A2", "B1", "B2", "C1", "C2"]
 
   return (
     <motion.section
@@ -609,10 +650,10 @@ function ResultsPreview() {
         <div className="flex flex-wrap justify-center gap-3">
           {levels.map((level, index) => (
             <motion.div
-              key={level}
+              key={level.level_code}
               className={`px-4 py-2 rounded-xl font-bold text-sm ${
-                level === "B1" 
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30" 
+                level.level_code === highlightedLevel
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
                   : "bg-white text-slate-600 border border-slate-200"
               }`}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -621,12 +662,12 @@ function ResultsPreview() {
               transition={{ delay: 0.5 + index * 0.05 }}
               whileHover={{ scale: 1.1 }}
             >
-              {level}
+              {level.level_code}
             </motion.div>
           ))}
         </div>
         <p className="text-center text-xs text-slate-400 mt-4">
-          B1 highlighted as example
+          {highlightedLevel} highlighted as example
         </p>
       </motion.div>
     </motion.section>
@@ -821,6 +862,73 @@ function FooterNote() {
 // =============================================================================
 
 export default function PlacementTestLanding() {
+  useEffect(() => {
+      const fetchLevels = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/reception/levels`)
+          const data = await response.json()
+          // console.log(data.message)
+          // return
+          if (data.levels && Array.isArray(data.levels)) {
+            console.log("Reception levels from database:", data.levels)
+            setLevels(data.levels)
+          } else {
+            console.log("No level found or error:", data.error)
+          }
+        } catch (error) {
+          console.error("Failed to fetch reception levels:", error)
+        }
+      }
+  
+      fetchLevels()
+    }, [])
+    
+  useEffect(() => {
+      const fetchTypes = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/reception/placement-tests`)
+          const data = await response.json()
+          // console.log(data.message)
+          // return
+          if (data.tests && Array.isArray(data.tests)) {
+            // console.log("Test types from database:", data.tests)
+            setPlacementTypes(data.tests)
+          } else {
+            console.log("No test types found or error:", data.error)
+          }
+        } catch (error) {
+          console.error("Failed to fetch test types:", error)
+        }
+      }
+  
+      fetchTypes()
+    }, [])
+
+  useEffect(() => {
+      const fetchDescription = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/reception/placement-test-descriptions`)
+          const data = await response.json()
+          // console.log(data.message)
+          // return
+          if (data.descriptions && Array.isArray(data.descriptions)) {
+            console.log("Test description from database:", data.descriptions)
+            setPlacementDescription(data.descriptions)
+          } else {
+            console.log("No test descriptions found or error:", data.error)
+          }
+        } catch (error) {
+          console.error("Failed to fetch test descriptions:", error)
+        }
+      }
+  
+      fetchDescription()
+    }, [])
+  
+  const [levels, setLevels] = useState<Level[]>([])
+  const [placementTypes, setPlacementTypes] = useState<PlacementType[]>([])
+  const [placementDescription, setPlacementDescription] = useState<PlacementDescription[]>([])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 font-sans overflow-x-hidden relative">
       {/* Animated background */}
@@ -832,16 +940,16 @@ export default function PlacementTestLanding() {
         <PlacementHero />
 
         {/* Test Flow */}
-        <TestFlowSection />
+        <TestFlowSection placementTypes={placementTypes}/>
 
         {/* Skills Detail */}
-        <SkillsSection />
+        <SkillsSection placementTypes={placementTypes} placementDescription={placementDescription}/>
 
         {/* Time Estimate */}
-        <TimeEstimateCard />
+        <TimeEstimateCard placementDescription={placementDescription}/>
 
         {/* Results Preview */}
-        <ResultsPreview />
+        <ResultsPreview levels={levels} />
 
         {/* Reassurance */}
         <ReassuranceSection />

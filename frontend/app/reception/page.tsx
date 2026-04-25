@@ -23,35 +23,19 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import Link from "next/link"
 import { 
   FaRocket, FaMapMarkedAlt, FaBrain, FaArrowRight, FaStar,
   FaCheckCircle, FaLock, FaCompass, FaChevronRight
 } from "react-icons/fa"
+import { Level } from "../Types"
+// API base URL - adjust based on your environment
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 // =============================================================================
 // TYPES & DATA
 // =============================================================================
-
-interface Level {
-  id: string
-  title: string
-  description: string
-  difficulty: "easy" | "medium" | "hard"
-  xpReward: number
-}
-
-const levels: Level[] = [
-  { id: "A0", title: "Novice", description: "Complete beginner starting from zero", difficulty: "easy", xpReward: 100 },
-  { id: "A1", title: "Beginner", description: "Basic words and simple phrases", difficulty: "easy", xpReward: 150 },
-  { id: "A2", title: "Elementary", description: "Everyday conversations and sentences", difficulty: "medium", xpReward: 200 },
-  { id: "B1", title: "Intermediate", description: "Clear standard French and opinions", difficulty: "medium", xpReward: 300 },
-  { id: "B2", title: "Upper-Int", description: "Complex texts and detailed discussions", difficulty: "hard", xpReward: 400 },
-  { id: "C1", title: "Advanced", description: "Fluent, flexible use for social & professional", difficulty: "hard", xpReward: 500 },
-  { id: "C2", title: "Mastery", description: "Effortless, precise expression like a native", difficulty: "hard", xpReward: 600 },
-]
 
 type PathChoice = "test" | "manual" | null
 
@@ -293,8 +277,8 @@ function PathCard({
 // PROGRESS PATH (A0 → C2)
 // =============================================================================
 
-function ProgressPath({ selectedLevel }: { selectedLevel: string | null }) {
-  const levelIndex = selectedLevel ? levels.findIndex(l => l.id === selectedLevel) : -1
+function ProgressPath({ levels, selectedLevel }: { levels: Level[], selectedLevel: string | null }) {
+  const levelIndex = selectedLevel ? levels.findIndex(l => l.level_code === selectedLevel) : -1
 
   return (
     <motion.div
@@ -316,13 +300,13 @@ function ProgressPath({ selectedLevel }: { selectedLevel: string | null }) {
       {/* Level nodes */}
       <div className="relative flex justify-between items-center">
         {levels.map((level, index) => {
-          const isSelected = level.id === selectedLevel
+          const isSelected = level.level_code === selectedLevel
           const isPast = levelIndex >= index
           const isFuture = levelIndex < index && levelIndex >= 0
 
           return (
             <motion.div
-              key={level.id}
+              key={level.level_code}
               className="flex flex-col items-center"
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -350,7 +334,7 @@ function ProgressPath({ selectedLevel }: { selectedLevel: string | null }) {
                 {isPast && !isSelected ? (
                   <FaCheckCircle className="w-5 h-5" />
                 ) : (
-                  level.id
+                  level.level_code
                 )}
 
                 {/* Star badge for selected */}
@@ -389,11 +373,12 @@ function ProgressPath({ selectedLevel }: { selectedLevel: string | null }) {
 // =============================================================================
 
 interface LevelGridProps {
+  levels: Level[]
   selectedLevel: string | null
   onSelectLevel: (levelId: string) => void
 }
 
-function LevelGrid({ selectedLevel, onSelectLevel }: LevelGridProps) {
+function LevelGrid({ levels, selectedLevel, onSelectLevel }: LevelGridProps) {
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
@@ -418,17 +403,17 @@ function LevelGrid({ selectedLevel, onSelectLevel }: LevelGridProps) {
 
       {/* Progress path */}
       <div className="mb-8">
-        <ProgressPath selectedLevel={selectedLevel} />
+        <ProgressPath levels={levels} selectedLevel={selectedLevel} />
       </div>
 
       {/* Level cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {levels.map((level, index) => (
           <LevelNode
-            key={level.id}
+            key={level.level_code}
             level={level}
-            isSelected={selectedLevel === level.id}
-            onSelect={() => onSelectLevel(level.id)}
+            isSelected={selectedLevel === level.level_code}
+            onSelect={() => onSelectLevel(level.level_code)}
             delay={0.3 + index * 0.08}
           />
         ))}
@@ -446,9 +431,9 @@ interface LevelNodeProps {
 
 function LevelNode({ level, isSelected, onSelect, delay }: LevelNodeProps) {
   const difficultyColors = {
-    easy: "from-emerald-400 to-emerald-500",
-    medium: "from-amber-400 to-orange-500",
-    hard: "from-rose-400 to-rose-500",
+    Easy: "from-emerald-400 to-emerald-500",
+    Medium: "from-amber-400 to-orange-500",
+    Hard: "from-rose-400 to-rose-500",
   }
 
   return (
@@ -476,14 +461,14 @@ function LevelNode({ level, isSelected, onSelect, delay }: LevelNodeProps) {
         animate={{ scale: 1 }}
         transition={{ delay: delay + 0.1, type: "spring" }}
       >
-        +{level.xpReward} XP
+        +{level.xp} XP
       </motion.div>
 
       {/* Level badge */}
       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${
         isSelected ? "from-purple-500 to-blue-500" : difficultyColors[level.difficulty]
       } flex items-center justify-center mb-3 shadow-md`}>
-        <span className="text-white font-bold text-lg">{level.id}</span>
+        <span className="text-white font-bold text-lg">{level.level_code}</span>
       </div>
 
       {/* Content */}
@@ -498,7 +483,7 @@ function LevelNode({ level, isSelected, onSelect, delay }: LevelNodeProps) {
           <div
             key={i}
             className={`w-2 h-2 rounded-full ${
-              i < (level.difficulty === "easy" ? 1 : level.difficulty === "medium" ? 2 : 3)
+              i < (level.difficulty === "Easy" ? 1 : level.difficulty === "Medium" ? 2 : 3)
                 ? isSelected ? "bg-purple-400" : "bg-slate-400"
                 : "bg-slate-200"
             }`}
@@ -620,6 +605,29 @@ function JourneyCTA({ selectedPath, selectedLevel, onContinue }: JourneyCTAProps
 export default function ReceptionPage() {
   const [selectedPath, setSelectedPath] = useState<PathChoice>(null)
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null)
+  const [levels, setLevels] = useState<Level[]>([])
+
+  // Fetch reception levels from database on mount
+  useEffect(() => {
+    const fetchLevels = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/reception/levels`)
+        const data = await response.json()
+        // console.log(data.message)
+        // return
+        if (data.levels && Array.isArray(data.levels)) {
+          console.log("Reception levels from database:", data.levels)
+          setLevels(data.levels)
+        } else {
+          console.log("No titles found or error:", data.error)
+        }
+      } catch (error) {
+        console.error("Failed to fetch reception levels:", error)
+      }
+    }
+
+    fetchLevels()
+  }, [])
 
   const handlePathSelect = (path: PathChoice) => {
     setSelectedPath(path)
@@ -682,6 +690,7 @@ export default function ReceptionPage() {
         <AnimatePresence>
           {selectedPath === "manual" && (
             <LevelGrid
+              levels={levels}
               selectedLevel={selectedLevel}
               onSelectLevel={handleLevelSelect}
             />

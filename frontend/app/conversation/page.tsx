@@ -672,8 +672,10 @@ export default function Home() {
   // ---------------------------------------------------------------------------
   // API FUNCTIONS (Preserved from original)
   // ---------------------------------------------------------------------------
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/conversation"
+
   async function getData() {
-    const res = await fetch("http://127.0.0.1:8000")
+    const res = await fetch(API_BASE_URL)
     const data = await res.json()
     setMessage(data.message)
   }
@@ -689,13 +691,13 @@ export default function Home() {
     setMessages(updatedHistory)
 
     try {
-      let url = "http://127.0.0.1:8000/respond"
+      let url = API_BASE_URL + "/respond"
       if (mode === "introduction") {
-        url = "http://127.0.0.1:8000/introduction"
+        url = API_BASE_URL + "/introduction"
       } else if (mode === "traveling") {
-        url = "http://127.0.0.1:8000/traveling"
+        url = API_BASE_URL + "/traveling"
       } else if (mode === "daily_conversations") {
-        url = "http://127.0.0.1:8000/daily_conversations"
+        url = API_BASE_URL + "/daily_conversations"
       }
 
       const res = await fetch(url, {
@@ -754,7 +756,7 @@ export default function Home() {
       setIsLoading(true)
 
       try {
-        const res = await fetch("http://127.0.0.1:8000/transcribe", { method: "POST", body: formData })
+        const res = await fetch("http://localhost:8000/transcribe", { method: "POST", body: formData })
         const data = await res.json()
 
         if (!res.ok) {
@@ -769,13 +771,13 @@ export default function Home() {
             const updatedHistory = [...messages, userMessage]
             setMessages(updatedHistory)
 
-            let url = "http://127.0.0.1:8000/respond"
+            let url = "http://localhost:8000/respond"
             if (mode === "introduction") {
-              url = "http://127.0.0.1:8000/introduction"
+              url = "http://localhost:8000/introduction"
             } else if (mode === "traveling") {
-              url = "http://127.0.0.1:8000/traveling"
+              url = "http://localhost:8000/traveling"
             } else if (mode === "daily_conversations") {
-              url = "http://127.0.0.1:8000/daily_conversations"
+              url = "http://localhost:8000/daily_conversations"
             }
 
             const aiRes = await fetch(url, {
