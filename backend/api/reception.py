@@ -133,9 +133,9 @@ def get_reading_placement_tests():
         return {"error": str(e), "tests": []}
 
 @router.get("/immediate-listen-question-feedback")
-def get_immediate_read_question_feedback():
+def get_immediate_listen_question_feedback():
     """
-    Fetch all immediate read question feedback from the immediate_question_feedback table.
+    Fetch all immediate listen question feedback from the immediate_question_feedback table.
     """
     try:
         conn = sqlite3.connect(DB_PATH)
@@ -168,6 +168,53 @@ def get_listening_placement_tests():
         
         cursor.execute("""
             SELECT * FROM listening_placement_tests
+            ORDER BY sort_order
+        """)
+        rows = cursor.fetchall()
+        
+        tests = [dict(row) for row in rows]
+        
+        conn.close()
+        return {"tests": tests}
+    except Exception as e:
+        return {"error": str(e), "tests": []}
+
+@router.get("/immediate-write-question-feedback")
+def get_immediate_write_question_feedback():
+    """
+    Fetch all immediate write question feedback from the immediate_question_feedback table.
+    """
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT * FROM immediate_question_feedback
+            WHERE skill = 'writing'
+            ORDER BY skill, feedback_type
+        """)
+        rows = cursor.fetchall()
+        
+        feedback = [dict(row) for row in rows]
+        
+        conn.close()
+        return {"feedback": feedback}
+    except Exception as e:
+        return {"error": str(e), "feedback": []}
+
+@router.get("/writing-placement-tests")
+def get_writing_placement_tests():
+    """
+    Fetch all writing placement tests from the writing_placement_tests table.
+    """
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT * FROM writing_placement_tests
             ORDER BY sort_order
         """)
         rows = cursor.fetchall()

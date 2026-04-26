@@ -20,13 +20,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import {
   FaPen, FaArrowRight, FaCheckCircle, FaLightbulb,
-  FaStar, FaTrophy, FaChevronRight, FaPencilAlt,
-  FaAlignLeft, FaParagraph, FaBook
+  FaStar, FaChevronRight, FaPencilAlt
 } from "react-icons/fa"
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 // =============================================================================
 // TYPES & DATA
@@ -34,101 +36,14 @@ import {
 
 interface Question {
   id: number
-  level: string
-  type: "copy" | "fill" | "short" | "medium" | "long"
-  prompt: string
-  text: string
+  level_id: string
+  question: string
+  question_text: string
   placeholder: string
-  expectedAnswer?: string
-  expectedKeywords?: string[]
-  validation?: string
-  guidance?: string[]
+  guide_json: string
+  word_count: number
+  xp_reward: number
 }
-
-const write_questions: Question[] = [
-  {
-    id: 1,
-    level: "A0",
-    type: "copy",
-    prompt: "Copy the following word:",
-    text: "Bonjour",
-    placeholder: "Type 'Bonjour' here...",
-    expectedAnswer: "Bonjour",
-    validation: "non-empty",
-    guidance: ["Look at the word carefully", "Type it exactly as shown", "Check your spelling"]
-  },
-  {
-    id: 2,
-    level: "A0",
-    type: "fill",
-    prompt: "Fill in the blank:",
-    text: "Je m'appelle _____. J'ai 25 ans. J'habite à Paris.",
-    placeholder: "Write the missing name...",
-    expectedKeywords: ["Marie", "25", "Paris"],
-    validation: "min-words-3",
-    guidance: ["Read the sentence", "What's the missing name?", "The answer is 'Marie'"]
-  },
-  {
-    id: 3,
-    level: "A1",
-    type: "short",
-    prompt: "Write a sentence about yourself:",
-    text: "Tell us your name and where you're from.",
-    placeholder: "Example: My name is John. I am from London.",
-    validation: "min-words-3",
-    guidance: ["Start with your name", "Add where you're from", "Keep it simple!"]
-  },
-  {
-    id: 4,
-    level: "A1",
-    type: "medium",
-    prompt: "Describe your daily routine:",
-    text: "Write 2-3 sentences about what you do every day.",
-    placeholder: "I wake up at... Then I... After that...",
-    validation: "min-words-10",
-    guidance: ["Start with morning activities", "Add afternoon tasks", "Finish with evening routine"]
-  },
-  {
-    id: 5,
-    level: "A2",
-    type: "long",
-    prompt: "Write about your last vacation:",
-    text: "Describe where you went, what you did, and how you felt.",
-    placeholder: "Last summer, I went to... I visited... It was...",
-    validation: "min-words-20",
-    guidance: ["Where did you go?", "What did you do there?", "How was your experience?"]
-  },
-  {
-    id: 6,
-    level: "B1",
-    type: "medium",
-    prompt: "Write an email to a friend:",
-    text: "Ask how they are and share your news.",
-    placeholder: "Hi [name], How are you? I'm doing well...",
-    validation: "min-words-15",
-    guidance: ["Start with a greeting", "Ask about your friend", "Share your news", "End with a closing"]
-  },
-  {
-    id: 7,
-    level: "B1",
-    type: "medium",
-    prompt: "Write a book review:",
-    text: "Choose a book and share your opinion about it.",
-    placeholder: "I read [book title] by [author]. I think...",
-    validation: "min-words-15",
-    guidance: ["Name the book and author", "Give your opinion", "Explain why you liked/disliked it"]
-  },
-  {
-    id: 8,
-    level: "B2",
-    type: "long",
-    prompt: "Write about your favorite hobby:",
-    text: "Explain why you enjoy it and how it enriches your life.",
-    placeholder: "My favorite hobby is... I started when... It makes me feel...",
-    validation: "min-words-30",
-    guidance: ["Introduce your hobby", "When/how did you start?", "Why do you enjoy it?", "How does it benefit you?"]
-  }
-]
 
 const getLevelFromScore = (score: number): { level: string; message: string; color: string } => {
   if (score <= 2) {
@@ -166,94 +81,34 @@ const getLevelFromScore = (score: number): { level: string; message: string; col
   }
 }
 
-const getFeedbackMessage = (taskIndex: number, isCorrect: boolean): string => {
-  const messages = ["Nice start 😏", "Good job!", "You're warming up 🔥", "That works!", "Now it gets interesting...", "Keep going!", "Almost there!", "Great effort!"]
+
+
+const getFeedbackMessage = (feedback: any[], isCorrect: boolean): string => {
+  const feedbackType = isCorrect ? 'correct' : 'incorrect'
+  const feedbackItem = feedback.find(f => f.feedback_type === feedbackType && f.skill === 'writing')
   
-  if (!isCorrect) {
-    return "Keep trying! Every attempt helps you learn 💪"
+  if (feedbackItem && feedbackItem.messages_json) {
+    const messages = JSON.parse(feedbackItem.messages_json)
+    return messages[Math.floor(Math.random() * messages.length)]
   }
   
-  return messages[taskIndex] || "Well done!"
+  return isCorrect ? "Well done!" : "Keep trying! 💪"
+}
+
+const getValidationExplanation = (isCorrect: boolean): string => {
+  return isCorrect 
+    ? "Your answer meets the requirements. Great work!"
+    : "Check your answer and try again. Look at the guidance for hints."
 }
 
 const validateAnswer = (question: Question, answer: string): boolean => {
   const trimmedAnswer = answer.trim()
-  
-  if (trimmedAnswer === "") return false
-  
-  switch (question.type) {
-    case "copy":
-      return trimmedAnswer.toLowerCase() === question.expectedAnswer?.toLowerCase()
-    
-    case "fill":
-    case "short":
-      // First check min-words validation if present
-      if (question.validation && question.validation.startsWith("min-words-")) {
-        const wordCount = trimmedAnswer.split(/\s+/).length
-        const minWords = parseInt(question.validation.split("-")[2])
-        if (wordCount < minWords) return false
-      }
-      // Then check keywords if present
-      if (question.expectedKeywords) {
-        return question.expectedKeywords.some(keyword => 
-          trimmedAnswer.toLowerCase().includes(keyword.toLowerCase())
-        )
-      }
-      return trimmedAnswer.length > 0
-    
-    case "medium":
-    case "long":
-      if (question.validation) {
-        const wordCount = trimmedAnswer.split(/\s+/).length
-        if (question.validation === "min-words-3") return wordCount >= 3
-        if (question.validation === "min-words-5") return wordCount >= 5
-        if (question.validation === "min-words-10") return wordCount >= 10
-        if (question.validation === "min-words-15") return wordCount >= 15
-        if (question.validation === "min-words-20") return wordCount >= 20
-        if (question.validation === "min-words-30") return wordCount >= 30
-      }
-      return trimmedAnswer.length > 0
-    
-    default:
-      return trimmedAnswer.length > 0
-  }
+  return trimmedAnswer.length > 0
 }
 
-const getValidationExplanation = (question: Question, isCorrect: boolean): string => {
-  if (isCorrect) {
-    switch (question.type) {
-      case "copy": return "Perfect! You copied it exactly right."
-      case "fill": return "Correct! That's the right answer."
-      case "short": return "Good! That's a valid answer."
-      case "medium": return "Nice! You wrote enough. Keep practicing!"
-      case "long": return "Excellent! You expressed your ideas well."
-      default: return "Good job!"
-    }
-  } else {
-    switch (question.type) {
-      case "copy": return `Try copying exactly: "${question.expectedAnswer}"`
-      case "fill": return "Check the text again. What name is missing?"
-      case "short": return "Please write a few words. Any answer is a good start!"
-      case "medium":
-      case "long":
-        if (question.validation) {
-          const minWords = question.validation.split("-")[2]
-          return `Try writing at least ${minWords} words. You've got this!`
-        }
-        return "Please write a bit more to complete this task."
-      default: return "Give it another try!"
-    }
-  }
-}
-
-const countWords = (text: string): number => {
+const countWords = (text: string | undefined): number => {
+  if (!text) return 0
   return text.trim().split(/\s+/).filter(word => word.length > 0).length
-}
-
-const getMinWords = (validation?: string): number => {
-  if (!validation) return 0
-  const match = validation.match(/min-words-(\d+)/)
-  return match ? parseInt(match[1]) : 0
 }
 
 // =============================================================================
@@ -324,12 +179,14 @@ function WritingHeader({
   totalTasks,
   progress,
   score,
+  totalXP,
   level
 }: {
   currentTask: number
   totalTasks: number
   progress: number
   score: number
+  totalXP: number
   level: string
 }) {
   return (
@@ -366,7 +223,7 @@ function WritingHeader({
             transition={{ type: "spring" }}
           >
             <FaStar className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-bold text-blue-700">{score * 15} XP</span>
+            <span className="text-sm font-bold text-blue-700">{totalXP} XP</span>
           </motion.div>
         </div>
       </div>
@@ -404,25 +261,7 @@ function WritingHeader({
 // PROMPT CARD
 // =============================================================================
 
-function PromptCard({ prompt, text, type }: { prompt: string; text: string; type: string }) {
-  const typeIcons = {
-    copy: FaPencilAlt,
-    fill: FaAlignLeft,
-    short: FaPen,
-    medium: FaParagraph,
-    long: FaBook
-  }
-  
-  const TypeIcon = typeIcons[type as keyof typeof typeIcons] || FaPen
-  
-  const typeLabels = {
-    copy: "Copy Task",
-    fill: "Fill in Blank",
-    short: "Short Answer",
-    medium: "Paragraph",
-    long: "Essay Writing"
-  }
-
+function PromptCard({ prompt, text }: { prompt: string; text: string }) {
   return (
     <motion.div
       className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 overflow-hidden"
@@ -433,9 +272,9 @@ function PromptCard({ prompt, text, type }: { prompt: string; text: string; type
       {/* Header */}
       <div className="px-6 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <TypeIcon className="w-4 h-4 text-amber-600" />
+          <FaPen className="w-4 h-4 text-amber-600" />
           <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">
-            {typeLabels[type as keyof typeof typeLabels] || "Writing Task"}
+            Writing Task
           </span>
         </div>
       </div>
@@ -504,7 +343,6 @@ function WritingArea({
   value,
   onChange,
   placeholder,
-  type,
   isSubmitted,
   isCorrect,
   wordCount,
@@ -513,7 +351,6 @@ function WritingArea({
   value: string
   onChange: (value: string) => void
   placeholder: string
-  type: string
   isSubmitted: boolean
   isCorrect: boolean
   wordCount: number
@@ -521,7 +358,7 @@ function WritingArea({
 }) {
   const [isFocused, setIsFocused] = useState(false)
   
-  const isShortInput = type === "copy" || type === "fill" || type === "short"
+  const isShortInput = minWords === 0
   
   const getInputStyles = () => {
     if (isSubmitted) {
@@ -592,7 +429,7 @@ function WritingArea({
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
           disabled={isSubmitted}
-          rows={type === "medium" ? 4 : 6}
+          rows={6}
           className={`w-full p-4 rounded-xl border-2 text-lg leading-relaxed transition-all duration-300 outline-none resize-none ${getInputStyles()}`}
         />
       )}
@@ -623,16 +460,14 @@ function SubmitButton({
   onClick,
   disabled,
   wordCount,
-  minWords,
-  type
+  minWords
 }: {
   onClick: () => void
   disabled: boolean
   wordCount: number
   minWords: number
-  type: string
 }) {
-  const isShortInput = type === "copy" || type === "fill" || type === "short"
+  const isShortInput = minWords === 0
   
   return (
     <motion.button
@@ -704,7 +539,7 @@ function FeedbackCard({
         whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(245,158,11,0.4)" }}
         whileTap={{ scale: 0.98 }}
       >
-        <span>{isLast ? "See Results" : "Next Task"}</span>
+        <span>{isLast ? "Speaking test" : "Next Task"}</span>
         <motion.div
           animate={{ x: [0, 5, 0] }}
           transition={{ duration: 1, repeat: Infinity }}
@@ -716,143 +551,79 @@ function FeedbackCard({
   )
 }
 
-// =============================================================================
-// RESULTS SCREEN
-// =============================================================================
-
-function ResultsScreen({
-  score,
-  totalTasks,
-  onRestart
-}: {
-  score: number
-  totalTasks: number
-  onRestart: () => void
-}) {
-  const result = getLevelFromScore(score)
-
-  return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center px-4 py-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <motion.div
-        className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 text-center"
-        initial={{ opacity: 0, scale: 0.9, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.6, type: "spring" }}
-      >
-        {/* Level badge */}
-        <motion.div
-          className={`w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br ${result.color} flex items-center justify-center shadow-xl`}
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-        >
-          <span className="text-4xl font-bold text-white">{result.level}</span>
-        </motion.div>
-
-        <motion.h2
-          className="text-2xl font-bold text-slate-900 mb-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          Your French Level
-        </motion.h2>
-
-        {/* Score */}
-        <motion.div
-          className="mb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="text-5xl font-bold text-slate-800 mb-1">{score}/{totalTasks}</div>
-          <p className="text-slate-500">tasks completed correctly</p>
-        </motion.div>
-
-        {/* XP earned */}
-        <motion.div
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-6"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.5, type: "spring" }}
-        >
-          <FaStar className="w-5 h-5 text-blue-600" />
-          <span className="text-lg font-bold text-blue-700">+{score * 15} XP Earned</span>
-        </motion.div>
-
-        {/* Progress bar */}
-        <motion.div
-          className="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${(score / totalTasks) * 100}%` }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className={`h-full bg-gradient-to-r ${result.color} rounded-full`}
-          />
-        </motion.div>
-
-        {/* Message */}
-        <motion.p
-          className="text-slate-700 mb-8 leading-relaxed"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          {result.message}
-        </motion.p>
-
-        {/* Buttons */}
-        <motion.div
-          className="flex gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          <button
-            onClick={onRestart}
-            className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
-          >
-            Try Again
-          </button>
-          <Link href="/home" className="flex-1">
-            <button className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all">
-              Start Learning
-            </button>
-          </Link>
-        </motion.div>
-      </motion.div>
-    </motion.div>
-  )
-}
 
 // =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
 export default function WritingTestLevel() {
+  const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState<string[]>(Array(write_questions.length).fill(""))
-  const [hasSubmitted, setHasSubmitted] = useState<boolean[]>(Array(write_questions.length).fill(false))
-  const [isCorrect, setIsCorrect] = useState<boolean[]>(Array(write_questions.length).fill(false))
-  const [showResult, setShowResult] = useState(false)
+  const [answers, setAnswers] = useState<string[]>([])
+  const [hasSubmitted, setHasSubmitted] = useState<boolean[]>([])
+  const [isCorrect, setIsCorrect] = useState<boolean[]>([])
   const [score, setScore] = useState(0)
-
-  const currentQuestion = write_questions[currentIndex]
-  const progress = ((currentIndex + (hasSubmitted[currentIndex] ? 1 : 0)) / write_questions.length) * 100
-  const currentAnswer = answers[currentIndex]
+  const [totalXP, setTotalXP] = useState(0)
+  const [writingQuestions, setWritingQuestions] = useState<Question[]>([])
+  const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<any[]>([])
+  const currentQuestion = writingQuestions[currentIndex]
+  const progress = writingQuestions.length > 0 ? ((currentIndex + (hasSubmitted[currentIndex] ? 1 : 0)) / writingQuestions.length) * 100 : 0
+  const currentAnswer = answers[currentIndex] || ""
   const currentSubmitted = hasSubmitted[currentIndex]
   const currentIsCorrect = isCorrect[currentIndex]
   const wordCount = countWords(currentAnswer)
-  const minWords = getMinWords(currentQuestion.validation)
+  const minWords = currentQuestion?.word_count || 0
+
+  useEffect(() => {
+        const fetchWritingTest = async () => {
+          try {
+            const response = await fetch(`${API_BASE_URL}/reception/writing-placement-tests`)
+            const data = await response.json()
+            // console.log(data.message)
+            // return
+            if (data.tests && Array.isArray(data.tests)) {
+              console.log("Writing tests from database:", data.tests)
+              // Transform API data to match Question interface
+              const transformedQuestions: Question[] = data.tests.map((test: any, index: number) => ({
+                id: test.id || index + 1,
+                level_id: test.level_id,
+                question: test.question,
+                question_text: test.question_text,
+                placeholder: test.placeholder,
+                guide_json: test.guide_json,
+                word_count: test.word_count,
+                xp_reward: parseInt(test.xp_reward, 10),
+              }))
+              setWritingQuestions(transformedQuestions)
+              setAnswers(Array(transformedQuestions.length).fill(""))
+              setHasSubmitted(Array(transformedQuestions.length).fill(false))
+              setIsCorrect(Array(transformedQuestions.length).fill(false))
+            } else {
+              console.log("No writing tests found or error:", data.error)
+            }
+          } catch (error) {
+            console.error("Failed to fetch writing tests:", error)
+          }
+        }
+    
+        fetchWritingTest()
+      }, [])
+
+  useEffect(() => {
+    const fetchImmediateQuestionFeedback = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/reception/immediate-write-question-feedback`)
+        const data = await response.json()
+        if (data.feedback && Array.isArray(data.feedback)) {
+          setImmediateQuestionFeedback(data.feedback)
+        }
+      } catch (error) {
+        console.error("Failed to fetch immediate question feedback:", error)
+      }
+    }
+    
+    fetchImmediateQuestionFeedback()
+  }, [])
 
   const handleInputChange = (value: string) => {
     if (currentSubmitted) return
@@ -864,10 +635,10 @@ export default function WritingTestLevel() {
   const handleSubmit = () => {
     if (currentSubmitted || currentAnswer.trim() === "") return
     
-    // For longer tasks, check minimum word count (but allow fill/short with keywords)
-    if (minWords > 0 && wordCount < minWords && !currentQuestion.expectedKeywords) {
-      return // Don't allow submit if below minimum
-    }
+    // For longer tasks, check minimum word count
+    // if (minWords > 0 && wordCount < minWords) {
+    //   return // Don't allow submit if below minimum
+    // }
     
     const correct = validateAnswer(currentQuestion, currentAnswer)
     
@@ -881,35 +652,26 @@ export default function WritingTestLevel() {
     
     if (correct) {
       setScore(prev => prev + 1)
+      setTotalXP(prev => prev + (currentQuestion?.xp_reward || 0))
     }
   }
 
   const handleNext = () => {
-    if (currentIndex < write_questions.length - 1) {
+    if (currentIndex < writingQuestions.length - 1) {
       setCurrentIndex(currentIndex + 1)
     } else {
-      setShowResult(true)
+      router.push('/reception/tests/speak_test_level')
     }
   }
 
-  const handleRestart = () => {
-    setCurrentIndex(0)
-    setAnswers(Array(write_questions.length).fill(""))
-    setHasSubmitted(Array(write_questions.length).fill(false))
-    setIsCorrect(Array(write_questions.length).fill(false))
-    setShowResult(false)
-    setScore(0)
-  }
-
-  if (showResult) {
+  // Loading state while questions fetch
+  if (writingQuestions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 font-sans overflow-x-hidden relative">
-        <AnimatedBackground />
-        <ResultsScreen
-          score={score}
-          totalTasks={write_questions.length}
-          onRestart={handleRestart}
-        />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 font-sans flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading questions...</p>
+        </div>
       </div>
     )
   }
@@ -922,10 +684,11 @@ export default function WritingTestLevel() {
         {/* Header */}
         <WritingHeader
           currentTask={currentIndex + 1}
-          totalTasks={write_questions.length}
+          totalTasks={writingQuestions.length}
           progress={progress}
           score={score}
-          level={currentQuestion.level}
+          totalXP={totalXP}
+          level={currentQuestion?.level_id || 'A0'}
         />
 
         {/* Two-zone layout */}
@@ -941,12 +704,11 @@ export default function WritingTestLevel() {
             {/* Left: Prompt & Guidance */}
             <div className="lg:col-span-2 order-1">
               <PromptCard
-                prompt={currentQuestion.prompt}
-                text={currentQuestion.text}
-                type={currentQuestion.type}
+                prompt={currentQuestion.question}
+                text={currentQuestion.question_text}
               />
               
-              <GuidanceCard guidance={currentQuestion.guidance} />
+              <GuidanceCard guidance={JSON.parse(currentQuestion.guide_json || '[]')} />
             </div>
 
             {/* Right: Writing Area */}
@@ -955,7 +717,6 @@ export default function WritingTestLevel() {
                 value={currentAnswer}
                 onChange={handleInputChange}
                 placeholder={currentQuestion.placeholder}
-                type={currentQuestion.type}
                 isSubmitted={currentSubmitted}
                 isCorrect={currentIsCorrect}
                 wordCount={wordCount}
@@ -968,12 +729,10 @@ export default function WritingTestLevel() {
                   <SubmitButton
                     onClick={handleSubmit}
                     disabled={currentAnswer.trim() === "" || (
-                      minWords > 0 && wordCount < minWords && 
-                      !currentQuestion.expectedKeywords // Allow shorter answers if keywords are expected
+                      minWords > 0 && wordCount < minWords
                     )}
                     wordCount={wordCount}
                     minWords={minWords}
-                    type={currentQuestion.type}
                   />
                 </div>
               )}
@@ -983,10 +742,10 @@ export default function WritingTestLevel() {
                 {currentSubmitted && (
                   <FeedbackCard
                     isCorrect={currentIsCorrect}
-                    message={getFeedbackMessage(currentIndex, currentIsCorrect)}
-                    explanation={getValidationExplanation(currentQuestion, currentIsCorrect)}
+                    message={getFeedbackMessage(immediateQuestionFeedback, currentIsCorrect)}
+                    explanation={getValidationExplanation(currentIsCorrect)}
                     onNext={handleNext}
-                    isLast={currentIndex === write_questions.length - 1}
+                    isLast={currentIndex === writingQuestions.length - 1}
                   />
                 )}
               </AnimatePresence>

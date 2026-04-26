@@ -398,8 +398,136 @@ Dans ce contexte, l’enjeu ne réside plus tant dans la possibilité d’accéd
 '40',
 '10'
 );
-"""
 
+-- Writing Questions
+CREATE TABLE IF NOT EXISTS writing_placement_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    level_id TEXT NOT NULL,
+    question TEXT NOT NULL,
+    question_text TEXT NOT NULL,
+    placeholder TEXT NOT NULL,
+    guide_json TEXT NOT NULL,
+    word_count INTEGER NOT NULL,
+    xp_reward INTEGER NOT NULL,
+    sort_order INTEGER NOT NULL
+);
+
+INSERT INTO writing_placement_tests
+(level_id, question, question_text, placeholder, guide_json, word_count, xp_reward, sort_order)
+VALUES
+(
+'A0',
+'What does "Hello/Good morning" mean?',
+'Hello/Good morning',
+'Type your answer here',
+'["Think of the word carefully", "Check your spelling"]',
+'1',
+'10',
+'1'
+),
+(
+'A0',
+'Fill in the blank',
+'Je m''appelle _____. J''ai ____ ans. J''habite à _____.',
+'Name, age, city',
+'["Think about the structure of the sentence", "Check your spelling"]',
+'3',
+'10',
+'2'
+),
+(
+'A1',
+'Remplacez les blancs par les mots appropriés',
+'Nom : .......................................
+Prénom : .....................................
+Nationalité : .....................................
+Adresse personnelle : .....................................
+Profession : .....................................
+Date d’arrivée à l’hôtel : .....................................
+Profession : .....................................
+Date d’arrivée à l’hôtel : .....................................
+Date de départ : .....................................
+Langue parlée : .....................................
+Avez-vous un animal ? .....................................',
+'Nom, Prénom, Nationalité, ...',
+'["No need to form sentences. Simply write the missing words all seperated with a comma"]',
+'11',
+'15',
+'3'
+),
+(
+'A1',
+'Écrivez une phrase courte en vous décrivant',
+'Dites-nous votre nom, votre âge, où vous vivez et ce que vous aimez faire',
+'Je m''appelle [votre nom]. J''ai ...',
+'["Talk about yourself", "Write complete sentences"]',
+'15',
+'15',
+'4'
+),
+(
+'A2',
+'Parlez de votre quotidien',
+'Parlez de votre routine quotidienne: le matin, le travail, le soir.',
+'Je me réveille à ... Je prends ... Je vais au travail à ...',
+'["Talk about your daily routine", "Use correct grammar"]',
+'20',
+'20',
+'5'
+),
+(
+'A2',
+'Écrivez des phrases courtes sur votre dernier voyage',
+'Decrivez où vous êtes allé, ce que vous avez fait et comment vous vous êtes senti.',
+'Je suis allé à ... J''ai ... J''ai ...',
+'["Write about you last travel", "Use correct grammar"]',
+'20',
+'20',
+'6'
+),
+(
+'B1',
+'Écrivez un email à un ami:',
+'Demandez comment il va et partagez vos nouvelles.',
+'Tapez ici...',
+'["Utilisez le grammaire B1"]',
+'25',
+'25',
+'7'
+),
+(
+'B2',
+'Écrivez un court paragraphe sur un livre que vous avez lu:',
+'Décrivez l''intrigue, les personnages et votre opinion.',
+'Tapez ici...',
+'["Utilisez le grammaire B2"]',
+'30',
+'30',
+'8'
+),
+(
+'C1',
+'Essai de problème-solution',
+'Beaucoup de villes sont confrontées à une congestion routière croissante.
+Quels sont les causes principaux de ce problème et quelles solutions peuvent être proposées?',
+'Tapez ici...',
+'["Utilisez le grammaire C1", "incluez des exemples spécifiques"]',
+'35',
+'35',
+'9'
+),
+(
+'C2',
+'Analysez et discutez de cette idée avec des exemples:',
+'La liberté n''est pas l''absence de contraintes, mais la capacité de les choisir',
+'Tapez ici...',
+'["Discutez de l''idée", "Donnez des exemples", "Utilisez le grammaire C2"]',
+'40',
+'40',
+'10'
+);
+"""
+# Daily routine for a1 instead
 def get_schema_sql() -> str:
     """
     Return the complete schema SQL as a single string.
