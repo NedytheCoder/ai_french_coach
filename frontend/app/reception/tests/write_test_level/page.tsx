@@ -45,43 +45,6 @@ interface Question {
   xp_reward: number
 }
 
-const getLevelFromScore = (score: number): { level: string; message: string; color: string } => {
-  if (score <= 2) {
-    return {
-      level: "A0",
-      message: "Every expert was once a beginner. Let's start your journey! 🌱",
-      color: "from-green-400 to-emerald-500"
-    }
-  }
-  if (score <= 4) {
-    return {
-      level: "A1",
-      message: "Great start! You're building solid foundations. Keep going! 💪",
-      color: "from-blue-400 to-cyan-500"
-    }
-  }
-  if (score <= 6) {
-    return {
-      level: "A2",
-      message: "Nice progress! You can express yourself in French now. 🎉",
-      color: "from-purple-400 to-violet-500"
-    }
-  }
-  if (score === 7) {
-    return {
-      level: "B1",
-      message: "Impressive! Your writing skills are getting strong. 🌟",
-      color: "from-orange-400 to-amber-500"
-    }
-  }
-  return {
-    level: "B2",
-    message: "Excellent! You have advanced writing skills. 🏆",
-    color: "from-red-400 to-rose-500"
-  }
-}
-
-
 
 const getFeedbackMessage = (feedback: any[], isCorrect: boolean): string => {
   const feedbackType = isCorrect ? 'correct' : 'incorrect'
@@ -95,10 +58,8 @@ const getFeedbackMessage = (feedback: any[], isCorrect: boolean): string => {
   return isCorrect ? "Well done!" : "Keep trying! 💪"
 }
 
-const getValidationExplanation = (isCorrect: boolean): string => {
-  return isCorrect 
-    ? "Your answer meets the requirements. Great work!"
-    : "Check your answer and try again. Look at the guidance for hints."
+const getValidationExplanation = (apiFeedback: string): string => {
+  return apiFeedback || "Your answer has been evaluated."
 }
 
 const validateAnswer = (question: Question, answer: string): boolean => {
@@ -385,8 +346,8 @@ function WritingArea({
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Answer</span>
         </div>
         
-        {/* Word counter for longer tasks */}
-        {!isShortInput && minWords > 0 && (
+        {/* Word counter */}
+        {minWords > 0 && (
           <div className="flex items-center gap-2">
             <span className={`text-sm font-medium ${
               wordCount >= minWords ? "text-emerald-600" : "text-slate-500"
@@ -409,33 +370,20 @@ function WritingArea({
         )}
       </div>
 
-      {/* Input field */}
-      {isShortInput ? (
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
-          disabled={isSubmitted}
-          className={`w-full p-4 rounded-xl border-2 text-lg transition-all duration-300 outline-none ${getInputStyles()}`}
-        />
-      ) : (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
-          disabled={isSubmitted}
-          rows={6}
-          className={`w-full p-4 rounded-xl border-2 text-lg leading-relaxed transition-all duration-300 outline-none resize-none ${getInputStyles()}`}
-        />
-      )}
+      {/* Textarea */}
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        placeholder={placeholder}
+        disabled={isSubmitted}
+        rows={6}
+        className={`w-full p-4 rounded-xl border-2 text-lg leading-relaxed transition-all duration-300 outline-none resize-none ${getInputStyles()}`}
+      />
 
       {/* Encouragement message */}
-      {!isSubmitted && !isShortInput && wordCount > 0 && (
+      {!isSubmitted && minWords > 0 && wordCount > 0 && (
         <motion.div
           className="mt-3 text-sm text-amber-600 font-medium"
           initial={{ opacity: 0, y: 10 }}
@@ -484,7 +432,7 @@ function SubmitButton({
       animate={{ opacity: 1, y: 0 }}
     >
       <span className="flex items-center justify-center gap-2">
-        {!isShortInput && wordCount < minWords && wordCount > 0 ? (
+        {minWords > 0 && wordCount < minWords && wordCount > 0 ? (
           <>
             <span>Keep Writing</span>
             <span className="text-sm opacity-80">({minWords - wordCount} more words)</span>
@@ -566,6 +514,7 @@ export default function WritingTestLevel() {
   const [totalXP, setTotalXP] = useState(0)
   const [writingQuestions, setWritingQuestions] = useState<Question[]>([])
   const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<any[]>([])
+  const [apiFeedback, setApiFeedback] = useState<string[]>([])
   const currentQuestion = writingQuestions[currentIndex]
   const progress = writingQuestions.length > 0 ? ((currentIndex + (hasSubmitted[currentIndex] ? 1 : 0)) / writingQuestions.length) * 100 : 0
   const currentAnswer = answers[currentIndex] || ""
@@ -598,6 +547,7 @@ export default function WritingTestLevel() {
               setAnswers(Array(transformedQuestions.length).fill(""))
               setHasSubmitted(Array(transformedQuestions.length).fill(false))
               setIsCorrect(Array(transformedQuestions.length).fill(false))
+              setApiFeedback(Array(transformedQuestions.length).fill(""))
             } else {
               console.log("No writing tests found or error:", data.error)
             }
@@ -632,7 +582,7 @@ export default function WritingTestLevel() {
     setAnswers(newAnswers)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (currentSubmitted || currentAnswer.trim() === "") return
     
     // For longer tasks, check minimum word count
@@ -640,19 +590,78 @@ export default function WritingTestLevel() {
     //   return // Don't allow submit if below minimum
     // }
     
-    const correct = validateAnswer(currentQuestion, currentAnswer)
+    // Prepare submission data
+    const submissionData = {
+      questionId: currentQuestion?.id,
+      questionIndex: currentIndex + 1,
+      question: currentQuestion?.question,
+      questionText: currentQuestion?.question_text,
+      userAnswer: currentAnswer,
+      wordCount: wordCount,
+      minWordsRequired: minWords,
+      level: currentQuestion?.level_id,
+      timestamp: new Date().toISOString(),
+      sessionId: 'writing-test-session',
+      testType: 'writing'
+    }
     
-    const newSubmitted = [...hasSubmitted]
-    newSubmitted[currentIndex] = true
-    setHasSubmitted(newSubmitted)
+    try {
+      // Send to API endpoint
+      const response = await fetch(`${API_BASE_URL}/reception/writing-test-scoring`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData)
+      })
     
-    const newIsCorrect = [...isCorrect]
-    newIsCorrect[currentIndex] = correct
-    setIsCorrect(newIsCorrect)
-    
-    if (correct) {
-      setScore(prev => prev + 1)
-      setTotalXP(prev => prev + (currentQuestion?.xp_reward || 0))
+      if (!response.ok) {
+        throw new Error(`HTTP error! !!!status: ${response.status}`)
+      }
+      
+      const result = await response.json()
+      
+      // Update state based on API response
+      const newSubmitted = [...hasSubmitted]
+      newSubmitted[currentIndex] = true
+      setHasSubmitted(newSubmitted)
+      
+      const newIsCorrect = [...isCorrect]
+      newIsCorrect[currentIndex] = result.isCorrect || false
+      setIsCorrect(newIsCorrect)
+      
+      const newApiFeedback = [...apiFeedback]
+      newApiFeedback[currentIndex] = result.feedback || ""
+      setApiFeedback(newApiFeedback)
+      
+      if (result.isCorrect) {
+        setTotalXP(prev => prev + (result.xpAwarded || currentQuestion?.xp_reward || 0))
+      }
+      
+      console.log('API Response:', result)
+      
+    } catch (error) {
+      console.error('Error submitting answer:', error)
+      
+      // Fallback to local validation if API fails
+      const correct = validateAnswer(currentQuestion, currentAnswer)
+      
+      const newSubmitted = [...hasSubmitted]
+      newSubmitted[currentIndex] = true
+      setHasSubmitted(newSubmitted)
+      
+      const newIsCorrect = [...isCorrect]
+      newIsCorrect[currentIndex] = correct
+      setIsCorrect(newIsCorrect)
+      
+      const newApiFeedback = [...apiFeedback]
+      newApiFeedback[currentIndex] = correct ? "Good job! Your answer has been evaluated." : "Keep practicing! Your answer has been evaluated."
+      setApiFeedback(newApiFeedback)
+      
+      if (correct) {
+        setScore(prev => prev + 1)
+        setTotalXP(prev => prev + (currentQuestion?.xp_reward || 0))
+      }
     }
   }
 
@@ -743,7 +752,7 @@ export default function WritingTestLevel() {
                   <FeedbackCard
                     isCorrect={currentIsCorrect}
                     message={getFeedbackMessage(immediateQuestionFeedback, currentIsCorrect)}
-                    explanation={getValidationExplanation(currentIsCorrect)}
+                    explanation={getValidationExplanation(apiFeedback[currentIndex])}
                     onNext={handleNext}
                     isLast={currentIndex === writingQuestions.length - 1}
                   />
