@@ -672,7 +672,7 @@ export default function Home() {
   // ---------------------------------------------------------------------------
   // API FUNCTIONS (Preserved from original)
   // ---------------------------------------------------------------------------
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/conversation"
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/conversation` || "http://localhost:8000/conversation"
 
   async function getData() {
     const res = await fetch(API_BASE_URL)

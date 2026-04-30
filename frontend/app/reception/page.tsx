@@ -43,6 +43,17 @@ type PathChoice = "test" | "manual" | null
 // ANIMATED COMPONENTS
 // =============================================================================
 
+const particles = [
+  { left: "57%", top: "61%", duration: 5.2, delay: 0.1 },
+  { left: "33%", top: "35%", duration: 4.8, delay: 0.4 },
+  { left: "6%", top: "61%", duration: 6.1, delay: 0.8 },
+  { left: "56%", top: "32%", duration: 5.7, delay: 1.2 },
+  { left: "63%", top: "86%", duration: 4.4, delay: 0.6 },
+  { left: "89%", top: "64%", duration: 6.5, delay: 1.5 },
+  { left: "88%", top: "52%", duration: 5.5, delay: 0.9 },
+  { left: "73%", top: "89%", duration: 4.9, delay: 1.8 },
+]
+
 function FloatingDecorations() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -56,9 +67,10 @@ function FloatingDecorations() {
             height: `${100 + i * 50}px`,
             left: `${10 + i * 20}%`,
             top: `${15 + (i % 3) * 25}%`,
-            background: i % 2 === 0 
-              ? "linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.1) 100%)"
-              : "linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(59,130,246,0.08) 100%)",
+            background:
+              i % 2 === 0
+                ? "linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.1) 100%)"
+                : "linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(59,130,246,0.08) 100%)",
           }}
           animate={{
             y: [0, -30, 0],
@@ -74,24 +86,24 @@ function FloatingDecorations() {
           }}
         />
       ))}
-      
+
       {/* Floating particles */}
-      {[...Array(8)].map((_, i) => (
+      {particles.map((particle, i) => (
         <motion.div
           key={`particle-${i}`}
           className="absolute w-2 h-2 rounded-full bg-gradient-to-br from-purple-400/30 to-blue-400/30"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: particle.left,
+            top: particle.top,
           }}
           animate={{
             y: [0, -50, 0],
             opacity: [0.2, 0.6, 0.2],
           }}
           transition={{
-            duration: 4 + Math.random() * 3,
+            duration: particle.duration,
             repeat: Infinity,
-            delay: Math.random() * 2,
+            delay: particle.delay,
           }}
         />
       ))}

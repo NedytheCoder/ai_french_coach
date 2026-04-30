@@ -68,6 +68,13 @@ const SKILL_LABELS: Record<SkillKey, string> = {
   speaking: "Speaking"
 }
 
+const SKILL_COLORS: Record<SkillKey, { bg: string; text: string; gradient: string }> = {
+  reading: { bg: "bg-emerald-100", text: "text-emerald-700", gradient: "from-emerald-500 via-teal-500 to-cyan-500" },
+  listening: { bg: "bg-blue-100", text: "text-blue-700", gradient: "from-blue-400 via-blue-500 to-cyan-500" },
+  writing: { bg: "bg-amber-100", text: "text-amber-700", gradient: "from-amber-500 via-orange-500 to-yellow-500" },
+  speaking: { bg: "bg-purple-100", text: "text-purple-700", gradient: "from-purple-500 via-purple-600 to-violet-500" }
+}
+
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
@@ -155,11 +162,11 @@ function LevelBadge({ level }: { level: CEFRLevel }) {
   )
 }
 
-function AnimatedProgressBar({ percentage }: { percentage: number }) {
+function AnimatedProgressBar({ percentage, gradient }: { percentage: number; gradient: string }) {
   return (
     <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
       <motion.div
-        className="h-full bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400 rounded-full"
+        className={`h-full bg-gradient-to-r ${gradient} rounded-full`}
         initial={{ width: 0 }}
         animate={{ width: `${percentage}%` }}
         transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
@@ -169,6 +176,8 @@ function AnimatedProgressBar({ percentage }: { percentage: number }) {
 }
 
 function SkillResultCard({ result, index }: { result: SkillResult; index: number }) {
+  const colors = SKILL_COLORS[result.key]
+
   return (
     <motion.div
       className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6"
@@ -178,7 +187,7 @@ function SkillResultCard({ result, index }: { result: SkillResult; index: number
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-white text-xl">
+          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center text-white text-xl`}>
             {SKILL_ICONS[result.key]}
           </div>
           <div>
@@ -194,9 +203,9 @@ function SkillResultCard({ result, index }: { result: SkillResult; index: number
       <div className="mb-4">
         <div className="flex justify-between text-sm text-slate-600 mb-2">
           <span>Progress</span>
-          <span className="font-semibold">{result.percentage}%</span>
+          <span className={`font-semibold ${colors.text}`}>{result.percentage}%</span>
         </div>
-        <AnimatedProgressBar percentage={result.percentage} />
+        <AnimatedProgressBar percentage={result.percentage} gradient={colors.gradient} />
       </div>
 
       <p className="text-sm text-slate-600 leading-relaxed">{result.feedback}</p>
@@ -254,14 +263,14 @@ function OverallResultCard({
 }) {
   return (
     <motion.div
-      className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-xl shadow-amber-200/50 border-2 border-amber-200 p-8"
+      className="bg-gradient-to-br from-rose-50 to-red-50 rounded-2xl shadow-xl shadow-rose-200/50 border-2 border-rose-200 p-8 mt-7"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ type: "spring", stiffness: 300, delay: 0.7 }}
     >
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <FaChartLine className="w-6 h-6 text-amber-500" />
+          <FaChartLine className="w-6 h-6 text-rose-500" />
           <h3 className="font-bold text-slate-800 text-2xl">Overall French Level</h3>
         </div>
       </div>
@@ -272,7 +281,7 @@ function OverallResultCard({
           <p className="font-bold text-slate-800 text-3xl mb-2">
             {averageScore} / {MAX_SCORE}
           </p>
-          <p className="text-2xl font-bold text-amber-600">{averagePercentage}%</p>
+          <p className="text-2xl font-bold text-rose-600">{averagePercentage}%</p>
         </div>
 
         <div className="flex justify-center mb-4">
@@ -281,7 +290,7 @@ function OverallResultCard({
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 300, delay: 0.9 }}
           >
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-amber-400 via-orange-400 to-yellow-400 flex items-center justify-center shadow-lg">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-rose-400 via-red-400 to-pink-400 flex items-center justify-center shadow-lg">
               <span className="text-white font-black text-4xl">{overallLevel}</span>
             </div>
           </motion.div>
@@ -335,8 +344,8 @@ function ResultActions({
     >
       <motion.button
         onClick={handleStartRecommended}
-        className="w-full py-4 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2"
-        whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(245,158,11,0.4)" }}
+        className="w-full py-4 px-6 bg-gradient-to-r from-rose-500 via-red-500 to-pink-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-rose-500/30 flex items-center justify-center gap-2"
+        whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(244,63,94,0.4)" }}
         whileTap={{ scale: 0.98 }}
       >
         <span>Start Recommended Level</span>
