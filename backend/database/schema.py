@@ -459,7 +459,7 @@ Avez-vous un animal ? .....................................',
 'A1',
 'Écrivez une phrase courte en vous décrivant',
 'Dites-nous votre nom, votre âge, où vous vivez et ce que vous aimez faire',
-'Je m''appelle [votre nom]. J''ai ...',
+'Je m''appelle ... J''ai ...',
 '["Talk about yourself", "Write complete sentences"]',
 '15',
 '15',
@@ -526,6 +526,136 @@ Quels sont les causes principaux de ce problème et quelles solutions peuvent ê
 '40',
 '10'
 );
+
+-- Speaking Questions --
+CREATE TABLE IF NOT EXISTS speaking_placement_tests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    level_id TEXT NOT NULL,
+    theme TEXT NOT NULL,
+    question_title TEXT NOT NULL,
+    explanation TEXT NOT NULL,
+    example TEXT NOT NULL,
+    tips_json TEXT NOT NULL,
+    time INTEGER NOT NULL,
+    xp_reward INTEGER NOT NULL,
+    sort_order INTEGER NOT NULL
+);
+
+-- Speaking data --
+INSERT INTO speaking_placement_tests
+(level_id, theme, question_title, explanation, example, tips_json, time, xp_reward, sort_order)
+VALUES
+(
+'A0',
+'Pronunciation',
+'Bonjour, Au revoir',
+'Say "Bonjour" and "Au revoir".',
+'Bonjour, Au revoir',
+'["Speak clearly and at a natural pace", "Find a quiet environment", "Aim for 3 seconds of speech"]',
+'3',
+'10',
+'1'
+),
+(
+'A0',
+'Introduction',
+'Self description',
+'Tell us your name and your age',
+'Je m''appelle.... J''ai.... ans.',
+'["Speak clearly and at a natural pace", "Find a quiet environment", "Aim for 5 seconds of speech"]',
+'5',
+'10',
+'2'
+),
+(
+'A1',
+'Déscription',
+'Décrivez votre jour typique.',
+'Parlez de votre routine quotidienne et de vos habitudes.',
+'Le matin, je... Le soir, je...',
+'["Speak clearly and at a natural pace", "Find a quiet environment", "Aim for 10 seconds of speech"]',
+'10',
+'15',
+'3'
+),
+(
+'A1',
+'Avis',
+'Quel est votre passe-temps préféré ?',
+'Expliquez pourquoi vous aimez cette activité.',
+'J''aime... parce que...',
+'["Speak clearly and at a natural pace", "Find a quiet environment", "Aim for 10 seconds of speech"]',
+'10',
+'15',
+'4'
+),
+(
+'A2',
+'Déscription',
+'Décrivez votre repas préféré.',
+'Parlez de la nourriture, des saveurs, et pourquoi vous l''aimez.',
+'Mon plat préféré est... Il contient...',
+'["Parlez clairement et de vitesse naturelle.", "Trouvez un environnement calme", "Visez au moins 12 secondes de parole"]',
+'12',
+'20',
+'5'
+),
+(
+'A2',
+'Scénario',
+'Vous êtes perdu en ville. Demandez votre chemin.',
+'Utilisez des phrases polies pour demander de l''aide à un passant.',
+'Excusez-moi, pouvez-vous m''aider ? Je cherche...',
+'["Parlez clairement et de vitesse naturelle.", "Trouvez un environnement calme", "Visez au moins 12 secondes de parole"]',
+'12',
+'20',
+'6'
+),
+(
+'B1',
+'Avis',
+'Pensez-vous qu''il est important d''apprendre une langue étrangère ?',
+'Donnez votre opinion avec au moins deux raisons et un exemple.',
+'À mon avis, c''est important parce que... De plus...',
+'["Parlez clairement et de vitesse naturelle.", "Trouvez un environnement calme", "Visez au moins 20 secondes de parole"]',
+'20',
+'25',
+'7'
+),
+(
+'B2',
+'Avis',
+'Discutez des avantages et inconvénients de la vie en ville.',
+'Présentez les deux côtés de l''argument avec des exemples concrets.',
+'D''un côté... Cependant... En conclusion...',
+'["Parlez clairement et de vitesse naturelle.", "Trouvez un environnement calme", "Visez au moins 25 secondes de parole"]',
+'25',
+'30',
+'8'
+),
+(
+'C1',
+'Analyse',
+'Analysez l''impact des réseaux sociaux sur la communication moderne.',
+'Présentez une réflexion nuancée avec des avantages, des limites, et un exemple concret.',
+'Les réseaux sociaux ont profondément changé... Toutefois... Il convient de noter que...',
+'["Parlez clairement et avec fluidité.", "Structurez vos idées avec des connecteurs.", "Visez au moins 30 secondes de parole"]',
+'30',
+'35',
+'9'
+),
+(
+'C2',
+'Argumentation',
+'Défendez ou critiquez l''idée que l''intelligence artificielle transforme durablement l''éducation.',
+'Construisez une réponse approfondie, nuancée et bien organisée avec exemples et contre-arguments.',
+'Il serait réducteur de dire que... En revanche... On peut également soutenir que...',
+'["Adoptez un registre soutenu et précis.", "Développez une argumentation structurée.", "Visez au moins 40 secondes de parole"]',
+'40',
+'40',
+'10'
+)
+
 """
 # Daily routine for a1 instead
 def get_schema_sql() -> str:

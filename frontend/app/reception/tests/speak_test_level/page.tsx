@@ -48,99 +48,19 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 // TYPES & DATA
 // =============================================================================
 
-interface SpeakingQuestion {
+interface Question {
   id: number
-  level: "A0" | "A1" | "A2" | "B1" | "B2"
-  type: "intro" | "describe" | "opinion" | "react" | "scenario"
-  prompt: string
-  instruction: string
+  level: string // Allow any level string from database
+  theme: string
+  question: string,
+  explanation: string,
   example?: string
   suggestedTime: number
   xpReward: number
+  tips?: string[] // For tips_json from database
 }
 
-const speakingQuestions: SpeakingQuestion[] = [
-  {
-    id: 1,
-    level: "A0",
-    type: "intro",
-    prompt: "Présentez-vous en quelques phrases.",
-    instruction: "Parlez de votre nom et d'où vous venez. Parlez pendant 20-30 secondes.",
-    example: "Bonjour, je m'appelle... Je viens de...",
-    suggestedTime: 30,
-    xpReward: 50
-  },
-  {
-    id: 2,
-    level: "A0",
-    type: "describe",
-    prompt: "Décrivez votre famille.",
-    instruction: "Parlez des membres de votre famille. Utilisez des mots simples.",
-    example: "Dans ma famille, il y a... Ma mère est... Mon père est...",
-    suggestedTime: 30,
-    xpReward: 50
-  },
-  {
-    id: 3,
-    level: "A1",
-    type: "describe",
-    prompt: "Décrivez votre jour typique.",
-    instruction: "Parlez de votre routine quotidienne et de vos habitudes.",
-    example: "Le matin, je... Le soir, je...",
-    suggestedTime: 40,
-    xpReward: 75
-  },
-  {
-    id: 4,
-    level: "A1",
-    type: "opinion",
-    prompt: "Quel est votre passe-temps préféré ?",
-    instruction: "Expliquez pourquoi vous aimez cette activité.",
-    example: "J'aime... parce que...",
-    suggestedTime: 35,
-    xpReward: 75
-  },
-  {
-    id: 5,
-    level: "A2",
-    type: "describe",
-    prompt: "Décrivez votre repas préféré.",
-    instruction: "Parlez de la nourriture, des saveurs, et pourquoi vous l'aimez.",
-    example: "Mon plat préféré est... Il contient...",
-    suggestedTime: 35,
-    xpReward: 100
-  },
-  {
-    id: 6,
-    level: "A2",
-    type: "scenario",
-    prompt: "Vous êtes perdu en ville. Demandez votre chemin.",
-    instruction: "Utilisez des phrases polies pour demander de l'aide à un passant.",
-    example: "Excusez-moi, pouvez-vous m'aider ? Je cherche...",
-    suggestedTime: 30,
-    xpReward: 100
-  },
-  {
-    id: 7,
-    level: "B1",
-    type: "opinion",
-    prompt: "Pensez-vous qu'il est important d'apprendre une langue étrangère ?",
-    instruction: "Donnez votre opinion avec au moins deux raisons et un exemple.",
-    example: "À mon avis, c'est important parce que... De plus...",
-    suggestedTime: 45,
-    xpReward: 150
-  },
-  {
-    id: 8,
-    level: "B2",
-    type: "opinion",
-    prompt: "Discutez des avantages et inconvénients de la vie en ville.",
-    instruction: "Présentez les deux côtés de l'argument avec des exemples concrets.",
-    example: "D'un côté... Cependant... En conclusion...",
-    suggestedTime: 50,
-    xpReward: 200
-  }
-]
+// Speaking questions are now loaded dynamically from database
 
 // =============================================================================
 // ANIMATED BACKGROUND
@@ -284,30 +204,19 @@ function SpeakingHeader({
         </div>
       </div>
     </motion.div>
-  )
-}
-
-// =============================================================================
+  )}
 // PROMPT CARD
 // =============================================================================
-
-function PromptCard({ question }: { question: SpeakingQuestion }) {
-  const typeLabels = {
-    intro: { label: "Introduction", color: "blue" },
-    describe: { label: "Description", color: "emerald" },
-    opinion: { label: "Opinion", color: "purple" },
-    react: { label: "Reaction", color: "orange" },
-    scenario: { label: "Scenario", color: "rose" }
-  }
-
-  const typeInfo = typeLabels[question.type]
   
+function PromptCard({ question }: { question: Question }) {
   const levelColors: Record<string, string> = {
     A0: "bg-green-100 text-green-700",
     A1: "bg-blue-100 text-blue-700",
     A2: "bg-purple-100 text-purple-700",
     B1: "bg-orange-100 text-orange-700",
-    B2: "bg-red-100 text-red-700"
+    B2: "bg-red-100 text-red-700",
+    C1: "bg-indigo-100 text-indigo-700",
+    C2: "bg-pink-100 text-pink-700"
   }
 
   return (
@@ -317,11 +226,11 @@ function PromptCard({ question }: { question: SpeakingQuestion }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
     >
-      {/* Header with type badge */}
-      <div className={`px-6 py-3 bg-gradient-to-r from-${typeInfo.color}-50 to-${typeInfo.color}-100/50 border-b border-slate-100`}>
+      {/* Header with theme badge */}
+      <div className="px-6 py-3 bg-gradient-to-r from-blue-50 to-blue-100/50 border-b border-slate-100">
         <div className="flex items-center justify-between">
-          <span className={`text-xs font-bold uppercase tracking-wider text-${typeInfo.color}-600`}>
-            {typeInfo.label}
+          <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+            {question.theme}
           </span>
           <div className="flex items-center gap-2">
             <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${levelColors[question.level]}`}>
@@ -337,14 +246,14 @@ function PromptCard({ question }: { question: SpeakingQuestion }) {
 
       {/* Content */}
       <div className="p-6">
-        {/* Prompt */}
+        {/* Question */}
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 leading-relaxed">
-          {question.prompt}
+          {question.question}
         </h2>
 
-        {/* Instruction */}
+        {/* Explanation */}
         <p className="text-slate-600 mb-4 leading-relaxed">
-          {question.instruction}
+          {question.explanation}
         </p>
 
         {/* Example */}
@@ -399,10 +308,12 @@ function WaveformVisualizer({ isRecording }: { isRecording: boolean }) {
 
 function MicrophoneRecorder({
   onRecordingComplete,
-  suggestedTime
+  suggestedTime,
+  tips
 }: {
-  onRecordingComplete: (blob: Blob) => void
+  onRecordingComplete: (blob: Blob, duration: number) => void
   suggestedTime: number
+  tips?: string | string[] | null
 }) {
   const [isRecording, setIsRecording] = useState(false)
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null)
@@ -414,6 +325,7 @@ function MicrophoneRecorder({
   const audioChunksRef = useRef<Blob[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const recordingDurationRef = useRef<number>(0)
 
   // Request microphone permission on mount
   useEffect(() => {
@@ -455,18 +367,22 @@ function MicrophoneRecorder({
 
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" })
+        const finalDuration = recordingDurationRef.current
         setRecordedBlob(audioBlob)
-        onRecordingComplete(audioBlob)
+        onRecordingComplete(audioBlob, finalDuration)
+        recordingDurationRef.current = 0
         stream.getTracks().forEach(track => track.stop())
       }
 
       mediaRecorder.start()
       setIsRecording(true)
       setRecordingTime(0)
+      recordingDurationRef.current = 0
 
       // Start timer
       timerRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1)
+        recordingDurationRef.current += 1
       }, 1000)
     } catch (err) {
       console.error("Error accessing microphone:", err)
@@ -644,9 +560,17 @@ function MicrophoneRecorder({
             <div>
               <p className="text-sm font-semibold text-blue-700">Tips for best results:</p>
               <ul className="text-sm text-blue-600 mt-1 space-y-1">
-                <li>• Speak clearly and at a natural pace</li>
-                <li>• Find a quiet environment</li>
-                <li>• Aim for {suggestedTime} seconds of speech</li>
+                {tips && Array.isArray(tips) 
+                  ? tips.map((tip: string, index: number) => (
+                      <li key={index}>• {tip}</li>
+                    ))
+                  : (
+                      <>
+                        <li>• Speak clearly and at a natural pace</li>
+                        <li>• Find a quiet environment</li>
+                        <li>• Aim for {suggestedTime} seconds of speech</li>
+                      </>
+                    )}
               </ul>
             </div>
           </div>
@@ -663,25 +587,27 @@ function MicrophoneRecorder({
 function FeedbackCard({
   xpGained,
   onNext,
-  isLast
+  isLast,
+  feedbackMessage,
+  isCorrect,
+  transcription
 }: {
   xpGained: number
   onNext: () => void
   isLast: boolean
+  feedbackMessage?: string
+  isCorrect?: boolean
+  transcription?: string
 }) {
-  const messages = [
-    "Nice! 😏",
-    "Good clarity! 🎙️",
-    "Keep going! 🔥",
-    "Well spoken! ✨",
-    "Great effort! 💪"
-  ]
-
-  const randomMessage = messages[Math.floor(Math.random() * messages.length)]
+  const displayMessage = feedbackMessage || "Great job! Keep practicing! 🎯"
 
   return (
     <motion.div
-      className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6 mb-6"
+      className={`rounded-3xl shadow-lg shadow-slate-200/50 border p-6 mb-6 ${
+        isCorrect
+          ? "bg-emerald-50/50 border-emerald-200"
+          : "bg-red-50/50 border-red-200"
+      }`}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 300 }}
@@ -700,9 +626,19 @@ function FeedbackCard({
       </div>
 
       {/* Message */}
-      <p className="text-center text-lg font-semibold text-slate-800 mb-6">
-        {randomMessage}
-      </p>
+      <div className={`p-4 rounded-xl mb-4 ${
+        isCorrect
+          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+          : "bg-red-100 text-red-800 border border-red-200"
+      }`}>
+        <p className="text-center font-semibold">{displayMessage}</p>
+        {transcription && (
+          <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <p className="text-sm text-slate-600 mb-1">What you said:</p>
+            <p className="text-slate-800 font-medium italic">"{transcription}"</p>
+          </div>
+        )}
+      </div>
 
       {/* Next button */}
       <motion.button
@@ -723,7 +659,49 @@ function FeedbackCard({
   )
 }
 
-// =============================================================================
+interface FeedbackItem {
+  skill: string
+  feedback_type: 'correct' | 'incorrect'
+  messages_json: string
+}
+
+const getFeedbackMessage = (feedback: FeedbackItem[], questionType: string, isCorrect: boolean = true): string => {
+  const speakingFeedback = feedback.find(f => f.skill === 'speaking' && f.feedback_type === (isCorrect ? 'correct' : 'incorrect'))
+  if (speakingFeedback && speakingFeedback.messages_json) {
+    try {
+      const messages = JSON.parse(speakingFeedback.messages_json)
+      if (Array.isArray(messages) && messages.length > 0) {
+        return messages[Math.floor(Math.random() * messages.length)]
+      }
+    } catch (error) {
+      console.error('Error parsing feedback messages:', error)
+    }
+  }
+  
+  // Fallback messages based on question type and correctness
+  const fallbackMessages = {
+    intro: {
+      correct: "Excellent introduction! Your pronunciation was clear and confident. 🎤",
+      incorrect: "Try your introduction again. Speak clearly and at a good pace. 🎤"
+    },
+    describe: {
+      correct: "Great description! You used good vocabulary and structure. 📝",
+      incorrect: "Keep practicing your description. Try to use more descriptive words. 📝"
+    },
+    opinion: {
+      correct: "Good opinion! You expressed your thoughts clearly. 💭",
+      incorrect: "Share your thoughts more clearly. Try to organize your ideas better. 💭"
+    },
+    scenario: {
+      correct: "Well done on the scenario! You handled the situation well. 🎭",
+      incorrect: "Try the scenario again. Think about the situation and respond appropriately. 🎭"
+    }
+  }
+  
+  const messageType = isCorrect ? 'correct' : 'incorrect'
+  return fallbackMessages[questionType as keyof typeof fallbackMessages]?.[messageType] || "Great job! Keep practicing! 🎯"
+}
+
 // MAIN COMPONENT
 // =============================================================================
 
@@ -732,30 +710,54 @@ export default function SpeakingTestLevel() {
   const [recordings, setRecordings] = useState<Blob[]>([])
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [totalXP, setTotalXP] = useState(0)
-  const [showResults, setShowResults] = useState(false)
+  const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<any[]>([])
+  const [speakingQuestions, setSpeakingQuestions] = useState<Question[]>([])
+  const [answers, setAnswers] = useState<string[]>([])
+  const [recordingDurations, setRecordingDurations] = useState<number[]>([])
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
+  const [isEvaluating, setIsEvaluating] = useState(false)
+  interface EvaluationResult {
+  isCorrect: boolean
+  feedback: string
+  xpAwarded: number | undefined
+  transcription: string
+}
+
+const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null>(null)
 
   const currentQuestion = speakingQuestions[currentIndex]
-  const progress = ((currentIndex + (hasSubmitted ? 1 : 0)) / speakingQuestions.length) * 100
+  const progress = speakingQuestions.length > 0 ? ((currentIndex + (hasSubmitted ? 1 : 0)) / speakingQuestions.length) * 100 : 0
 
   useEffect(() => {
         const fetchSpeakingTest = async () => {
+          setIsLoadingQuestions(true)
           try {
             const response = await fetch(`${API_BASE_URL}/reception/speaking-placement-tests`)
             const data = await response.json()
-            // console.log(data.message)
-            // return
+            
             if (data.tests && Array.isArray(data.tests)) {
-              console.log("Speaking tests from database:", data.tests)
-              // Transform API data to match Question interface
-              const transformedQuestions: Question[] = data.tests.map((test: any, index: number) => ({
+              const questions: Question[] = data.tests.map((test: any, index: number) => ({
+                id: test.id || index + 1,
+                level: test.level_id,
+                theme: test.theme,
+                question: test.question_title,
+                explanation: test.explanation,
+                example: test.example,
+                suggestedTime: test.time,
+                xpReward: test.xp_reward,
+                tips: JSON.parse(test.tips_json)
               }))
-              setSpeakingQuestions(transformedQuestions)
-              setAnswers(Array(transformedQuestions.length).fill(""))
+              setSpeakingQuestions(questions)
+              setAnswers(Array(questions.length).fill(""))
             } else {
               console.log("No speaking tests found or error:", data.error)
+              setSpeakingQuestions([])
             }
           } catch (error) {
             console.error("Failed to fetch speaking tests:", error)
+            setSpeakingQuestions([])
+          } finally {
+            setIsLoadingQuestions(false)
           }
         }
     
@@ -765,28 +767,88 @@ export default function SpeakingTestLevel() {
   useEffect(() => {
     const fetchImmediateQuestionFeedback = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/reception/immediate-write-question-feedback`)
+        const response = await fetch(`${API_BASE_URL}/reception/immediate-speak-question-feedback`)
         const data = await response.json()
         if (data.feedback && Array.isArray(data.feedback)) {
           setImmediateQuestionFeedback(data.feedback)
         }
       } catch (error) {
-        console.error("Failed to fetch immediate question feedback:", error)
+        // console.error("Failed to fetch immediate question feedback:", error)
       }
     }
     
     fetchImmediateQuestionFeedback()
   }, [])
   
-  const handleRecordingComplete = (blob: Blob) => {
+  const handleRecordingComplete = (blob: Blob, duration: number) => {
     const newRecordings = [...recordings]
     newRecordings[currentIndex] = blob
     setRecordings(newRecordings)
+    
+    // Store recording duration for validation
+    const newDurations = [...(recordingDurations || [])]
+    newDurations[currentIndex] = duration
+    setRecordingDurations(newDurations)
+    
+    // Reset submission state when re-recording
+    setHasSubmitted(false)
+    
+    // Use the current recording time for validation
+    // console.log(`Recording completed: ${duration}s for question ${currentIndex + 1}`)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // Validate minimum recording duration (80% of suggested time)
+    const currentDuration = recordingDurations[currentIndex] || 0
+    const minimumDuration = Math.floor(currentQuestion.suggestedTime * 0.8)
+    
+    // console.log(`Current recording duration: ${currentDuration}s, Minimum required: ${minimumDuration}s`)
+    
+    if (currentDuration < minimumDuration) {
+      alert(`Recording is too short! Please record for at least ${minimumDuration} seconds. Current recording: ${currentDuration} seconds.`)
+      return
+    }
+    
     setHasSubmitted(true)
-    setTotalXP(prev => prev + currentQuestion.xpReward)
+    setIsEvaluating(true)
+    
+    // Call speaking test scoring API
+    try {
+      const formData = new FormData()
+      const recordingBlob = recordings[currentIndex]
+      if (recordingBlob) {
+        formData.append('audio', recordingBlob, 'recording.webm')
+        formData.append('question', currentQuestion.question)
+        formData.append('instruction', currentQuestion.explanation)
+        formData.append('level', currentQuestion.level)
+        formData.append('questionType', currentQuestion.theme)
+        formData.append('actualDuration', currentDuration.toString())
+        formData.append('xpReward', currentQuestion.xpReward.toString())
+        
+        const response = await fetch(`${API_BASE_URL}/reception/speaking-test-scoring`, {
+          method: 'POST',
+          body: formData
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          console.log("the result is: " + JSON.stringify(result, null, 2))
+          // Store evaluation result for feedback display
+          setEvaluationResult(result)
+          setIsEvaluating(false)
+          // Handle scoring result here
+          setTotalXP(prev => prev + (result?.xpAwarded !== undefined ? result.xpAwarded : currentQuestion.xpReward))
+        } else {
+          console.error('Scoring failed:', response.status)
+          setIsEvaluating(false)
+          setTotalXP(prev => prev + currentQuestion.xpReward)
+        }
+      }
+    } catch (error) {
+      console.error('Error submitting speaking test:', error)
+      setIsEvaluating(false)
+      setTotalXP(prev => prev + currentQuestion.xpReward)
+    }
   }
 
   const handleNext = () => {
@@ -794,33 +856,45 @@ export default function SpeakingTestLevel() {
       setCurrentIndex(prev => prev + 1)
       setHasSubmitted(false)
     } else {
-      setShowResults(true)
+      // setShowResults(true)
     }
   }
 
-  const handleRestart = () => {
-    setCurrentIndex(0)
-    setRecordings([])
-    setHasSubmitted(false)
-    setTotalXP(0)
-    setShowResults(false)
-  }
-
-  // Results screen
-  if (showResults) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden relative">
-        <AnimatedBackground />
-        <ResultsScreen
-          totalXP={totalXP}
-          questionsCompleted={speakingQuestions.length}
-          onRestart={handleRestart}
-        />
-      </div>
-    )
-  }
-
+  // Loading state
+if (isLoadingQuestions) {
   return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden relative flex items-center justify-center">
+      <div className="text-center">
+        <motion.div
+          className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">Loading Speaking Test</h2>
+        <p className="text-gray-500">Preparing your questions...</p>
+      </div>
+    </div>
+  )
+}
+
+// Error state - no questions available
+if (!speakingQuestions || speakingQuestions.length === 0) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden relative flex items-center justify-center">
+      <div className="text-center bg-white rounded-3xl shadow-lg p-8 max-w-md">
+        <div className="text-6xl mb-4">Sorry! We couldn't load the speaking test questions. Please try refreshing the page or contact support if the problem persists.</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
+        >
+          Refresh Page
+        </button>
+      </div>
+    </div>
+  )
+}
+
+return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden relative">
       {/* Animated background */}
       <AnimatedBackground />
@@ -848,38 +922,12 @@ export default function SpeakingTestLevel() {
             {/* Prompt card */}
             <PromptCard question={currentQuestion} />
 
-            {/* Level progression indicator */}
-            {currentIndex > 0 && currentQuestion.level !== speakingQuestions[currentIndex - 1].level && (
-              <motion.div
-                className="flex items-center justify-center gap-2 mb-4"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <div className="px-3 py-1 bg-amber-100 rounded-full">
-                  <span className="text-xs font-bold text-amber-700">⬆️ Difficulty increased to {currentQuestion.level}</span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Milestone indicator at halfway */}
-            {currentIndex === Math.floor(speakingQuestions.length / 2) && !hasSubmitted && (
-              <motion.div
-                className="flex items-center justify-center gap-2 mb-4"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <div className="px-3 py-1 bg-blue-100 rounded-full">
-                  <span className="text-xs font-bold text-blue-700">🏃 Halfway there!</span>
-                </div>
-              </motion.div>
-            )}
-
+        
             {/* Recorder */}
             <MicrophoneRecorder
               onRecordingComplete={handleRecordingComplete}
               suggestedTime={currentQuestion.suggestedTime}
+              tips={currentQuestion.tips}
             />
 
             {/* Submit button (shown when recording exists and not yet submitted) */}
@@ -903,11 +951,34 @@ export default function SpeakingTestLevel() {
 
             {/* Feedback card (shown after submission) */}
             {hasSubmitted && (
-              <FeedbackCard
-                xpGained={currentQuestion.xpReward}
-                onNext={handleNext}
-                isLast={currentIndex === speakingQuestions.length - 1}
-              />
+              <>
+                {isEvaluating ? (
+                  <motion.div
+                    className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6 mb-6"
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <div className="text-center">
+                      <motion.div
+                        className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      />
+                      <p className="text-lg font-semibold text-slate-700">Getting your score...</p>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <FeedbackCard
+                    xpGained={evaluationResult?.xpAwarded || 0}
+                    onNext={handleNext}
+                    isLast={currentIndex === speakingQuestions.length - 1}
+                    feedbackMessage={evaluationResult?.feedback || getFeedbackMessage(immediateQuestionFeedback, currentQuestion.theme, evaluationResult?.isCorrect)}
+                    isCorrect={evaluationResult?.isCorrect}
+                    transcription={evaluationResult?.transcription}
+                  />
+                )}
+              </>
             )}
           </motion.div>
         </AnimatePresence>
