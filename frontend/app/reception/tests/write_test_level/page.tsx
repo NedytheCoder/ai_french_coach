@@ -305,6 +305,7 @@ function WritingArea({
   placeholder,
   isSubmitted,
   isCorrect,
+  isEvaluating,
   wordCount,
   minWords
 }: {
@@ -313,6 +314,7 @@ function WritingArea({
   placeholder: string
   isSubmitted: boolean
   isCorrect: boolean
+  isEvaluating: boolean
   wordCount: number
   minWords: number
 }) {
@@ -321,7 +323,7 @@ function WritingArea({
   const isShortInput = minWords === 0
 
   const getInputStyles = () => {
-    if (isSubmitted) {
+    if (isSubmitted && !isEvaluating) {
       return isCorrect
         ? "border-emerald-500 bg-emerald-50/50"
         : "border-red-400 bg-red-50/50"
@@ -449,12 +451,14 @@ function SubmitButton({
 // =============================================================================
 
 function FeedbackCard({
+  xpGained,
   isCorrect,
   message,
   explanation,
   onNext,
   isLast
 }: {
+  xpGained: number
   isCorrect: boolean
   message: string
   explanation: string
@@ -472,6 +476,18 @@ function FeedbackCard({
           ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
           : "bg-red-100 text-red-800 border border-red-200"
         }`}>
+        {/* XP animation */}
+        <div className="text-center mb-3">
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 500 }}
+          >
+            <FaStar className="w-5 h-5 text-amber-500" />
+            <span className="text-lg font-bold text-amber-700">+{xpGained} XP</span>
+          </motion.div>
+        </div>
         <p className="font-bold text-center text-lg mb-1">{message}</p>
         <p className="text-sm text-center opacity-80">{explanation}</p>
       </div>
@@ -507,6 +523,19 @@ export default function WritingTestLevel() {
   const [isCorrect, setIsCorrect] = useState<boolean[]>([])
   const [score, setScore] = useState(0)
   const [totalXP, setTotalXP] = useState(0)
+  const [isEvaluating, setIsEvaluating] = useState(false)
+  const [xpAwarded, setXpAwarded] = useState<number[]>([])
+
+  // Reset score to 0 and clear localStorage on page load
+  useEffect(() => {
+    setTotalXP(0)
+    localStorage.removeItem('writing_test_score')
+  }, [])
+
+  // Save score to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('writing_test_score', totalXP.toString())
+  }, [totalXP])
   const [writingQuestions, setWritingQuestions] = useState<Question[]>([])
   interface QuestionFeedback {
     skill: string
@@ -560,6 +589,7 @@ export default function WritingTestLevel() {
           setHasSubmitted(Array(transformedQuestions.length).fill(false))
           setIsCorrect(Array(transformedQuestions.length).fill(false))
           setApiFeedback(Array(transformedQuestions.length).fill(""))
+          setXpAwarded(Array(transformedQuestions.length).fill(0))
         } else {
           console.log("No writing tests found or error:", data.error)
         }
@@ -602,6 +632,12 @@ export default function WritingTestLevel() {
     //   return // Don't allow submit if below minimum
     // }
 
+    setIsEvaluating(true)
+
+    const newSubmitted = [...hasSubmitted]
+    newSubmitted[currentIndex] = true
+    setHasSubmitted(newSubmitted)
+
     // Prepare submission data
     const submissionData = {
       question: currentQuestion?.question,
@@ -628,10 +664,9 @@ export default function WritingTestLevel() {
 
       const result = await response.json()
 
+      setIsEvaluating(false)
+
       // Update state based on API response
-      const newSubmitted = [...hasSubmitted]
-      newSubmitted[currentIndex] = true
-      setHasSubmitted(newSubmitted)
 
       const newIsCorrect = [...isCorrect]
       newIsCorrect[currentIndex] = result.isCorrect || false
@@ -641,21 +676,21 @@ export default function WritingTestLevel() {
       newApiFeedback[currentIndex] = result.feedback || ""
       setApiFeedback(newApiFeedback)
 
-      if (result.isCorrect) {
-        setTotalXP(prev => prev + (result.xpAwarded || currentQuestion?.xp_reward || 0))
-      }
+      const newXpAwarded = [...xpAwarded]
+      newXpAwarded[currentIndex] = result.xpAwarded || 0
+      setXpAwarded(newXpAwarded)
+
+      // Always add XP for writing tests since they're subjective
+      setTotalXP(prev => prev + (result.xpAwarded || currentQuestion?.xp_reward || 0))
 
       console.log('API Response:', result)
 
     } catch (error) {
       console.error('Error submitting answer:', error)
+      setIsEvaluating(false)
 
       // Fallback to local validation if API fails
       const correct = validateAnswer(currentQuestion, currentAnswer)
-
-      const newSubmitted = [...hasSubmitted]
-      newSubmitted[currentIndex] = true
-      setHasSubmitted(newSubmitted)
 
       const newIsCorrect = [...isCorrect]
       newIsCorrect[currentIndex] = correct
@@ -735,6 +770,7 @@ export default function WritingTestLevel() {
                 placeholder={currentQuestion.placeholder}
                 isSubmitted={currentSubmitted}
                 isCorrect={currentIsCorrect}
+                isEvaluating={isEvaluating}
                 wordCount={wordCount}
                 minWords={minWords}
               />
@@ -756,13 +792,34 @@ export default function WritingTestLevel() {
               {/* Feedback */}
               <AnimatePresence>
                 {currentSubmitted && (
-                  <FeedbackCard
-                    isCorrect={currentIsCorrect}
-                    message={getFeedbackMessage(immediateQuestionFeedback, currentIsCorrect)}
-                    explanation={getValidationExplanation(apiFeedback[currentIndex])}
-                    onNext={handleNext}
-                    isLast={currentIndex === writingQuestions.length - 1}
-                  />
+                  <>
+                    {isEvaluating ? (
+                      <motion.div
+                        className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6 mb-6 mt-5"
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <div className="text-center">
+                          <motion.div
+                            className="w-16 h-16 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-4"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          />
+                          <p className="text-lg font-semibold text-slate-700">Getting your score...</p>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <FeedbackCard
+                        xpGained={xpAwarded[currentIndex] || 0}
+                        isCorrect={currentIsCorrect}
+                        message={getFeedbackMessage(immediateQuestionFeedback, currentIsCorrect)}
+                        explanation={getValidationExplanation(apiFeedback[currentIndex])}
+                        onNext={handleNext}
+                        isLast={currentIndex === writingQuestions.length - 1}
+                      />
+                    )}
+                  </>
                 )}
               </AnimatePresence>
             </div>

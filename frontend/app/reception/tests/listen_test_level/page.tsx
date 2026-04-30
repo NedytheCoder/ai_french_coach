@@ -606,6 +606,17 @@ function FeedbackCard({
 export default function ListenTestLevel() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [score, setScore] = useState(0)
+
+  // Reset score to 0 and clear localStorage on page load
+  useEffect(() => {
+    setScore(0)
+    localStorage.removeItem('listening_test_score')
+  }, [])
+
+  // Save score to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('listening_test_score', score.toString())
+  }, [score])
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [hasAnswered, setHasAnswered] = useState(false)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)

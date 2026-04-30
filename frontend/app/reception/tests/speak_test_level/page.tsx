@@ -34,6 +34,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import {
@@ -706,10 +707,22 @@ const getFeedbackMessage = (feedback: FeedbackItem[], questionType: string, isCo
 // =============================================================================
 
 export default function SpeakingTestLevel() {
+  const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [recordings, setRecordings] = useState<Blob[]>([])
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [totalXP, setTotalXP] = useState(0)
+
+  // Reset score to 0 and clear localStorage on page load
+  useEffect(() => {
+    setTotalXP(0)
+    localStorage.removeItem('speaking_test_score')
+  }, [])
+
+  // Save score to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('speaking_test_score', totalXP.toString())
+  }, [totalXP])
   const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<any[]>([])
   const [speakingQuestions, setSpeakingQuestions] = useState<Question[]>([])
   const [answers, setAnswers] = useState<string[]>([])
@@ -856,7 +869,8 @@ const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null
       setCurrentIndex(prev => prev + 1)
       setHasSubmitted(false)
     } else {
-      // setShowResults(true)
+      // Navigate to results page
+      router.push('/reception/tests/results')
     }
   }
 
