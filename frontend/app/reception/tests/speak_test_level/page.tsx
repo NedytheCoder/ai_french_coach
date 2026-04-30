@@ -845,7 +845,7 @@ const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null
         
         if (response.ok) {
           const result = await response.json()
-          console.log("the result is: " + JSON.stringify(result, null, 2))
+          // console.log("the result is: " + JSON.stringify(result, null, 2))
           // Store evaluation result for feedback display
           setEvaluationResult(result)
           setIsEvaluating(false)

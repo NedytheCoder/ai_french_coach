@@ -628,7 +628,7 @@ export default function ListenTestLevel() {
   const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<FeedbackMessage[]>([])
 
   const currentQuestion = questions[currentIndex]
-  console.log("Current question:", currentQuestion)
+  // console.log("Current question:", currentQuestion)
   const progress = ((currentIndex + (hasAnswered ? 1 : 0)) / questions.length) * 100
 
   useEffect(() => {

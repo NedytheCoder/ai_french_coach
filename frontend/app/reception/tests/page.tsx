@@ -816,7 +816,7 @@ export default function PlacementTestLanding() {
           // console.log(data.message)
           // return
           if (data.levels && Array.isArray(data.levels)) {
-            console.log("Reception levels from database:", data.levels)
+            // console.log("Reception levels from database:", data.levels)
             setLevels(data.levels)
           } else {
             console.log("No level found or error:", data.error)
@@ -858,7 +858,7 @@ export default function PlacementTestLanding() {
           // console.log(data.message)
           // return
           if (data.descriptions && Array.isArray(data.descriptions)) {
-            console.log("Test description from database:", data.descriptions)
+            // console.log("Test description from database:", data.descriptions)
             setPlacementDescription(data.descriptions)
           } else {
             console.log("No test descriptions found or error:", data.error)

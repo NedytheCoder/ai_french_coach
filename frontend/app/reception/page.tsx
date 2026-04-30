@@ -628,7 +628,7 @@ export default function ReceptionPage() {
         // console.log(data.message)
         // return
         if (data.levels && Array.isArray(data.levels)) {
-          console.log("Reception levels from database:", data.levels)
+          // console.log("Reception levels from database:", data.levels)
           setLevels(data.levels)
         } else {
           console.log("No titles found or error:", data.error)

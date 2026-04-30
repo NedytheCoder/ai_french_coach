@@ -594,7 +594,7 @@ export default function ReadingTestLevel() {
             // console.log(data.message)
             // return
             if (data.tests && Array.isArray(data.tests)) {
-              console.log("Reading tests from database:", data.tests)
+              // console.log("Reading tests from database:", data.tests)
               // Transform API data to match Question interface
               const transformedQuestions: Question[] = data.tests.map((test: any, index: number) => ({
                 id: test.id || index + 1,
