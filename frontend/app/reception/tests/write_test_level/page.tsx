@@ -45,60 +45,21 @@ interface Question {
   xp_reward: number
 }
 
-const getLevelFromScore = (score: number): { level: string; message: string; color: string } => {
-  if (score <= 2) {
-    return {
-      level: "A0",
-      message: "Every expert was once a beginner. Let's start your journey! 🌱",
-      color: "from-green-400 to-emerald-500"
-    }
-  }
-  if (score <= 4) {
-    return {
-      level: "A1",
-      message: "Great start! You're building solid foundations. Keep going! 💪",
-      color: "from-blue-400 to-cyan-500"
-    }
-  }
-  if (score <= 6) {
-    return {
-      level: "A2",
-      message: "Nice progress! You can express yourself in French now. 🎉",
-      color: "from-purple-400 to-violet-500"
-    }
-  }
-  if (score === 7) {
-    return {
-      level: "B1",
-      message: "Impressive! Your writing skills are getting strong. 🌟",
-      color: "from-orange-400 to-amber-500"
-    }
-  }
-  return {
-    level: "B2",
-    message: "Excellent! You have advanced writing skills. 🏆",
-    color: "from-red-400 to-rose-500"
-  }
-}
-
-
 
 const getFeedbackMessage = (feedback: any[], isCorrect: boolean): string => {
   const feedbackType = isCorrect ? 'correct' : 'incorrect'
   const feedbackItem = feedback.find(f => f.feedback_type === feedbackType && f.skill === 'writing')
-  
+
   if (feedbackItem && feedbackItem.messages_json) {
     const messages = JSON.parse(feedbackItem.messages_json)
     return messages[Math.floor(Math.random() * messages.length)]
   }
-  
+
   return isCorrect ? "Well done!" : "Keep trying! 💪"
 }
 
-const getValidationExplanation = (isCorrect: boolean): string => {
-  return isCorrect 
-    ? "Your answer meets the requirements. Great work!"
-    : "Check your answer and try again. Look at the guidance for hints."
+const getValidationExplanation = (apiFeedback: string): string => {
+  return apiFeedback || "Your answer has been evaluated."
 }
 
 const validateAnswer = (question: Question, answer: string): boolean => {
@@ -127,11 +88,10 @@ function AnimatedBackground() {
             height: `${120 + i * 40}px`,
             left: `${10 + i * 22}%`,
             top: `${15 + (i % 2) * 35}%`,
-            background: `linear-gradient(135deg, ${
-              i % 2 === 0
+            background: `linear-gradient(135deg, ${i % 2 === 0
                 ? "rgba(245,158,11,0.08) 0%, rgba(59,130,246,0.06) 100%"
                 : "rgba(16,185,129,0.06) 0%, rgba(59,130,246,0.04) 100%"
-            })`,
+              })`,
           }}
           animate={{
             y: [0, -20, 0],
@@ -314,7 +274,7 @@ function GuidanceCard({ guidance }: { guidance?: string[] }) {
         <FaLightbulb className="w-5 h-5 text-blue-500" />
         <span className="text-sm font-bold text-blue-700">Structure Guide</span>
       </div>
-      
+
       <ul className="space-y-2">
         {guidance.map((step, index) => (
           <motion.li
@@ -345,6 +305,7 @@ function WritingArea({
   placeholder,
   isSubmitted,
   isCorrect,
+  isEvaluating,
   wordCount,
   minWords
 }: {
@@ -353,15 +314,16 @@ function WritingArea({
   placeholder: string
   isSubmitted: boolean
   isCorrect: boolean
+  isEvaluating: boolean
   wordCount: number
   minWords: number
 }) {
   const [isFocused, setIsFocused] = useState(false)
-  
+
   const isShortInput = minWords === 0
-  
+
   const getInputStyles = () => {
-    if (isSubmitted) {
+    if (isSubmitted && !isEvaluating) {
       return isCorrect
         ? "border-emerald-500 bg-emerald-50/50"
         : "border-red-400 bg-red-50/50"
@@ -384,22 +346,20 @@ function WritingArea({
           <FaPencilAlt className="w-4 h-4 text-slate-400" />
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Answer</span>
         </div>
-        
-        {/* Word counter for longer tasks */}
-        {!isShortInput && minWords > 0 && (
+
+        {/* Word counter */}
+        {minWords > 0 && (
           <div className="flex items-center gap-2">
-            <span className={`text-sm font-medium ${
-              wordCount >= minWords ? "text-emerald-600" : "text-slate-500"
-            }`}>
+            <span className={`text-sm font-medium ${wordCount >= minWords ? "text-emerald-600" : "text-slate-500"
+              }`}>
               {wordCount} / {minWords} words
             </span>
-            
+
             {/* Mini progress bar */}
             <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
               <motion.div
-                className={`h-full rounded-full ${
-                  wordCount >= minWords ? "bg-emerald-500" : "bg-amber-400"
-                }`}
+                className={`h-full rounded-full ${wordCount >= minWords ? "bg-emerald-500" : "bg-amber-400"
+                  }`}
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min((wordCount / minWords) * 100, 100)}%` }}
                 transition={{ duration: 0.3 }}
@@ -409,33 +369,20 @@ function WritingArea({
         )}
       </div>
 
-      {/* Input field */}
-      {isShortInput ? (
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
-          disabled={isSubmitted}
-          className={`w-full p-4 rounded-xl border-2 text-lg transition-all duration-300 outline-none ${getInputStyles()}`}
-        />
-      ) : (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
-          disabled={isSubmitted}
-          rows={6}
-          className={`w-full p-4 rounded-xl border-2 text-lg leading-relaxed transition-all duration-300 outline-none resize-none ${getInputStyles()}`}
-        />
-      )}
+      {/* Textarea */}
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        placeholder={placeholder}
+        disabled={isSubmitted}
+        rows={6}
+        className={`w-full p-4 rounded-xl border-2 text-lg leading-relaxed transition-all duration-300 outline-none resize-none ${getInputStyles()}`}
+      />
 
       {/* Encouragement message */}
-      {!isSubmitted && !isShortInput && wordCount > 0 && (
+      {!isSubmitted && minWords > 0 && wordCount > 0 && (
         <motion.div
           className="mt-3 text-sm text-amber-600 font-medium"
           initial={{ opacity: 0, y: 10 }}
@@ -468,23 +415,22 @@ function SubmitButton({
   minWords: number
 }) {
   const isShortInput = minWords === 0
-  
+
   return (
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all ${
-        disabled
+      className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all ${disabled
           ? "bg-slate-200 text-slate-400 cursor-not-allowed"
           : "bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white shadow-lg shadow-amber-500/30 hover:shadow-xl"
-      }`}
+        }`}
       whileHover={!disabled ? { scale: 1.02 } : {}}
       whileTap={!disabled ? { scale: 0.98 } : {}}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
       <span className="flex items-center justify-center gap-2">
-        {!isShortInput && wordCount < minWords && wordCount > 0 ? (
+        {minWords > 0 && wordCount < minWords && wordCount > 0 ? (
           <>
             <span>Keep Writing</span>
             <span className="text-sm opacity-80">({minWords - wordCount} more words)</span>
@@ -505,12 +451,14 @@ function SubmitButton({
 // =============================================================================
 
 function FeedbackCard({
+  xpGained,
   isCorrect,
   message,
   explanation,
   onNext,
   isLast
 }: {
+  xpGained: number
   isCorrect: boolean
   message: string
   explanation: string
@@ -524,11 +472,22 @@ function FeedbackCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 300 }}
     >
-      <div className={`p-5 rounded-xl mb-4 ${
-        isCorrect
+      <div className={`p-5 rounded-xl mb-4 ${isCorrect
           ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
           : "bg-red-100 text-red-800 border border-red-200"
-      }`}>
+        }`}>
+        {/* XP animation */}
+        <div className="text-center mb-3">
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 500 }}
+          >
+            <FaStar className="w-5 h-5 text-amber-500" />
+            <span className="text-lg font-bold text-amber-700">+{xpGained} XP</span>
+          </motion.div>
+        </div>
         <p className="font-bold text-center text-lg mb-1">{message}</p>
         <p className="text-sm text-center opacity-80">{explanation}</p>
       </div>
@@ -564,8 +523,39 @@ export default function WritingTestLevel() {
   const [isCorrect, setIsCorrect] = useState<boolean[]>([])
   const [score, setScore] = useState(0)
   const [totalXP, setTotalXP] = useState(0)
+  const [isEvaluating, setIsEvaluating] = useState(false)
+  const [xpAwarded, setXpAwarded] = useState<number[]>([])
+
+  // Reset score to 0 and clear localStorage on page load
+  useEffect(() => {
+    setTotalXP(0)
+    localStorage.removeItem('writing_test_score')
+  }, [])
+
+  // Save score to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('writing_test_score', totalXP.toString())
+  }, [totalXP])
   const [writingQuestions, setWritingQuestions] = useState<Question[]>([])
-  const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<any[]>([])
+  interface QuestionFeedback {
+    skill: string
+    feedback_type: string
+    feedback_message: string
+  }
+
+  interface APITestData {
+    id?: number
+    level_id: string
+    question: string
+    question_text: string
+    placeholder: string
+    guide_json: string
+    word_count: number
+    xp_reward: string
+  }
+
+  const [immediateQuestionFeedback, setImmediateQuestionFeedback] = useState<QuestionFeedback[]>([])
+  const [apiFeedback, setApiFeedback] = useState<string[]>([])
   const currentQuestion = writingQuestions[currentIndex]
   const progress = writingQuestions.length > 0 ? ((currentIndex + (hasSubmitted[currentIndex] ? 1 : 0)) / writingQuestions.length) * 100 : 0
   const currentAnswer = answers[currentIndex] || ""
@@ -575,39 +565,41 @@ export default function WritingTestLevel() {
   const minWords = currentQuestion?.word_count || 0
 
   useEffect(() => {
-        const fetchWritingTest = async () => {
-          try {
-            const response = await fetch(`${API_BASE_URL}/reception/writing-placement-tests`)
-            const data = await response.json()
-            // console.log(data.message)
-            // return
-            if (data.tests && Array.isArray(data.tests)) {
-              console.log("Writing tests from database:", data.tests)
-              // Transform API data to match Question interface
-              const transformedQuestions: Question[] = data.tests.map((test: any, index: number) => ({
-                id: test.id || index + 1,
-                level_id: test.level_id,
-                question: test.question,
-                question_text: test.question_text,
-                placeholder: test.placeholder,
-                guide_json: test.guide_json,
-                word_count: test.word_count,
-                xp_reward: parseInt(test.xp_reward, 10),
-              }))
-              setWritingQuestions(transformedQuestions)
-              setAnswers(Array(transformedQuestions.length).fill(""))
-              setHasSubmitted(Array(transformedQuestions.length).fill(false))
-              setIsCorrect(Array(transformedQuestions.length).fill(false))
-            } else {
-              console.log("No writing tests found or error:", data.error)
-            }
-          } catch (error) {
-            console.error("Failed to fetch writing tests:", error)
-          }
+    const fetchWritingTest = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/reception/writing-placement-tests`)
+        const data = await response.json()
+        // console.log(data.message)
+        // return
+        if (data.tests && Array.isArray(data.tests)) {
+          console.log("Writing tests from database:", data.tests)
+          // Transform API data to match Question interface
+          const transformedQuestions: Question[] = data.tests.map((test: APITestData, index: number) => ({
+            id: test.id || index + 1,
+            level_id: test.level_id,
+            question: test.question,
+            question_text: test.question_text,
+            placeholder: test.placeholder,
+            guide_json: test.guide_json,
+            word_count: test.word_count,
+            xp_reward: parseInt(test.xp_reward, 10),
+          }))
+          setWritingQuestions(transformedQuestions)
+          setAnswers(Array(transformedQuestions.length).fill(""))
+          setHasSubmitted(Array(transformedQuestions.length).fill(false))
+          setIsCorrect(Array(transformedQuestions.length).fill(false))
+          setApiFeedback(Array(transformedQuestions.length).fill(""))
+          setXpAwarded(Array(transformedQuestions.length).fill(0))
+        } else {
+          console.log("No writing tests found or error:", data.error)
         }
-    
-        fetchWritingTest()
-      }, [])
+      } catch (error) {
+        console.error("Failed to fetch writing tests:", error)
+      }
+    }
+
+    fetchWritingTest()
+  }, [])
 
   useEffect(() => {
     const fetchImmediateQuestionFeedback = async () => {
@@ -621,7 +613,7 @@ export default function WritingTestLevel() {
         console.error("Failed to fetch immediate question feedback:", error)
       }
     }
-    
+
     fetchImmediateQuestionFeedback()
   }, [])
 
@@ -632,27 +624,86 @@ export default function WritingTestLevel() {
     setAnswers(newAnswers)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (currentSubmitted || currentAnswer.trim() === "") return
-    
+
     // For longer tasks, check minimum word count
     // if (minWords > 0 && wordCount < minWords) {
     //   return // Don't allow submit if below minimum
     // }
-    
-    const correct = validateAnswer(currentQuestion, currentAnswer)
-    
+
+    setIsEvaluating(true)
+
     const newSubmitted = [...hasSubmitted]
     newSubmitted[currentIndex] = true
     setHasSubmitted(newSubmitted)
-    
-    const newIsCorrect = [...isCorrect]
-    newIsCorrect[currentIndex] = correct
-    setIsCorrect(newIsCorrect)
-    
-    if (correct) {
-      setScore(prev => prev + 1)
-      setTotalXP(prev => prev + (currentQuestion?.xp_reward || 0))
+
+    // Prepare submission data
+    const submissionData = {
+      question: currentQuestion?.question,
+      questionText: currentQuestion?.question_text,
+      userAnswer: currentAnswer,
+      level: currentQuestion?.level_id
+    }
+
+    try {
+      // Send to API endpoint
+      const response = await fetch(`${API_BASE_URL}/reception/writing-test-scoring`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(submissionData)
+      })
+
+      console.log("Submitting answer:", submissionData)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! !!!status: ${response.status}`)
+      }
+
+      const result = await response.json()
+
+      setIsEvaluating(false)
+
+      // Update state based on API response
+
+      const newIsCorrect = [...isCorrect]
+      newIsCorrect[currentIndex] = result.isCorrect || false
+      setIsCorrect(newIsCorrect)
+
+      const newApiFeedback = [...apiFeedback]
+      newApiFeedback[currentIndex] = result.feedback || ""
+      setApiFeedback(newApiFeedback)
+
+      const newXpAwarded = [...xpAwarded]
+      newXpAwarded[currentIndex] = result.xpAwarded || 0
+      setXpAwarded(newXpAwarded)
+
+      // Always add XP for writing tests since they're subjective
+      setTotalXP(prev => prev + (result.xpAwarded || currentQuestion?.xp_reward || 0))
+
+      console.log('API Response:', result)
+
+    } catch (error) {
+      console.error('Error submitting answer:', error)
+      setIsEvaluating(false)
+
+      // Fallback to local validation if API fails
+      const correct = validateAnswer(currentQuestion, currentAnswer)
+
+      const newIsCorrect = [...isCorrect]
+      newIsCorrect[currentIndex] = correct
+      setIsCorrect(newIsCorrect)
+
+      const newApiFeedback = [...apiFeedback]
+      newApiFeedback[currentIndex] = correct ? "Good job! Your answer has been evaluated." : "Keep practicing! Your answer has been evaluated."
+      setApiFeedback(newApiFeedback)
+
+      if (correct) {
+        setScore(prev => prev + 1)
+        setTotalXP(prev => prev + (currentQuestion?.xp_reward || 0))
+      }
     }
   }
 
@@ -707,7 +758,7 @@ export default function WritingTestLevel() {
                 prompt={currentQuestion.question}
                 text={currentQuestion.question_text}
               />
-              
+
               <GuidanceCard guidance={JSON.parse(currentQuestion.guide_json || '[]')} />
             </div>
 
@@ -719,6 +770,7 @@ export default function WritingTestLevel() {
                 placeholder={currentQuestion.placeholder}
                 isSubmitted={currentSubmitted}
                 isCorrect={currentIsCorrect}
+                isEvaluating={isEvaluating}
                 wordCount={wordCount}
                 minWords={minWords}
               />
@@ -740,13 +792,34 @@ export default function WritingTestLevel() {
               {/* Feedback */}
               <AnimatePresence>
                 {currentSubmitted && (
-                  <FeedbackCard
-                    isCorrect={currentIsCorrect}
-                    message={getFeedbackMessage(immediateQuestionFeedback, currentIsCorrect)}
-                    explanation={getValidationExplanation(currentIsCorrect)}
-                    onNext={handleNext}
-                    isLast={currentIndex === writingQuestions.length - 1}
-                  />
+                  <>
+                    {isEvaluating ? (
+                      <motion.div
+                        className="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6 mb-6 mt-5"
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <div className="text-center">
+                          <motion.div
+                            className="w-16 h-16 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-4"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          />
+                          <p className="text-lg font-semibold text-slate-700">Getting your score...</p>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <FeedbackCard
+                        xpGained={xpAwarded[currentIndex] || 0}
+                        isCorrect={currentIsCorrect}
+                        message={getFeedbackMessage(immediateQuestionFeedback, currentIsCorrect)}
+                        explanation={getValidationExplanation(apiFeedback[currentIndex])}
+                        onNext={handleNext}
+                        isLast={currentIndex === writingQuestions.length - 1}
+                      />
+                    )}
+                  </>
                 )}
               </AnimatePresence>
             </div>

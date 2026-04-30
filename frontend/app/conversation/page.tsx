@@ -756,7 +756,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/c
       setIsLoading(true)
 
       try {
-        const res = await fetch("http://localhost:8000/transcribe", { method: "POST", body: formData })
+        const res = await fetch(`${API_BASE_URL}/transcribe`, { method: "POST", body: formData })
         const data = await res.json()
 
         if (!res.ok) {
@@ -771,14 +771,14 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/c
             const updatedHistory = [...messages, userMessage]
             setMessages(updatedHistory)
 
-            let url = "http://localhost:8000/respond"
-            if (mode === "introduction") {
-              url = "http://localhost:8000/introduction"
-            } else if (mode === "traveling") {
-              url = "http://localhost:8000/traveling"
-            } else if (mode === "daily_conversations") {
-              url = "http://localhost:8000/daily_conversations"
-            }
+           let url = API_BASE_URL + "/respond"
+      if (mode === "introduction") {
+        url = API_BASE_URL + "/introduction"
+      } else if (mode === "traveling") {
+        url = API_BASE_URL + "/traveling"
+      } else if (mode === "daily_conversations") {
+        url = API_BASE_URL + "/daily_conversations"
+      }
 
             const aiRes = await fetch(url, {
               method: "POST",

@@ -46,60 +46,6 @@ interface SkillInfo {
   gradient: string
 }
 
-const skills: SkillInfo[] = [
-  {
-    id: "reading",
-    title: "Reading",
-    icon: FaBookOpen,
-    description: "Understand written French texts",
-    format: "Multiple choice / comprehension",
-    questions: "~10–15 questions",
-    time: "5–8 minutes",
-    color: "blue",
-    gradient: "from-blue-500 to-cyan-500",
-  },
-  {
-    id: "listening",
-    title: "Listening",
-    icon: FaHeadphones,
-    description: "Understand spoken French",
-    format: "Audio-based questions",
-    questions: "~8–12 questions",
-    time: "5–7 minutes",
-    color: "purple",
-    gradient: "from-purple-500 to-violet-500",
-  },
-  {
-    id: "writing",
-    title: "Writing",
-    icon: FaPen,
-    description: "Express your ideas in French",
-    format: "Short written responses",
-    questions: "~2–3 prompts",
-    time: "5–10 minutes",
-    color: "emerald",
-    gradient: "from-emerald-500 to-teal-500",
-  },
-  {
-    id: "speaking",
-    title: "Speaking",
-    icon: FaMicrophone,
-    description: "Speak and respond in French",
-    format: "Voice responses",
-    questions: "~2–3 prompts",
-    time: "5–10 minutes",
-    color: "orange",
-    gradient: "from-orange-500 to-amber-500",
-  },
-]
-
-const flowSteps = [
-  { id: 1, title: "Reading", icon: FaBookOpen, color: "blue" },
-  { id: 2, title: "Listening", icon: FaHeadphones, color: "purple" },
-  { id: 3, title: "Writing", icon: FaPen, color: "emerald" },
-  { id: 4, title: "Speaking", icon: FaMicrophone, color: "orange" },
-]
-
 // =============================================================================
 // ANIMATED BACKGROUND
 // =============================================================================
