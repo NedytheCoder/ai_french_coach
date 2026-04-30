@@ -3,6 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.conversation import router as conversation_router
 from api.reception import router as reception_router
+from fastapi import FastAPI
+import shutil
+
+print("ffmpeg path:", shutil.which("ffmpeg"))
 
 # OpenAI - Client for GPT-4 and transcription services
 from openai import OpenAI
