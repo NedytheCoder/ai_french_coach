@@ -457,7 +457,7 @@ function FinalCTASection() {
 // Main Page Component
 export default function A0LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/20 to-teal-50/20 font-sans overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/20 to-teal-50/20 overflow-hidden">
       <FloatingDecorations />
 
       {/* Main Content */}

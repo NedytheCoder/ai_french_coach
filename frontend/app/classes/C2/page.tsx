@@ -395,7 +395,7 @@ function FinalCTASection() {
 // Main Component
 export default function C2WelcomePage() {
   return (
-    <div className="min-h-screen bg-[#FDFDFD] font-sans overflow-hidden">
+    <div className="min-h-screen bg-[#FDFDFD] overflow-hidden">
       {/* No background decorations - pure minimalism */}
       
       <main className="relative z-10 max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">

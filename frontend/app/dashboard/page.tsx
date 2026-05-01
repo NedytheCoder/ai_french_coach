@@ -180,7 +180,7 @@ export default function DashboardPage() {
     setIsNotificationOpen(false)
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 overflow-x-hidden">
       <FloatingDecorations />
 
       {/* Navigation */}

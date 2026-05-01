@@ -441,7 +441,7 @@ function FinalCTASection() {
 // Main Component
 export default function B2WelcomePage() {
   return (
-    <div className="min-h-screen bg-slate-50 font-sans overflow-hidden">
+    <div className="min-h-screen bg-slate-50 overflow-hidden">
       {/* Very minimal background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-slate-100/50 to-transparent rounded-full blur-3xl" />

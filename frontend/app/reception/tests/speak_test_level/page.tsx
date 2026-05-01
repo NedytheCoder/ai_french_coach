@@ -877,7 +877,7 @@ const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null
   // Loading state
 if (isLoadingQuestions) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden relative flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 overflow-x-hidden relative flex items-center justify-center">
       <div className="text-center">
         <motion.div
           className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"
@@ -894,7 +894,7 @@ if (isLoadingQuestions) {
 // Error state - no questions available
 if (!speakingQuestions || speakingQuestions.length === 0) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden relative flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 overflow-x-hidden relative flex items-center justify-center">
       <div className="text-center bg-white rounded-3xl shadow-lg p-8 max-w-md">
         <div className="text-6xl mb-4">Sorry! We couldn't load the speaking test questions. Please try refreshing the page or contact support if the problem persists.</div>
         <button 
@@ -909,7 +909,7 @@ if (!speakingQuestions || speakingQuestions.length === 0) {
 }
 
 return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 overflow-x-hidden relative">
       {/* Animated background */}
       <AnimatedBackground />
 

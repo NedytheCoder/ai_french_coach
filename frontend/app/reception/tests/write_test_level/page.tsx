@@ -718,7 +718,7 @@ export default function WritingTestLevel() {
   // Loading state while questions fetch
   if (writingQuestions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 font-sans flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
           <p className="text-slate-600">Loading questions...</p>
@@ -728,7 +728,7 @@ export default function WritingTestLevel() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 font-sans overflow-x-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/20 overflow-x-hidden relative">
       <AnimatedBackground />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">

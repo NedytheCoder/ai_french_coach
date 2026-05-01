@@ -125,7 +125,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50/20 overflow-x-hidden">
       {/* Animated background decorations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div

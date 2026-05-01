@@ -1,39 +1,36 @@
-import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import type { Metadata, Viewport } from "next"
 import { Analytics } from "@vercel/analytics/next"
-import "./globals.css";
+import { Poppins } from "next/font/google"
+import "./globals.css"
 
 const poppins = Poppins({
-  weight: "400",
+  weight: ["300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
-});
+  display: "swap",
+})
 
-export const viewport = {
+export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-};
+}
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "French Coach",
   description: "Your personal AI French language coach",
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${poppins.className} h-full antialiased overflow-x-hidden`}
-    >
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-      </head>
-      <Analytics />
-      <body className="min-h-full flex flex-col overflow-x-hidden">{children}</body>
+    <html lang="en" className="h-full antialiased overflow-x-hidden">
+      <body className={`${poppins.className} min-h-full flex flex-col overflow-x-hidden`}>
+        {children}
+        <Analytics />
+      </body>
     </html>
-  );
+  )
 }

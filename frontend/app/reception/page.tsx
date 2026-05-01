@@ -661,7 +661,7 @@ export default function ReceptionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-purple-50/30 font-sans overflow-x-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-purple-50/30 overflow-x-hidden relative">
       {/* Animated background */}
       <FloatingDecorations />
 

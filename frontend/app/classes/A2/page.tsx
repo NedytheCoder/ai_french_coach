@@ -381,7 +381,7 @@ function FinalCTASection() {
 // Main Component
 export default function A2LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50 font-sans overflow-hidden">
+    <div className="min-h-screen bg-slate-50 overflow-hidden">
       {/* Subtle background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-20 -right-20 w-80 h-80 bg-gradient-to-br from-blue-100/30 to-indigo-100/20 rounded-full blur-3xl" />
