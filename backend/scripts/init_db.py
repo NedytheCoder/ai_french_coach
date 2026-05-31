@@ -1,66 +1,56 @@
 """
-Database initialization script.
+Database initialization script for fresh installs.
 
-Creates the data directory if needed, initializes the SQLite database,
-and executes all schema creation statements.
+Creates the data directory if needed, applies the full schema, and seeds
+the languages table. Safe to re-run — all statements use IF NOT EXISTS
+and INSERT OR IGNORE.
 
 Usage:
-    Run this script from the backend directory:
-    
-    $ python scripts/init_db.py
-    
-    Or from the project root:
-    $ python backend/scripts/init_db.py
+    From the backend directory:
+        python scripts/init_db.py
+
+    From the project root:
+        python backend/scripts/init_db.py
 """
 
 import os
+import sqlite3
 import sys
 
-# Add the parent directory to the path so we can import from database package
 script_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.dirname(script_dir)
-# sys.exit()
 sys.path.insert(0, backend_dir)
 
 from database.config import DATA_DIR, DATABASE_PATH
 from database.connection import get_connection
-from database.schema import get_schema_sql
+from database.schema import get_languages_seed_sql, get_schema_sql
 
 
 def ensure_data_directory() -> None:
-    """
-    Create the data directory if it does not exist.
-    """
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
         print(f"Created data directory: {DATA_DIR}")
     else:
-        print(f"Data directory already exists: {DATA_DIR}")
+        print(f"Data directory exists: {DATA_DIR}")
 
 
 def initialize_database() -> None:
-    """
-    Initialize the database by executing the schema SQL.
-    
-    Creates all tables and indexes defined in schema.py.
-    """
     conn = get_connection()
     try:
-        # Get the schema SQL and execute it
-        schema_sql = get_schema_sql()
-        conn.executescript(schema_sql)
+        conn.executescript(get_schema_sql())
+        conn.executescript(get_languages_seed_sql())
         conn.commit()
-        print("Database schema initialized successfully.")
-        print("Tables created:")
-        
-        # List created tables for confirmation
+
         cursor = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
         )
-        tables = cursor.fetchall()
-        for table in tables:
-            print(f"  - {table['name']}")
-            
+        tables = [row["name"] for row in cursor.fetchall()]
+        print(f"Schema applied. Tables: {', '.join(sorted(tables))}")
+
+        cursor = conn.execute("SELECT code, name FROM languages ORDER BY code")
+        languages = cursor.fetchall()
+        print(f"Languages seeded ({len(languages)}): {', '.join(r['code'] for r in languages)}")
+
     except sqlite3.Error as e:
         print(f"Error initializing database: {e}")
         sys.exit(1)
@@ -69,28 +59,18 @@ def initialize_database() -> None:
 
 
 def main() -> None:
-    """
-    Main entry point for the initialization script.
-    """
     print("=" * 50)
     print("Database Initialization")
     print("=" * 50)
-    print()
-    
-    # Step 1: Ensure data directory exists
+
     ensure_data_directory()
-    print()
-    
-    # Step 2: Initialize the database schema
-    print(f"Database file: {DATABASE_PATH}")
+    print(f"Database: {DATABASE_PATH}")
     initialize_database()
-    print()
-    
+
     print("=" * 50)
-    print("Initialization complete!")
+    print("Initialization complete.")
     print("=" * 50)
 
 
 if __name__ == "__main__":
-    import sqlite3  # Import here for the error handling in initialize_database
     main()
