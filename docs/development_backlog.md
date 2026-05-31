@@ -48,12 +48,14 @@ The smallest deployable system: auth, language pair selection, and AI tutor chat
 
 ---
 
-### M1-05: PromptBuilder — Core Abstraction
+### M1-05: PromptBuilder — Core Abstraction ✓ COMPLETE
 
 **Description:** Create `backend/ai/prompt_builder.py`. Implement `tutor_system_prompt(source_language, target_language, level)` for general, introduction, travelling, and daily_life modes. No language name is hard-coded; all are injected parameters. Write unit tests for each mode with at least three different language pairs.
 
 **Dependencies:** None  
-**Priority:** Critical
+**Priority:** Critical  
+**Completed:** 2026-05-31  
+**Artefacts:** `backend/ai/prompt_builder.py`, `backend/tests/test_prompt_builder.py` (25 tests, all passing)
 
 ---
 
