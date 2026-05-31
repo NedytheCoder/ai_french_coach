@@ -12,18 +12,29 @@ Tasks are ordered by dependency within each milestone. Complete each milestone b
 
 The smallest deployable system: auth, language pair selection, and AI tutor chat. No lessons required.
 
-### M1-01: Database Schema Migration
+### M1-01: Database Schema Migration ✅ COMPLETED 2026-05-31
 
 **Description:** Apply the new language-pair-agnostic schema (users, refresh_tokens, languages, user_language_pairs, conversation_sessions, messages, progress_records, vocabulary_items, assessments, assessment_answers). Seed the languages table. Write `init_db.py` for fresh installs and a migration script for the existing `app.db`.
+
+**Implemented:**
+- `backend/database/schema.py` — new schema, all 12 tables + indexes + language seed SQL
+- `backend/scripts/init_db.py` — idempotent fresh-install script
+- `backend/scripts/migrate_db.py` — migrates existing `app.db` (backs up, drops legacy tables, applies new schema, seeds languages, records migration in `schema_migrations`)
 
 **Dependencies:** None  
 **Priority:** Critical
 
 ---
 
-### M1-02: Auth — Register and Login
+### M1-02: Auth — Register and Login ✅ COMPLETED 2026-05-31
 
 **Description:** Implement `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `POST /auth/refresh`, and `GET /auth/me`. Password hashing with bcrypt. JWT access tokens (15 min) and refresh tokens (7 days) with server-side revocation via `refresh_tokens` table.
+
+**Implemented:**
+- `backend/models/auth.py` — Pydantic request/response models
+- `backend/services/auth_service.py` — bcrypt hashing, JWT creation/verification, `get_current_user` dependency, refresh token storage/revocation
+- `backend/api/auth.py` — all five auth endpoints per API contract
+- `backend/main.py` — updated to register auth router; removed legacy debug prints and reception router
 
 **Dependencies:** M1-01  
 **Priority:** Critical
