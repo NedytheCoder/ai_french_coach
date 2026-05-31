@@ -3,13 +3,14 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { useTranslation } from "../i18n/LanguageProvider"
 
 import { CiCircleCheck } from "react-icons/ci";
 import { 
   FaArrowRight, FaBookOpen, FaCheckCircle, FaGithub, FaHeadphones, 
   FaInstagram, FaLinkedin, FaMicrophone, FaPen, FaPlayCircle, FaStar, 
   FaTwitter, FaFire, FaTrophy, FaGem, FaMedal, FaBolt, FaRocket,
-  FaGraduationCap, FaLock, FaUnlock, FaHeart
+  FaGraduationCap, FaLock, FaUnlock, FaHeart, FaFlag
 } from "react-icons/fa";
 
 // Animated counter hook
@@ -133,7 +134,8 @@ function GamifiedFeatureCard({
   description, 
   color, 
   xpReward,
-  index 
+  index,
+  unlockText,
 }: { 
   icon: React.ElementType; 
   title: string; 
@@ -141,6 +143,7 @@ function GamifiedFeatureCard({
   color: string; 
   xpReward: number;
   index: number;
+  unlockText?: string;
 }) {
   const colorClasses: Record<string, { bg: string; icon: string; shadow: string }> = {
     purple: { bg: "from-purple-100 to-purple-50", icon: "text-purple-600", shadow: "shadow-purple-500/10" },
@@ -188,7 +191,7 @@ function GamifiedFeatureCard({
         viewport={{ once: true }}
         transition={{ delay: 0.4 + index * 0.1 }}
       >
-        <span>Unlock Skill</span>
+        <span>{unlockText ?? "Unlock Skill"}</span>
         <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
       </motion.div>
     </motion.div>
@@ -196,7 +199,7 @@ function GamifiedFeatureCard({
 }
 
 // Live Stats Counter
-function LiveStats() {
+function LiveStats({ labels }: { labels: string[] }) {
   const lessonsCount = useAnimatedCounter(12547, 2.5)
   const streakCount = useAnimatedCounter(3421, 2.5)
   const xpCount = useAnimatedCounter(892034, 2.5)
@@ -209,11 +212,11 @@ function LiveStats() {
       viewport={{ once: true }}
       transition={{ duration: 0.8 }}
     >
-      {[
-        { icon: FaBookOpen, value: lessonsCount, label: "Lessons Completed", color: "text-purple-600" },
-        { icon: FaFire, value: streakCount, label: "Active Streaks", color: "text-orange-600" },
-        { icon: FaStar, value: xpCount, label: "XP Earned Today", color: "text-amber-600" },
-      ].map((stat, index) => (
+          {[
+            { icon: FaBookOpen, value: lessonsCount, label: labels[0], color: "text-purple-600" },
+            { icon: FaFire, value: streakCount, label: labels[1], color: "text-orange-600" },
+            { icon: FaStar, value: xpCount, label: labels[2], color: "text-amber-600" },
+          ].map((stat, index) => (
         <motion.div
           key={stat.label}
           className="text-center p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60"
@@ -239,32 +242,26 @@ function LiveStats() {
   )
 }
 
-// Animated CTA Button
-function AnimatedCTA({ href, children, variant = "primary" }: { href: string; children: React.ReactNode; variant?: "primary" | "secondary" }) {
+// Animated CTA used in hero/CTA sections
+function AnimatedCTA({ href, variant = "primary", children }: { href: string; variant?: "primary" | "secondary"; children: React.ReactNode }) {
   const isPrimary = variant === "primary"
-  
   return (
     <Link href={href}>
       <motion.div
         className={`group relative inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-lg overflow-hidden ${
-          isPrimary 
-            ? "bg-white text-purple-600 shadow-xl" 
+          isPrimary
+            ? "bg-white text-purple-600 shadow-xl"
             : "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/25"
         }`}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
       >
         {isPrimary && (
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-purple-100 to-blue-100 opacity-0 group-hover:opacity-100 transition-opacity"
-          />
+          <motion.div className="absolute inset-0 bg-gradient-to-r from-purple-100 to-blue-100 opacity-0 group-hover:opacity-100 transition-opacity" />
         )}
         <span className="relative z-10 flex items-center gap-2">
           {children}
-          <motion.div
-            animate={{ x: [0, 5, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
+          <motion.div animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
             <FaArrowRight className="w-5 h-5" />
           </motion.div>
         </span>
@@ -274,25 +271,27 @@ function AnimatedCTA({ href, children, variant = "primary" }: { href: string; ch
 }
 
 export default function LandingPage() {
+  const { t, lang, setLang } = useTranslation()
+
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
   }
 
   const learningPath = [
-    { level: "A0", label: "Beginner", status: "current" as const },
-    { level: "A1", label: "Elementary", status: "locked" as const },
-    { level: "A2", label: "Pre-Intermediate", status: "locked" as const },
-    { level: "B1", label: "Intermediate", status: "locked" as const },
-    { level: "B2", label: "Upper-Int", status: "locked" as const },
-    { level: "C1", label: "Advanced", status: "locked" as const },
-    { level: "C2", label: "Mastery", status: "locked" as const },
+    { level: "A0", label: t("level_A0"), status: "current" as const },
+    { level: "A1", label: t("level_A1"), status: "locked" as const },
+    { level: "A2", label: t("level_A2"), status: "locked" as const },
+    { level: "B1", label: t("level_B1"), status: "locked" as const },
+    { level: "B2", label: t("level_B2"), status: "locked" as const },
+    { level: "C1", label: t("level_C1"), status: "locked" as const },
+    { level: "C2", label: t("level_C2"), status: "locked" as const },
   ]
 
   const gamifiedFeatures = [
-    { icon: FaMicrophone, title: "Speaking XP", description: "Practice conversations with AI and earn XP for every correct pronunciation", color: "purple", xpReward: 50 },
-    { icon: FaHeadphones, title: "Listening Quests", description: "Train your ears with audio challenges and unlock listening achievements", color: "blue", xpReward: 40 },
-    { icon: FaBookOpen, title: "Reading Rewards", description: "Read interactive stories, click words for help, collect vocabulary gems", color: "cyan", xpReward: 35 },
-    { icon: FaPen, title: "Writing Badges", description: "Get instant corrections, learn from mistakes, earn perfect writing medals", color: "emerald", xpReward: 45 },
+    { icon: FaMicrophone, title: t("feature_speaking_title"), description: t("feature_speaking_desc"), color: "purple", xpReward: 50 },
+    { icon: FaHeadphones, title: t("feature_listening_title"), description: t("feature_listening_desc"), color: "blue", xpReward: 40 },
+    { icon: FaBookOpen, title: t("feature_reading_title"), description: t("feature_reading_desc"), color: "cyan", xpReward: 35 },
+    { icon: FaPen, title: t("feature_writing_title"), description: t("feature_writing_desc"), color: "emerald", xpReward: 45 },
   ]
 
   return (
@@ -324,29 +323,43 @@ export default function LandingPage() {
                 className="text-slate-600 hover:text-purple-600 transition-colors text-sm font-medium"
                 whileHover={{ scale: 1.05 }}
               >
-                Your Journey
+                {t("nav_your_journey")}
               </motion.button>
               <motion.button 
                 onClick={() => scrollToSection("features")} 
                 className="text-slate-600 hover:text-purple-600 transition-colors text-sm font-medium"
                 whileHover={{ scale: 1.05 }}
               >
-                Skills
+                {t("nav_skills")}
               </motion.button>
               <motion.button 
                 onClick={() => scrollToSection("how-it-works")} 
                 className="text-slate-600 hover:text-purple-600 transition-colors text-sm font-medium"
                 whileHover={{ scale: 1.05 }}
               >
-                How to Play
+                {t("nav_how_to_play")}
               </motion.button>
               <Link 
                 href="/dashboard" 
                 className="group px-5 py-2.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full font-medium text-sm hover:shadow-lg hover:shadow-purple-500/25 transition-all hover:scale-105 flex items-center gap-2"
               >
                 <FaRocket className="w-4 h-4 group-hover:animate-bounce" />
-                Start Journey
+                {t("nav_start_journey")}
               </Link>
+
+              <label className="flex items-center gap-2">
+                <select
+                  aria-label="Language selector"
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value as any)}
+                  className="bg-white border border-slate-200 rounded-md px-3 py-1.5 text-sm font-medium hover:border-purple-400 transition-colors cursor-pointer"
+                >
+                  <option value="en">🇬🇧 {t("lang_en")}</option>
+                  <option value="fr">🇫🇷 {t("lang_fr")}</option>
+                  <option value="de">🇩🇪 {t("lang_de")}</option>
+                  <option value="zh">🇨🇳 {t("lang_zh")}</option>
+                </select>
+              </label>
             </div>
           </div>
         </div>
@@ -357,26 +370,18 @@ export default function LandingPage() {
         <FloatingParticles />
         
         {/* Animated background orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div 
-            className="absolute top-20 left-10 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl"
-            animate={{ 
-              scale: [1, 1.2, 1], 
-              x: [0, 20, 0],
-              y: [0, -20, 0],
-            }}
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div
+            className="absolute -top-28 -left-20 w-80 h-80 bg-purple-300/20 rounded-full blur-3xl"
+            animate={{ y: [0, -20, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
-          <motion.div 
+          <motion.div
             className="absolute bottom-20 right-10 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl"
-            animate={{ 
-              scale: [1, 1.3, 1], 
-              x: [0, -30, 0],
-              y: [0, 30, 0],
-            }}
+            animate={{ scale: [1, 1.3, 1], x: [0, -30, 0], y: [0, 30, 0] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           />
-          <motion.div 
+          <motion.div
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-purple-200/10 to-blue-200/10 rounded-full blur-3xl"
             animate={{ rotate: 360 }}
             transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
@@ -399,7 +404,7 @@ export default function LandingPage() {
                 >
                   <FaTrophy className="w-4 h-4 text-amber-600" />
                 </motion.div>
-                <span className="text-sm font-bold text-amber-800">Join 10,000+ learners leveling up!</span>
+                <span className="text-sm font-bold text-amber-800">{t("badge_join_learners")}</span>
               </motion.div>
 
               <motion.h1 
@@ -408,11 +413,11 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 }}
               >
-                Begin Your{" "}
+                {t("hero_begin_your")} {" "}
                 <span className="bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
-                  French
+                  {t("hero_highlight")}
                 </span>{" "}
-                Adventure
+                {t("hero_adventure")}
               </motion.h1>
               
               <motion.p 
@@ -421,7 +426,7 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
               >
-                Level up your language skills through AI-powered quests. Earn XP, unlock badges, and master French one achievement at a time.
+                {t("hero_subtitle")}
               </motion.p>
 
               {/* XP Preview */}
@@ -433,13 +438,13 @@ export default function LandingPage() {
               >
                 <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-xl">
                   <FaStar className="w-5 h-5 text-purple-600" />
-                  <span className="font-bold text-purple-700">+500 XP</span>
-                  <span className="text-sm text-purple-600">first lesson bonus</span>
+                  <span className="font-bold text-purple-700">{t("xp_first_bonus")}</span>
+                  <span className="text-sm text-purple-600">{t("xp_first_bonus_label")}</span>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-xl">
                   <FaFire className="w-5 h-5 text-amber-600" />
-                  <span className="font-bold text-amber-700">7-Day</span>
-                  <span className="text-sm text-amber-600">streak reward</span>
+                  <span className="font-bold text-amber-700">{t("xp_streak")}</span>
+                  <span className="text-sm text-amber-600">{t("xp_streak_label")}</span>
                 </div>
               </motion.div>
               
@@ -456,8 +461,8 @@ export default function LandingPage() {
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
                   />
-                  <FaRocket className="w-5 h-5 relative z-10 group-hover:animate-bounce" />
-                  <span className="relative z-10">Start Your Journey</span>
+                    <FaRocket className="w-5 h-5 relative z-10 group-hover:animate-bounce" />
+                    <span className="relative z-10">{t("cta_start_your_journey")}</span>
                 </Link>
                 <motion.button 
                   onClick={() => scrollToSection("how-it-works")}
@@ -466,7 +471,7 @@ export default function LandingPage() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <FaPlayCircle className="w-5 h-5" />
-                  See How It Works
+                    {t("cta_see_how")}
                 </motion.button>
               </motion.div>
               
@@ -483,7 +488,7 @@ export default function LandingPage() {
                   <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
                     <CiCircleCheck className="w-3 h-3 text-green-600" />
                   </div>
-                  <span>Free forever</span>
+                  <span>{t("free_forever")}</span>
                 </motion.div>
                 <motion.div 
                   className="flex items-center gap-2"
@@ -492,7 +497,7 @@ export default function LandingPage() {
                   <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
                     <CiCircleCheck className="w-3 h-3 text-green-600" />
                   </div>
-                  <span>No credit card</span>
+                  <span>{t("no_credit_card")}</span>
                 </motion.div>
                 <motion.div 
                   className="flex items-center gap-2"
@@ -501,7 +506,7 @@ export default function LandingPage() {
                   <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
                     <CiCircleCheck className="w-3 h-3 text-green-600" />
                   </div>
-                  <span>Cancel anytime</span>
+                  <span>{t("cancel_anytime")}</span>
                 </motion.div>
               </motion.div>
             </div>
@@ -531,13 +536,13 @@ export default function LandingPage() {
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-sm">AI</span>
                     </div>
-                    <div>
-                      <p className="font-semibold text-slate-800 text-sm">French Coach</p>
-                      <p className="text-xs text-slate-500">Your Learning Partner</p>
-                    </div>
+                      <div>
+                        <p className="font-semibold text-slate-800 text-sm">French Coach</p>
+                        <p className="text-xs text-slate-500">{t("your_learning_partner")}</p>
+                      </div>
                     <div className="ml-auto flex items-center gap-1 px-2 py-1 bg-green-100 rounded-full">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-xs text-green-700 font-medium">Online</span>
+                        <span className="text-xs text-green-700 font-medium">{t("status_online")}</span>
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -547,7 +552,7 @@ export default function LandingPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1.2 }}
                     >
-                      <p className="text-sm text-slate-700">Bonjour! Ready for today&apos;s quest? 🎯</p>
+                      <p className="text-sm text-slate-700">{t("chat_line_1")}</p>
                     </motion.div>
                     <motion.div 
                       className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl rounded-tr-none p-3 max-w-[80%] ml-auto"
@@ -555,7 +560,7 @@ export default function LandingPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1.4 }}
                     >
-                      <p className="text-sm text-white">Oui! I&apos;m ready to level up!</p>
+                      <p className="text-sm text-white">{t("chat_line_2")}</p>
                     </motion.div>
                     <motion.div 
                       className="bg-slate-100 rounded-2xl rounded-tl-none p-3 max-w-[85%]"
@@ -563,12 +568,12 @@ export default function LandingPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 1.6 }}
                     >
-                      <p className="text-sm text-slate-700">Parfait! Let&apos;s practice greetings. You&apos;ll earn 25 XP! ✨</p>
+                      <p className="text-sm text-slate-700">{t("chat_line_3")}</p>
                     </motion.div>
                   </div>
                   <div className="flex items-center gap-2 pt-4">
                     <div className="flex-1 bg-slate-100 rounded-full px-4 py-2 text-sm text-slate-400">
-                      Type your answer...
+                      {t("input_placeholder")}
                     </div>
                     <motion.div 
                       className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center cursor-pointer"
@@ -592,8 +597,8 @@ export default function LandingPage() {
                       <FaMedal className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Achievement Unlocked!</p>
-                      <p className="font-bold text-slate-800 text-sm">First Conversation</p>
+                      <p className="text-xs text-slate-500">{t("achievement_unlocked")}</p>
+                      <p className="font-bold text-slate-800 text-sm">{t("first_conversation")}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -621,13 +626,13 @@ export default function LandingPage() {
               transition={{ type: "spring", stiffness: 400 }}
             >
               <FaGraduationCap className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-bold text-purple-700">Your Learning Path</span>
+              <span className="text-sm font-bold text-purple-700">{t("your_learning_path")}</span>
             </motion.div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-              Journey from A0 to C2
+              {t("journey_a0_to_c2")}
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Complete quests, earn XP, and unlock new levels on your path to French mastery
+              {t("journey_description")}
             </p>
           </motion.div>
 
@@ -657,15 +662,15 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <motion.div
-            className="mt-12 p-6 bg-gradient-to-r from-purple-500 to-blue-500 rounded-3xl text-white text-center"
+            <motion.div
+              className="mt-12 p-6 bg-gradient-to-r from-purple-500 to-blue-500 rounded-3xl text-white text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.8 }}
           >
-            <p className="text-lg font-semibold mb-2">🎯 You&apos;re at Level A0 - Beginner</p>
-            <p className="text-white/80">Complete your first lesson to unlock A1 and earn the &quot;First Steps&quot; badge!</p>
+            <p className="text-lg font-semibold mb-2">🎯 {t("journey_banner") ?? `You're at Level A0 - ${t("level_A0")}`}</p>
+            <p className="text-white/80">{t("first_steps_badge_text")}</p>
           </motion.div>
         </div>
       </section>
@@ -688,13 +693,13 @@ export default function LandingPage() {
               transition={{ type: "spring", stiffness: 400 }}
             >
               <FaGem className="w-4 h-4 text-amber-600" />
-              <span className="text-sm font-bold text-amber-700">Unlock Skills & Earn XP</span>
+              <span className="text-sm font-bold text-amber-700">{t("features_badge")}</span>
             </motion.div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-              Master 4 Language Skills
+              {t("features_title")}
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Complete quests in each skill area to earn XP and unlock powerful abilities
+              {t("features_subtitle")}
             </p>
           </motion.div>
 
@@ -707,7 +712,8 @@ export default function LandingPage() {
                 description={feature.description}
                 color={feature.color}
                 xpReward={feature.xpReward}
-                index={index}
+                  index={index}
+                  unlockText={t("feature_unlock_skill")}
               />
             ))}
           </div>
@@ -736,32 +742,32 @@ export default function LandingPage() {
             {[
               { 
                 step: "1", 
-                title: "Create Hero", 
-                desc: "Set up your profile and choose your learning goals",
+                title: t("step_1_title"), 
+                desc: t("step_1_desc"),
                 icon: FaRocket,
                 color: "from-purple-500 to-purple-600",
                 reward: "+100 XP"
               },
               { 
                 step: "2", 
-                title: "Assessment Quest", 
-                desc: "Complete the placement test to determine your starting level",
+                title: t("step_2_title"), 
+                desc: t("step_2_desc"),
                 icon: FaGraduationCap,
                 color: "from-blue-500 to-blue-600",
                 reward: "+50 XP"
               },
               { 
                 step: "3", 
-                title: "Daily Missions", 
-                desc: "Practice with AI-guided lessons tailored to your level",
+                title: t("step_3_title"), 
+                desc: t("step_3_desc"),
                 icon: FaFire,
                 color: "from-cyan-500 to-cyan-600",
                 reward: "+25 XP/lesson"
               },
               { 
                 step: "4", 
-                title: "Level Up!", 
-                desc: "Track progress, earn badges, and unlock new content",
+                title: t("step_4_title"), 
+                desc: t("step_4_desc"),
                 icon: FaTrophy,
                 color: "from-emerald-500 to-emerald-600",
                 reward: "Epic Rewards"
@@ -820,12 +826,12 @@ export default function LandingPage() {
               <span className="text-sm font-bold text-green-700">Live Activity</span>
             </motion.div>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">
-              Join Learners Leveling Up Right Now
+              {t("live_activity_title")}
             </h2>
-            <p className="text-slate-600">See what our community is achieving today</p>
+            <p className="text-slate-600">{t("live_activity_subtitle")}</p>
           </motion.div>
 
-          <LiveStats />
+          <LiveStats labels={[t("stat_lessons_completed"), t("stat_active_streaks"), t("stat_xp_earned_today")] } />
         </div>
       </section>
 
@@ -840,41 +846,41 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-              Hero Stories
+              {t("testimonials_title")}
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              See how learners are achieving French fluency
+              {t("testimonials_subtitle")}
             </p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { 
-                name: "Sarah", 
-                initials: "SM", 
+                name: t("testimonial_sarah_name"),
+                initials: t("testimonial_sarah_initials"), 
                 color: "from-purple-400 to-purple-500",
-                level: "Level A2",
-                xp: "3,240 XP",
-                quote: "I went from complete beginner to having conversations in 3 months. The gamification keeps me hooked!",
-                badge: "7-Day Streak"
+                level: t("testimonial_sarah_level"),
+                xp: t("testimonial_sarah_xp"),
+                quote: t("testimonial_sarah_quote"),
+                badge: t("testimonial_sarah_badge")
               },
               { 
-                name: "James", 
-                initials: "JC", 
+                name: t("testimonial_james_name"),
+                initials: t("testimonial_james_initials"), 
                 color: "from-blue-400 to-blue-500",
-                level: "Level B1",
-                xp: "8,520 XP",
-                quote: "The daily quests fit perfectly into my busy schedule. I've never been so consistent with learning!",
-                badge: "Quiz Master"
+                level: t("testimonial_james_level"),
+                xp: t("testimonial_james_xp"),
+                quote: t("testimonial_james_quote"),
+                badge: t("testimonial_james_badge")
               },
               { 
-                name: "Emma", 
-                initials: "ER", 
+                name: t("testimonial_emma_name"),
+                initials: t("testimonial_emma_initials"), 
                 color: "from-cyan-400 to-cyan-500",
-                level: "Level A1",
-                xp: "1,890 XP",
-                quote: "Finally, an app that makes pronunciation fun! The AI feedback is like having a personal tutor.",
-                badge: "Fast Learner"
+                level: t("testimonial_emma_level"),
+                xp: t("testimonial_emma_xp"),
+                quote: t("testimonial_emma_quote"),
+                badge: t("testimonial_emma_badge")
               },
             ].map((testimonial, index) => (
               <motion.div 
@@ -945,27 +951,27 @@ export default function LandingPage() {
             </div>
 
             <div className="relative z-10">
-              <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6"
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", delay: 0.3 }}
-              >
-                <FaHeart className="w-4 h-4 text-pink-200" />
-                <span className="text-sm font-bold">Loved by 10,000+ learners</span>
-              </motion.div>
+                <motion.div
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6"
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ type: "spring", delay: 0.3 }}
+                >
+                  <FaHeart className="w-4 h-4 text-pink-200" />
+                  <span className="text-sm font-bold">{t("loved_by_learners")}</span>
+                </motion.div>
 
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-                Ready to Level Up Your French?
+                {t("ready_to_level")}
               </h2>
               <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Join thousands of heroes on their journey to French mastery. Your first quest awaits!
+                {t("first_quest_awaits")}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <AnimatedCTA href="/dashboard" variant="primary">
-                  Begin Your Adventure
+                  {t("cta_begin_adventure")}
                 </AnimatedCTA>
               </div>
 
@@ -978,15 +984,15 @@ export default function LandingPage() {
               >
                 <div className="flex items-center gap-2">
                   <FaCheckCircle className="w-4 h-4" />
-                  <span>Free forever</span>
+                  <span>{t("free_forever")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FaCheckCircle className="w-4 h-4" />
-                  <span>No credit card</span>
+                  <span>{t("no_credit_card")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FaCheckCircle className="w-4 h-4" />
-                  <span>Cancel anytime</span>
+                  <span>{t("cancel_anytime")}</span>
                 </div>
               </motion.div>
             </div>
@@ -1023,29 +1029,29 @@ export default function LandingPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Quests</h4>
+              <h4 className="font-semibold mb-4">{t("footer_quests")}</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="/dashboard" className="hover:text-white transition-colors">Start Learning</Link></li>
-                <li><button onClick={() => scrollToSection("features")} className="hover:text-white transition-colors">Skills</button></li>
-                <li><button onClick={() => scrollToSection("journey")} className="hover:text-white transition-colors">Learning Path</button></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">Achievements</span></li>
+                <li><Link href="/dashboard" className="hover:text-white transition-colors">{t("footer_quick_start")}</Link></li>
+                <li><button onClick={() => scrollToSection("features")} className="hover:text-white transition-colors">{t("nav_skills")}</button></li>
+                <li><button onClick={() => scrollToSection("journey")} className="hover:text-white transition-colors">{t("your_learning_path")}</button></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_achievements")}</span></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Guild</h4>
+              <h4 className="font-semibold mb-4">{t("footer_guild")}</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><span className="hover:text-white transition-colors cursor-pointer">About</span></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">Blog</span></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">Careers</span></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">Contact</span></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_about")}</span></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_blog")}</span></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_careers")}</span></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_contact")}</span></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Rules</h4>
+              <h4 className="font-semibold mb-4">{t("footer_rules")}</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><span className="hover:text-white transition-colors cursor-pointer">Privacy Policy</span></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">Terms of Service</span></li>
-                <li><span className="hover:text-white transition-colors cursor-pointer">Cookie Policy</span></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_privacy")}</span></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_terms")}</span></li>
+                <li><span className="hover:text-white transition-colors cursor-pointer">{t("footer_cookies")}</span></li>
               </ul>
             </div>
           </div>

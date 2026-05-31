@@ -105,6 +105,14 @@ These features must be present before the first public release.
 - Recommended next lesson or activity based on current level and recent performance
 - Unlockable levels: completing A0 unlocks A1, and so on
 
+### 9. The system is a personalized learning engine.
+Every learner experience is dynamically adapted based on:
+- native language
+- target language
+- proficiency level
+- historical mistakes
+- vocabulary mastery
+
 ---
 
 ## Post-MVP Roadmap
@@ -122,6 +130,8 @@ These features are explicitly out of scope for the MVP but the architecture must
 | Native app | React Native wrapper |
 | Content marketplace | Third-party lesson packs |
 | Enterprise / B2B | Team accounts, admin dashboards |
+| Region-based language detection | Initial UI language may be inferred from browser settings or geography |
+| Spaced Repetition System (SRS) | Scheduled lessons over increasing periods of time on a mistake or failure with a particular word or grammer |
 
 ---
 
