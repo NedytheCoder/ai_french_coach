@@ -140,13 +140,15 @@ List all languages the platform supports.
 ```json
 {
   "languages": [
-    { "id": 1, "code": "en", "name": "English", "native_name": "English", "is_active": true },
-    { "id": 2, "code": "fr", "name": "French", "native_name": "Français", "is_active": true },
-    { "id": 3, "code": "de", "name": "German", "native_name": "Deutsch", "is_active": true },
-    { "id": 4, "code": "ar", "name": "Arabic", "native_name": "العربية", "is_active": true }
+    { "id": 1, "code": "en", "name": "English", "native_name": "English", "is_active": true, "is_rtl": false },
+    { "id": 2, "code": "fr", "name": "French",  "native_name": "Français",  "is_active": true, "is_rtl": false },
+    { "id": 3, "code": "de", "name": "German",  "native_name": "Deutsch",   "is_active": true, "is_rtl": false },
+    { "id": 4, "code": "ar", "name": "Arabic",  "native_name": "العربية",   "is_active": true, "is_rtl": true  }
   ]
 }
 ```
+
+`is_rtl` indicates right-to-left script; the frontend must use this flag to set text direction.
 
 ---
 

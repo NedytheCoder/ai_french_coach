@@ -12,11 +12,13 @@ from models.auth import AuthResponse, LoginRequest, RefreshRequest, RegisterRequ
 from services.auth_service import (
     create_access_token,
     create_refresh_token,
+    create_user,
     get_current_user,
     get_user_by_email,
-    hash_password,
+    get_user_by_id,
     revoke_refresh_token,
     store_refresh_token,
+    update_last_seen,
     verify_password,
 )
 
@@ -37,34 +39,11 @@ def _user_out(row: sqlite3.Row) -> UserOut:
 def register(body: RegisterRequest):
     conn = get_connection()
     try:
-        lang = conn.execute(
-            "SELECT id FROM languages WHERE code = ? AND is_active = 1",
-            (body.source_language_code,),
-        ).fetchone()
-        if lang is None:
-            raise HTTPException(status_code=400, detail="Unknown or inactive source_language_code")
-
-        if get_user_by_email(conn, body.email) is not None:
-            raise HTTPException(status_code=422, detail="Email already registered")
-
-        conn.execute(
-            """
-            INSERT INTO users (email, password_hash, display_name, source_language_id)
-            VALUES (?, ?, ?, ?)
-            """,
-            (body.email, hash_password(body.password), body.display_name, lang["id"]),
-        )
-        user_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
-
+        user_id = create_user(conn, body.email, body.password, body.display_name, body.source_language_code)
         raw_refresh, token_hash = create_refresh_token(user_id)
         store_refresh_token(conn, user_id, token_hash)
         conn.commit()
-
-        user_row = conn.execute(
-            "SELECT u.*, l.code AS source_language_code FROM users u JOIN languages l ON l.id = u.source_language_id WHERE u.id = ?",
-            (user_id,),
-        ).fetchone()
-
+        user_row = get_user_by_id(conn, user_id)
         return AuthResponse(
             user=_user_out(user_row),
             access_token=create_access_token(user_id),
@@ -87,11 +66,7 @@ def login(body: LoginRequest):
         if user is None or not verify_password(body.password, user["password_hash"]):
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
-        conn.execute(
-            "UPDATE users SET last_seen_at = datetime('now') WHERE id = ?",
-            (user["id"],),
-        )
-
+        update_last_seen(conn, user["id"])
         raw_refresh, token_hash = create_refresh_token(user["id"])
         store_refresh_token(conn, user["id"], token_hash)
         conn.commit()

@@ -57,11 +57,11 @@
 
 ```
 frontend/app/
-├── (auth)/                      # Auth group (no shared layout)
-│   ├── login/page.tsx
-│   ├── signup/page.tsx
-│   ├── forgot-password/page.tsx
-│   └── change-password/page.tsx
+├── auth/                        # Auth pages (URL prefix: /auth)
+│   ├── login/page.tsx           # /auth/login
+│   ├── signup/page.tsx          # /auth/signup
+│   ├── forgot-password/page.tsx # /auth/forgot-password
+│   └── change-password/page.tsx # /auth/change-password
 ├── (app)/                       # Authenticated app group
 │   ├── layout.tsx               # App shell (navbar, auth guard)
 │   ├── dashboard/page.tsx       # Home after login
@@ -86,7 +86,7 @@ frontend/app/
 | Route | Purpose |
 |---|---|
 | `/` | Marketing landing page |
-| `/login`, `/signup` | Authentication |
+| `/auth/login`, `/auth/signup` | Authentication |
 | `/dashboard` | Post-login home: active pairs, streaks, recommended next action |
 | `/languages` | Add/remove language pairs |
 | `/learn/[pairId]` | Learning hub for one language pair: levels, progress, path |
@@ -103,10 +103,14 @@ The app uses two React Contexts:
 **`AuthContext`** — session state
 ```ts
 {
-  user: User | null
-  token: string | null
-  login: (email, password) => Promise<void>
-  logout: () => void
+  user: AuthUser | null
+  accessToken: string | null
+  refreshToken: string | null
+  isLoading: boolean
+  isAuthenticated: boolean
+  login: (email: string, password: string) => Promise<void>
+  register: (displayName: string, email: string, password: string, sourceLanguageCode: string) => Promise<void>
+  logout: () => Promise<void>
 }
 ```
 
@@ -126,11 +130,13 @@ Lesson and chat state is local to those pages — no global state required for M
 User visits /dashboard
         │
         ▼
-   Is token in localStorage?
-   ├── No  → redirect to /login
-   └── Yes → validate token with GET /auth/me
-              ├── Invalid → clear token → /login
-              └── Valid   → render dashboard
+   Is auth state in localStorage?
+   ├── No  → redirect to /auth/login
+   └── Yes → validate access token with GET /auth/me
+              ├── Valid (200)  → render dashboard
+              └── Invalid (401) → attempt POST /auth/refresh
+                                  ├── Refresh OK  → retry GET /auth/me → render dashboard
+                                  └── Refresh fail → clear state → /auth/login
 ```
 
 ---

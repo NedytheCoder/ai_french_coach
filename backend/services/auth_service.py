@@ -120,6 +120,42 @@ def get_user_by_id(conn: sqlite3.Connection, user_id: int) -> sqlite3.Row | None
 
 
 # ---------------------------------------------------------------------------
+# User record helpers (Rule 5 — business logic belongs in service layer)
+# ---------------------------------------------------------------------------
+
+def create_user(
+    conn: sqlite3.Connection,
+    email: str,
+    password: str,
+    display_name: str,
+    source_language_code: str,
+) -> int:
+    """Validate, insert a new user, and return the new user id."""
+    lang = conn.execute(
+        "SELECT id FROM languages WHERE code = ? AND is_active = 1",
+        (source_language_code,),
+    ).fetchone()
+    if lang is None:
+        raise HTTPException(status_code=400, detail="Unknown or inactive source_language_code")
+
+    if get_user_by_email(conn, email) is not None:
+        raise HTTPException(status_code=422, detail="Email already registered")
+
+    conn.execute(
+        "INSERT INTO users (email, password_hash, display_name, source_language_id) VALUES (?, ?, ?, ?)",
+        (email, hash_password(password), display_name, lang["id"]),
+    )
+    return conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+
+def update_last_seen(conn: sqlite3.Connection, user_id: int) -> None:
+    conn.execute(
+        "UPDATE users SET last_seen_at = datetime('now') WHERE id = ?",
+        (user_id,),
+    )
+
+
+# ---------------------------------------------------------------------------
 # FastAPI dependency — use on every protected endpoint
 # ---------------------------------------------------------------------------
 

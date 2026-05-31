@@ -3,6 +3,8 @@ import { Analytics } from "@vercel/analytics/next"
 import { Poppins } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "../i18n/LanguageProvider"
+import { AuthProvider } from "./auth/AuthProvider"
+import { LanguagePairProvider } from "./LanguagePairProvider"
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -17,8 +19,8 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "French Coach",
-  description: "Your personal AI French language coach",
+  title: "Language Coach",
+  description: "Your personal AI language coach",
 }
 
 export default function RootLayout({
@@ -30,7 +32,9 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased overflow-x-hidden">
       <body className={`${poppins.className} min-h-full flex flex-col overflow-x-hidden`}>
         <LanguageProvider>
-          {children}
+          <AuthProvider>
+            <LanguagePairProvider>{children}</LanguagePairProvider>
+          </AuthProvider>
         </LanguageProvider>
         <Analytics />
       </body>

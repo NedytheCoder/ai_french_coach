@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import { FaEnvelope, FaLock, FaSignInAlt } from "react-icons/fa";
+import { FaEnvelope, FaSignInAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 import { AuthLayout } from "../components/AuthLayout";
 import { AuthCard } from "../components/AuthCard";
@@ -12,6 +13,7 @@ import { AuthInput } from "../components/AuthInput";
 import { AuthPasswordInput } from "../components/AuthPasswordInput";
 import { AuthButton } from "../components/AuthButton";
 import { AuthFooterLink } from "../components/AuthFooterLink";
+import { useAuth } from "../AuthProvider";
 
 // Validation Schema
 const loginSchema = z.object({
@@ -28,7 +30,16 @@ export default function LoginPage() {
   });
   const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [serverError, setServerError] = useState("");
+
+  const auth = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!auth.isLoading && auth.user) {
+      router.replace("/dashboard");
+    }
+  }, [auth.isLoading, auth.user, router]);
 
   const handleChange = (name: keyof LoginFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -43,6 +54,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError("");
     setIsSubmitting(true);
 
     const result = loginSchema.safeParse(formData);
@@ -59,33 +71,14 @@ export default function LoginPage() {
       return;
     }
 
-    console.log("Login form data:", formData);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSuccess(true);
-    setIsSubmitting(false);
+    try {
+      await auth.login(result.data.email, result.data.password);
+      router.push("/dashboard");
+    } catch (error) {
+      setServerError(error instanceof Error ? error.message : "Unable to sign in. Please try again.");
+      setIsSubmitting(false);
+    }
   };
-
-  if (isSuccess) {
-    return (
-      <AuthLayout>
-        <AuthCard className="p-8">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="text-center"
-          >
-            <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30">
-              <FaSignInAlt className="w-10 h-10 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-2">Welcome Back!</h2>
-            <p className="text-slate-600 mb-6">Successfully logged in. Redirecting...</p>
-          </motion.div>
-        </AuthCard>
-      </AuthLayout>
-    );
-  }
 
   return (
     <AuthLayout>
@@ -93,7 +86,7 @@ export default function LoginPage() {
         <div className="p-6 sm:p-8">
           <AuthHeader
             title="Welcome Back"
-            subtitle="Sign in to continue your French journey"
+            subtitle="Sign in to continue your language journey"
             icon={
               <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
                 <FaSignInAlt className="w-8 h-8 text-white" />
@@ -102,6 +95,11 @@ export default function LoginPage() {
           />
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {serverError && (
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                {serverError}
+              </div>
+            )}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
