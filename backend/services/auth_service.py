@@ -84,10 +84,10 @@ def store_refresh_token(conn: sqlite3.Connection, user_id: int, token_hash: str)
     )
 
 
-def revoke_refresh_token(conn: sqlite3.Connection, token_hash: str) -> None:
+def revoke_refresh_token(conn: sqlite3.Connection, raw_token: str) -> None:
     conn.execute(
         "UPDATE refresh_tokens SET revoked = 1 WHERE token_hash = ?",
-        (token_hash,),
+        (_hash_token(raw_token),),
     )
 
 
@@ -153,6 +153,29 @@ def update_last_seen(conn: sqlite3.Connection, user_id: int) -> None:
         "UPDATE users SET last_seen_at = datetime('now') WHERE id = ?",
         (user_id,),
     )
+
+
+def verify_refresh_token(conn: sqlite3.Connection, raw_token: str) -> int:
+    """Validate a refresh token and return the user_id. Raises 401 on any failure."""
+
+    invalid = HTTPException(status_code=401, detail="Invalid or expired refresh token")
+    try:
+        payload = jwt.decode(raw_token, _secret(), algorithms=[ALGORITHM])
+        if payload.get("type") != "refresh":
+            raise invalid
+        user_id = int(payload["sub"])
+    except (JWTError, KeyError, ValueError):
+        raise invalid
+
+    token_hash = _hash_token(raw_token)
+    row = conn.execute(
+        "SELECT 1 FROM refresh_tokens WHERE token_hash = ? AND revoked = 0",
+        (token_hash,),
+    ).fetchone()
+    if row is None:
+        raise invalid
+
+    return user_id
 
 
 # ---------------------------------------------------------------------------

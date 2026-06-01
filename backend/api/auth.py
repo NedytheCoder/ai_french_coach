@@ -2,7 +2,6 @@
 Auth endpoints — Rule 5: handlers own HTTP, services own business logic.
 """
 
-import hashlib
 import sqlite3
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -20,6 +19,7 @@ from services.auth_service import (
     store_refresh_token,
     update_last_seen,
     verify_password,
+    verify_refresh_token,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -87,39 +87,21 @@ def login(body: LoginRequest):
 
 @router.post("/refresh", response_model=TokenResponse)
 def refresh(body: RefreshRequest):
-    from jose import JWTError, jwt
-    from services.auth_service import ALGORITHM, _secret
-
-    invalid = HTTPException(status_code=401, detail="Invalid or expired refresh token")
-    try:
-        payload = jwt.decode(body.refresh_token, _secret(), algorithms=[ALGORITHM])
-        if payload.get("type") != "refresh":
-            raise invalid
-        user_id = int(payload["sub"])
-    except (JWTError, KeyError, ValueError):
-        raise invalid
-
-    token_hash = hashlib.sha256(body.refresh_token.encode()).hexdigest()
     conn = get_connection()
     try:
-        row = conn.execute(
-            "SELECT * FROM refresh_tokens WHERE token_hash = ? AND revoked = 0",
-            (token_hash,),
-        ).fetchone()
-        if row is None:
-            raise invalid
-
+        user_id = verify_refresh_token(conn, body.refresh_token)
         return TokenResponse(access_token=create_access_token(user_id))
+    except HTTPException:
+        raise
     finally:
         conn.close()
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(body: RefreshRequest):
-    token_hash = hashlib.sha256(body.refresh_token.encode()).hexdigest()
     conn = get_connection()
     try:
-        revoke_refresh_token(conn, token_hash)
+        revoke_refresh_token(conn, body.refresh_token)
         conn.commit()
     finally:
         conn.close()

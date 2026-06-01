@@ -58,27 +58,40 @@
 ```
 frontend/app/
 ├── auth/                        # Auth pages (URL prefix: /auth)
+│   ├── AuthProvider.tsx         # AuthContext: session restore, login/register/logout
+│   ├── AuthGuard.tsx            # Redirects unauthenticated users to /auth/login
 │   ├── login/page.tsx           # /auth/login
 │   ├── signup/page.tsx          # /auth/signup
 │   ├── forgot-password/page.tsx # /auth/forgot-password
-│   └── change-password/page.tsx # /auth/change-password
-├── (app)/                       # Authenticated app group
-│   ├── layout.tsx               # App shell (navbar, auth guard)
-│   ├── dashboard/page.tsx       # Home after login
-│   ├── languages/page.tsx       # Manage language pairs
-│   ├── learn/
-│   │   ├── [pairId]/            # Context: active language pair
-│   │   │   ├── page.tsx         # Pair overview / learning path
-│   │   │   ├── lesson/
-│   │   │   │   └── [lessonId]/page.tsx
-│   │   │   ├── chat/page.tsx    # AI tutor conversation
-│   │   │   ├── assessment/page.tsx
-│   │   │   ├── vocabulary/page.tsx
-│   │   │   └── progress/page.tsx
-├── page.tsx                     # Landing page
-├── layout.tsx                   # Root layout
-├── globals.css
-└── Types.ts                     # Shared TypeScript types
+│   ├── change-password/page.tsx # /auth/change-password
+│   └── components/              # Shared auth UI (AuthLayout, AuthCard, AuthInput, etc.)
+├── components/                  # Shared app UI (Skeleton, ToastProvider)
+├── dashboard/page.tsx           # Home after login; auth-guarded via AuthGuard
+├── languages/page.tsx           # Manage language pairs; auth-guarded
+├── learn/
+│   └── [pairId]/                # Context: active language pair
+│       ├── page.tsx             # Learning path (CEFR levels A0–C2)
+│       ├── chat/page.tsx        # AI tutor conversation
+│       ├── assessment/page.tsx  # Placement / progress assessment
+│       ├── vocabulary/page.tsx  # Vocabulary review and flashcards
+│       ├── progress/page.tsx    # XP history, streaks, level graph
+│       └── lesson/
+│           └── [lessonId]/page.tsx   # Structured lesson UI (M3-03, not yet built)
+├── LanguagePairProvider.tsx     # LanguagePairContext: activePair / setActivePair
+├── Types.ts                     # Shared TypeScript types
+├── page.tsx                     # Marketing landing page
+├── layout.tsx                   # Root layout (LanguageProvider → AuthProvider → LanguagePairProvider → ToastProvider)
+├── error.tsx                    # Route-level error boundary
+├── global-error.tsx             # Root-level error boundary
+└── globals.css
+```
+
+Auth is enforced via the `AuthGuard` component wrapper, not a Next.js route group layout. All authenticated pages import and render `<AuthGuard>` directly.
+
+```
+frontend/i18n/
+├── LanguageProvider.tsx    # I18nContext: UI language code, setLang, t() lookup
+└── translations.ts          # UI translation strings, keyed by language code
 ```
 
 ### Key Pages
@@ -98,9 +111,18 @@ frontend/app/
 
 ### State Management
 
-The app uses two React Contexts:
+The app uses three React Contexts, nested outermost-first in `layout.tsx`:
 
-**`AuthContext`** — session state
+**`I18nContext`** — UI language selection (outermost; provided by `frontend/i18n/LanguageProvider.tsx`)
+```ts
+{
+  lang: string                      // current UI language code, e.g. "en"
+  setLang: (lang: string) => void
+  t: (key: string) => string        // look up a UI translation key
+}
+```
+
+**`AuthContext`** — session state (provided by `app/auth/AuthProvider.tsx`)
 ```ts
 {
   user: AuthUser | null
@@ -114,7 +136,7 @@ The app uses two React Contexts:
 }
 ```
 
-**`LanguagePairContext`** — active pair for the current session
+**`LanguagePairContext`** — active pair for the current session (provided by `app/LanguagePairProvider.tsx`)
 ```ts
 {
   activePair: UserLanguagePair | null
@@ -200,6 +222,12 @@ backend/
 - Tokens stored in `httpOnly` cookies (production) or `localStorage` (MVP)
 - Every protected route uses a FastAPI `Depends(get_current_user)` dependency
 
+### Rate Limiting Middleware
+
+All AI-backed endpoints are protected by per-user in-memory rate limiting via `slowapi` (ADR-004). Rate limit state lives in `backend/middleware/rate_limit.py`. The `Limiter` is attached to `app.state` in `main.py` and applied via `@limiter.limit(...)` decorators on individual endpoint handlers.
+
+Limits: 30 chat requests/hour, 10 lesson generation requests/hour, 10 assessment scoring requests/hour.
+
 ### AI Layer
 
 The AI layer is isolated from all business logic. It has one responsibility: given a structured input, return a structured output.
@@ -215,12 +243,13 @@ class PromptBuilder:
         level: str,             # e.g. "A2"
     ) -> str: ...
 
-    def lesson_prompt(
+    def assessment_question_prompt(
         self,
         source_language: str,
         target_language: str,
         level: str,
-        lesson_type: str,       # "vocabulary" | "grammar" | "reading" | ...
+        skill: str,             # "reading" | "listening" | "writing" | "speaking"
+        count: int,
     ) -> str: ...
 
     def assessment_scoring_prompt(
@@ -231,6 +260,15 @@ class PromptBuilder:
         skill: str,
         question: str,
         user_answer: str,
+    ) -> str: ...
+
+    def lesson_prompt(
+        self,
+        source_language: str,
+        target_language: str,
+        level: str,
+        lesson_type: str,       # "vocabulary" | "grammar" | "reading" | "listening" | "writing" | "speaking"
+        topic: str | None = None,
     ) -> str: ...
 ```
 

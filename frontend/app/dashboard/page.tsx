@@ -3,10 +3,13 @@
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { FaUser, FaCog, FaArrowRight, FaFire, FaPlus, FaStar, FaComments } from "react-icons/fa"
+import { useEffect } from "react"
 import { AuthGuard } from "../auth/AuthGuard"
 import { useAuth } from "../auth/AuthProvider"
 import { useLanguagePair } from "../LanguagePairProvider"
 import { usePairs } from "../../lib/hooks"
+import { useToast } from "../components/ToastProvider"
+import { SkeletonPairCard } from "../components/Skeleton"
 import type { UserLanguagePair } from "../Types"
 
 // ---------------------------------------------------------------------------
@@ -138,7 +141,12 @@ function PairCard({ pair }: { pair: UserLanguagePair }) {
 function DashboardContent() {
   const { user } = useAuth()
   const { accessToken } = useAuth()
-  const { pairs, isLoading } = usePairs(accessToken)
+  const { pairs, isLoading, error } = usePairs(accessToken)
+  const { addToast } = useToast()
+
+  useEffect(() => {
+    if (error) addToast(error, "error")
+  }, [error, addToast])
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"
@@ -190,15 +198,23 @@ function DashboardContent() {
             {user?.display_name ?? "Welcome back"} 👋
           </h1>
           <p className="text-slate-500 mt-2">
-            {isLoading
-              ? "Loading your languages…"
-              : pairs.length === 0
+            {pairs.length === 0 && !isLoading
               ? "Add your first language to start learning."
-              : `You're learning ${pairs.length} ${pairs.length === 1 ? "language" : "languages"}.`}
+              : pairs.length > 0
+              ? `You're learning ${pairs.length} ${pairs.length === 1 ? "language" : "languages"}.`
+              : " "}
           </p>
         </motion.div>
 
-        {/* Pairs grid */}
+        {/* Skeleton while loading */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <SkeletonPairCard />
+            <SkeletonPairCard />
+          </div>
+        )}
+
+        {/* Pairs grid — only rendered after load */}
         <AnimatePresence mode="wait">
           {!isLoading && pairs.length === 0 ? (
             <motion.div

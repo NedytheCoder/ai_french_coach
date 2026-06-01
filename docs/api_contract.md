@@ -18,7 +18,23 @@ All request and response bodies are `application/json` unless noted.
 - `403` — authenticated but not authorised
 - `404` — resource not found
 - `422` — business logic error (e.g. language pair already exists)
+- `429` — rate limit exceeded on an AI-backed endpoint (see Rate Limits below)
 - `500` — unexpected server error
+
+### Rate Limits
+
+The following endpoints are rate-limited per authenticated user. Exceeding the limit returns `429 Too Many Requests`.
+
+| Endpoint | Limit | Notes |
+|---|---|---|
+| `POST /chat` | 30 requests/hour | |
+| `POST /lesson/generate` | 10 requests/hour | |
+| `POST /assessment/score-writing` | 20 requests/hour | Shared with writing lesson scoring |
+| `POST /assessment/score-speaking` | 20 requests/hour | Shared with speaking lesson scoring |
+
+The `429` response body follows the standard error format: `{"error": "Rate limit exceeded: ..."}`. Limits reset on the hour boundary. In-memory for MVP; Redis-backed post-MVP (see ADR-004).
+
+**Note on shared scoring budget:** `POST /assessment/score-writing` and `POST /assessment/score-speaking` are called by both the placement/progress assessment flow and the writing/speaking lesson renderers. The 20 requests/hour limit applies to all scoring calls from both contexts combined. Users who mix assessments and writing/speaking lessons in the same hour draw from the same bucket.
 
 ---
 
@@ -106,6 +122,12 @@ Exchange a refresh token for a new access token.
 ### `POST /auth/logout`
 
 Invalidate the refresh token server-side.
+
+**Request**
+
+```json
+{ "refresh_token": "<jwt>" }
+```
 
 **Response `204`** — no body.
 
@@ -624,3 +646,46 @@ Submit a written answer for AI scoring.
   "xp_awarded": 16
 }
 ```
+
+---
+
+## 11. Audio Transcription
+
+### `POST /conversation/transcribe`
+
+Transcribe an audio recording to text. Used by the assessment speaking flow and the chat page voice input. The transcription model auto-detects the spoken language — no language hint is required or sent.
+
+**Request** — `multipart/form-data`
+
+| Field | Type | Notes |
+|---|---|---|
+| `file` | file | `.webm` audio recorded in the browser |
+
+**Response `200`** — transcription succeeded
+
+```json
+{ "transcription": "Bonjour, je m'appelle Ahmed." }
+```
+
+**Response `200`** — audio validation failed (not an HTTP error; check for `detail` key)
+
+```json
+{ "detail": "Audio volume too low." }
+```
+
+Possible `detail` values: `"Audio file size too small."`, `"Audio duration too short."`, `"Audio volume too low."`, `"No clear speech detected."`, `"Not enough speech detected."`, `"No transcription detected."`
+
+**Response `500`** — transcription service error.
+
+---
+
+## 12. Deprecated Conversation Endpoints
+
+> **Deprecated — do not use in new code.** These endpoints predate Milestone 1 and are French-specific. They are superseded by `POST /chat` (§6) which is language-pair-agnostic. They will be removed in a future cleanup sprint (see backlog F-12).
+
+| Endpoint | Superseded by |
+|---|---|
+| `POST /conversation/respond` | `POST /chat` with `mode: "general"` |
+| `POST /conversation/introduction` | `POST /chat` with `mode: "introduction"` |
+| `POST /conversation/traveling` | `POST /chat` with `mode: "travelling"` |
+| `POST /conversation/daily_conversations` | `POST /chat` with `mode: "daily_life"` |

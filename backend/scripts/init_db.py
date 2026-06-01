@@ -24,6 +24,7 @@ sys.path.insert(0, backend_dir)
 from database.config import DATA_DIR, DATABASE_PATH
 from database.connection import get_connection
 from database.schema import get_languages_seed_sql, get_schema_sql
+from database.migrations import apply_pending_migrations
 
 
 def ensure_data_directory() -> None:
@@ -40,6 +41,7 @@ def initialize_database() -> None:
         conn.executescript(get_schema_sql())
         conn.executescript(get_languages_seed_sql())
         conn.commit()
+        apply_pending_migrations(conn)
 
         cursor = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"

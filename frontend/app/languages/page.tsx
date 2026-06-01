@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { FaPlus, FaTrash, FaArrowRight, FaGlobe, FaFire } from "react-icons/fa";
@@ -8,6 +8,8 @@ import { AuthGuard } from "../auth/AuthGuard";
 import { useAuth } from "../auth/AuthProvider";
 import { useLanguages, usePairs } from "../../lib/hooks";
 import { pairsApi } from "../../lib/api";
+import { useToast } from "../components/ToastProvider";
+import { SkeletonListItem } from "../components/Skeleton";
 import type { UserLanguagePair } from "../Types";
 
 export default function LanguagesPage() {
@@ -20,14 +22,23 @@ export default function LanguagesPage() {
 
 function LanguagesContent() {
   const { accessToken } = useAuth();
-  const { languages, isLoading: langsLoading } = useLanguages();
-  const { pairs, isLoading: pairsLoading, refetch } = usePairs(accessToken);
+  const { languages, isLoading: langsLoading, error: langsError } = useLanguages();
+  const { pairs, isLoading: pairsLoading, error: pairsError, refetch } = usePairs(accessToken);
+  const { addToast } = useToast();
 
   const [sourceCode, setSourceCode] = useState("");
   const [targetCode, setTargetCode] = useState("");
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState("");
   const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (langsError) addToast("Could not load languages. Check your connection.", "error");
+  }, [langsError, addToast]);
+
+  useEffect(() => {
+    if (pairsError) addToast(pairsError, "error");
+  }, [pairsError, addToast]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +67,8 @@ function LanguagesContent() {
     try {
       await pairsApi.remove(accessToken, pairId);
       refetch();
-    } catch {
-      // silently ignore — pair still shows until refetch
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : "Failed to remove language pair.", "error");
     } finally {
       setDeletingId(null);
     }
@@ -110,7 +121,7 @@ function LanguagesContent() {
                 >
                   <option value="">Select a language</option>
                   {languageOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
+                    <option key={opt.value} value={opt.value} dir={opt.isRtl ? "rtl" : "ltr"}>
                       {opt.label}
                     </option>
                   ))}
@@ -128,7 +139,7 @@ function LanguagesContent() {
                 >
                   <option value="">Select a language</option>
                   {languageOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
+                    <option key={opt.value} value={opt.value} dir={opt.isRtl ? "rtl" : "ltr"}>
                       {opt.label}{opt.nativeName !== opt.label ? ` — ${opt.nativeName}` : ""}
                     </option>
                   ))}
@@ -163,8 +174,15 @@ function LanguagesContent() {
         {/* Active Pairs */}
         <section>
           <h2 className="text-lg font-semibold text-slate-800 mb-4">
-            {pairsLoading ? "Loading your languages…" : pairs.length === 0 ? "No languages added yet" : `Your languages (${pairs.length})`}
+            {pairsLoading ? "Loading…" : pairs.length === 0 ? "No languages added yet" : `Your languages (${pairs.length})`}
           </h2>
+
+          {pairsLoading && (
+            <div className="space-y-3">
+              <SkeletonListItem />
+              <SkeletonListItem />
+            </div>
+          )}
 
           {!pairsLoading && pairs.length === 0 && (
             <p className="text-sm text-slate-500">Add your first language pair above to get started.</p>

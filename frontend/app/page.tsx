@@ -1,8 +1,8 @@
 "use client"
 
-import { motion, useMotionValue, useTransform, animate } from "framer-motion"
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "../i18n/LanguageProvider"
 
 import { CiCircleCheck } from "react-icons/ci";
@@ -12,6 +12,7 @@ import {
   FaTwitter, FaFire, FaTrophy, FaGem, FaMedal, FaBolt, FaRocket,
   FaGraduationCap, FaLock, FaUnlock, FaHeart, FaFlag
 } from "react-icons/fa";
+import { GiEarthAfricaEurope } from "react-icons/gi"
 
 // Animated counter hook
 function useAnimatedCounter(target: number, duration: number = 2) {
@@ -270,6 +271,130 @@ function AnimatedCTA({ href, variant = "primary", children }: { href: string; va
   )
 }
 
+// ---------------------------------------------------------------------------
+// Custom language selector — themed, animated, keyboard-accessible
+// ---------------------------------------------------------------------------
+
+const LANG_FLAGS: Record<string, string> = {
+  en: "🇬🇧", fr: "🇫🇷", de: "🇩🇪", zh: "🇨🇳",
+}
+
+function LanguageSelector({
+  lang,
+  setLang,
+  t,
+}: {
+  lang: string
+  setLang: (l: string) => void
+  t: (k: string) => string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  const options = [
+    { value: "en", label: t("lang_en") },
+    { value: "fr", label: t("lang_fr") },
+    { value: "de", label: t("lang_de") },
+    { value: "zh", label: t("lang_zh") },
+  ]
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  const current = options.find((o) => o.value === lang) ?? options[0]
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Trigger */}
+      <motion.button
+        onClick={() => setOpen((v) => !v)}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+          open
+            ? "bg-purple-50 border-purple-400 text-purple-700 shadow-md shadow-purple-500/15"
+            : "bg-white/80 border-purple-200/60 text-slate-700 hover:border-purple-400 hover:bg-purple-50/80 shadow-sm"
+        } backdrop-blur-sm`}
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.96 }}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <motion.span
+          key={lang}
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 500, damping: 20 }}
+          className="text-base"
+        >
+          {LANG_FLAGS[lang]}
+        </motion.span>
+        <span className="hidden sm:inline">{current.label}</span>
+        <motion.svg
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="w-3.5 h-3.5 text-purple-400"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+        </motion.svg>
+      </motion.button>
+
+      {/* Dropdown panel */}
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            role="listbox"
+            className="absolute right-0 top-full mt-2 w-36 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl shadow-purple-500/10 border border-purple-100 overflow-hidden z-50 py-1"
+            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+          >
+            {options.map((opt, i) => {
+              const selected = lang === opt.value
+              return (
+                <motion.li
+                  key={opt.value}
+                  role="option"
+                  aria-selected={selected}
+                  onClick={() => { setLang(opt.value); setOpen(false) }}
+                  className={`flex items-center gap-2.5 px-3 py-2 mx-1 rounded-xl text-sm font-medium cursor-pointer transition-colors ${
+                    selected
+                      ? "bg-gradient-to-r from-purple-100 to-blue-50 text-purple-700"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ x: selected ? 0 : 3 }}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  <span className="text-base">{LANG_FLAGS[opt.value]}</span>
+                  <span className="flex-1">{opt.label}</span>
+                  {selected && (
+                    <motion.div
+                      layoutId="langActiveDot"
+                      className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0"
+                      transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                    />
+                  )}
+                </motion.li>
+              )
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 export default function LandingPage() {
   const { t, lang, setLang } = useTranslation()
 
@@ -311,10 +436,10 @@ export default function LandingPage() {
                 whileHover={{ rotate: 10, scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <span className="text-white font-bold text-sm">F</span>
+                <span className="text-white font-bold text-sm"><GiEarthAfricaEurope /></span>
               </motion.div>
               <span className="text-xl font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                FrenchCoach
+                NedLang
               </span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
@@ -347,19 +472,7 @@ export default function LandingPage() {
                 {t("nav_start_journey")}
               </Link>
 
-              <label className="flex items-center gap-2">
-                <select
-                  aria-label="Language selector"
-                  value={lang}
-                  onChange={(e) => setLang(e.target.value as any)}
-                  className="bg-white border border-slate-200 rounded-md px-3 py-1.5 text-sm font-medium hover:border-purple-400 transition-colors cursor-pointer"
-                >
-                  <option value="en">🇬🇧 {t("lang_en")}</option>
-                  <option value="fr">🇫🇷 {t("lang_fr")}</option>
-                  <option value="de">🇩🇪 {t("lang_de")}</option>
-                  <option value="zh">🇨🇳 {t("lang_zh")}</option>
-                </select>
-              </label>
+              <LanguageSelector lang={lang} setLang={(l) => setLang(l as any)} t={t} />
             </div>
           </div>
         </div>
@@ -534,10 +647,10 @@ export default function LandingPage() {
                 <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
                   <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">AI</span>
+                      <span className="text-white font-bold text-sm"><GiEarthAfricaEurope/></span>
                     </div>
                       <div>
-                        <p className="font-semibold text-slate-800 text-sm">French Coach</p>
+                        <p className="font-semibold text-slate-800 text-sm">NedLang</p>
                         <p className="text-xs text-slate-500">{t("your_learning_partner")}</p>
                       </div>
                     <div className="ml-auto flex items-center gap-1 px-2 py-1 bg-green-100 rounded-full">
@@ -669,7 +782,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ delay: 0.8 }}
           >
-            <p className="text-lg font-semibold mb-2">🎯 {t("journey_banner") ?? `You're at Level A0 - ${t("level_A0")}`}</p>
+            <p className="text-lg font-semibold mb-2">🎯 {t("journey_banner")}</p>
             <p className="text-white/80">{t("first_steps_badge_text")}</p>
           </motion.div>
         </div>

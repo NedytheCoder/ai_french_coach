@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException
 
@@ -11,6 +11,7 @@ from models.chat import (
     SessionOut,
     SessionsResponse,
 )
+from services.progress_service import record_activity
 
 _XP_PER_REPLY = 5
 _HISTORY_LIMIT = 20  # messages sent to the AI for context
@@ -84,49 +85,11 @@ def _persist_message(
 
 
 def _award_xp(conn: sqlite3.Connection, pair_id: int) -> None:
-    today = datetime.now(timezone.utc).date().isoformat()
     conn.execute(
         "UPDATE user_language_pairs SET total_xp = total_xp + ? WHERE id = ?",
         (_XP_PER_REPLY, pair_id),
     )
-    conn.execute(
-        """
-        INSERT INTO progress_records (pair_id, date, xp_earned, messages_sent)
-        VALUES (?, ?, ?, 1)
-        ON CONFLICT(pair_id, date) DO UPDATE SET
-            xp_earned = xp_earned + ?,
-            messages_sent = messages_sent + 1
-        """,
-        (pair_id, today, _XP_PER_REPLY, _XP_PER_REPLY),
-    )
-    _update_streak(conn, pair_id, today)
-
-
-def _update_streak(conn: sqlite3.Connection, pair_id: int, today_str: str) -> None:
-    row = conn.execute(
-        "SELECT streak_days, longest_streak, last_activity_date FROM user_language_pairs WHERE id = ?",
-        (pair_id,),
-    ).fetchone()
-
-    last = row["last_activity_date"]
-    if last == today_str:
-        return
-
-    today = date.fromisoformat(today_str)
-    if last and date.fromisoformat(last) == today - timedelta(days=1):
-        new_streak = row["streak_days"] + 1
-    else:
-        new_streak = 1
-
-    new_longest = max(row["longest_streak"], new_streak)
-    conn.execute(
-        """
-        UPDATE user_language_pairs
-        SET streak_days = ?, longest_streak = ?, last_activity_date = ?
-        WHERE id = ?
-        """,
-        (new_streak, new_longest, today_str, pair_id),
-    )
+    record_activity(conn, pair_id, _XP_PER_REPLY, messages_sent=1)
 
 
 def _save_vocabulary(

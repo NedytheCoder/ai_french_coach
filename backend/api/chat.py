@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from database.connection import get_connection
+from middleware.rate_limit import CHAT_LIMIT, limiter
 from models.chat import ChatRequest, ChatResponse, MessagesResponse, SessionsResponse
 from services.auth_service import get_current_user
 from services.chat_service import get_messages, list_sessions, send_message
@@ -9,7 +10,8 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.post("", response_model=ChatResponse)
-def post_chat(body: ChatRequest, current_user=Depends(get_current_user)):
+@limiter.limit(CHAT_LIMIT)
+def post_chat(request: Request, body: ChatRequest, current_user=Depends(get_current_user)):
     conn = get_connection()
     try:
         result = send_message(

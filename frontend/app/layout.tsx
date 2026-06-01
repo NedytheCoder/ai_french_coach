@@ -5,6 +5,7 @@ import "./globals.css"
 import { LanguageProvider } from "../i18n/LanguageProvider"
 import { AuthProvider } from "./auth/AuthProvider"
 import { LanguagePairProvider } from "./LanguagePairProvider"
+import { ToastProvider } from "./components/ToastProvider"
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body className={`${poppins.className} min-h-full flex flex-col overflow-x-hidden`}>
         <LanguageProvider>
           <AuthProvider>
-            <LanguagePairProvider>{children}</LanguagePairProvider>
+            <LanguagePairProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </LanguagePairProvider>
           </AuthProvider>
         </LanguageProvider>
         <Analytics />

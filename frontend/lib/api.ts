@@ -1,4 +1,4 @@
-import type { Language, UserLanguagePair, ChatApiResponse, ChatSession, ChatMessage } from "../app/Types";
+import type { Language, UserLanguagePair, ChatApiResponse, ChatSession, ChatMessage, ProgressData, VocabularyItem, ReviewResult, StartAssessmentResponse, SubmitAssessmentResponse, LessonOut, CompleteLessonResponse, WritingScoreResult, SpeakingScoreResult } from "../app/Types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
@@ -49,6 +49,127 @@ export const transcriptionApi = {
     const form = new FormData();
     form.append("file", audio, "recording.webm");
     return request("/conversation/transcribe", { method: "POST", body: form });
+  },
+};
+
+export const progressApi = {
+  get: (token: string, pairId: number): Promise<ProgressData> =>
+    request(`/progress/${pairId}`, { headers: authed(token) }),
+};
+
+export const vocabularyApi = {
+  list: (
+    token: string,
+    pairId: number,
+    dueForReview = false,
+    limit = 50
+  ): Promise<{ items: VocabularyItem[] }> =>
+    request(`/vocabulary?pair_id=${pairId}&due_for_review=${dueForReview}&limit=${limit}`, {
+      headers: authed(token),
+    }),
+
+  review: (token: string, itemId: number, correct: boolean): Promise<ReviewResult> =>
+    request(`/vocabulary/${itemId}/review`, {
+      method: "POST",
+      headers: authed(token),
+      body: JSON.stringify({ correct }),
+    }),
+};
+
+export const assessmentApi = {
+  start: (
+    token: string,
+    pairId: number,
+    assessmentType: "placement" | "progress",
+    skills: string[]
+  ): Promise<StartAssessmentResponse> =>
+    request("/assessment/start", {
+      method: "POST",
+      headers: authed(token),
+      body: JSON.stringify({ pair_id: pairId, assessment_type: assessmentType, skills }),
+    }),
+
+  submit: (
+    token: string,
+    assessmentId: number,
+    answers: { question_id: string; skill: string; answer: string }[]
+  ): Promise<SubmitAssessmentResponse> =>
+    request(`/assessment/${assessmentId}/submit`, {
+      method: "POST",
+      headers: authed(token),
+      body: JSON.stringify({ answers }),
+    }),
+};
+
+export const lessonApi = {
+  generate: (
+    token: string,
+    pairId: number,
+    level: string,
+    lessonType: string,
+    topic?: string
+  ): Promise<LessonOut> =>
+    request("/lesson/generate", {
+      method: "POST",
+      headers: authed(token),
+      body: JSON.stringify({
+        pair_id: pairId,
+        level,
+        lesson_type: lessonType,
+        ...(topic ? { topic } : {}),
+      }),
+    }),
+
+  get: (token: string, lessonId: number): Promise<LessonOut> =>
+    request(`/lesson/${lessonId}`, { headers: authed(token) }),
+
+  complete: (
+    token: string,
+    lessonId: number,
+    score: number,
+    maxScore: number
+  ): Promise<CompleteLessonResponse> =>
+    request(`/lesson/${lessonId}/complete`, {
+      method: "POST",
+      headers: authed(token),
+      body: JSON.stringify({ score, max_score: maxScore }),
+    }),
+};
+
+export const scoringApi = {
+  scoreWriting: (
+    token: string,
+    pairId: number,
+    question: string,
+    level: string,
+    userAnswer: string,
+    xpReward: number
+  ): Promise<WritingScoreResult> =>
+    request("/assessment/score-writing", {
+      method: "POST",
+      headers: authed(token),
+      body: JSON.stringify({ pair_id: pairId, question, level, user_answer: userAnswer, xp_reward: xpReward }),
+    }),
+
+  scoreSpeaking: (
+    token: string,
+    audio: Blob,
+    pairId: number,
+    question: string,
+    level: string,
+    xpReward: number
+  ): Promise<SpeakingScoreResult> => {
+    const form = new FormData();
+    form.append("audio", audio, "recording.webm");
+    form.append("pair_id", String(pairId));
+    form.append("question", question);
+    form.append("level", level);
+    form.append("xp_reward", String(xpReward));
+    return request("/assessment/score-speaking", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
   },
 };
 

@@ -34,6 +34,26 @@ Users ──< UserLanguagePairs >── Languages (source)
 
 ## Tables
 
+### `schema_migrations`
+
+Tracks which numbered migration files have been applied. Used by the migration runner in `backend/database/migrations/__init__.py` to ensure each `.sql` file is applied exactly once.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | INTEGER | PK, AUTOINCREMENT | |
+| `version` | TEXT | NOT NULL, UNIQUE | Migration filename, e.g. `"001_assessment_questions.sql"` |
+| `applied_at` | TEXT | NOT NULL | ISO 8601 UTC, set at application time |
+
+```sql
+CREATE TABLE IF NOT EXISTS schema_migrations (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    version    TEXT    NOT NULL UNIQUE,
+    applied_at TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+```
+
+---
+
 ### `users`
 
 Stores authenticated platform users.
@@ -342,6 +362,8 @@ Assessment sessions tracking placement or progress evaluations.
 | `result_level` | TEXT | | CEFR code, set on completion |
 | `skill_levels_json` | TEXT | | `{"reading":"A1","writing":"A0"}` |
 | `total_xp_awarded` | INTEGER | | |
+| `questions_json` | TEXT | NOT NULL DEFAULT '[]' | Full question objects including `correct_index`; never exposed to client. Added by migration `001_assessment_questions.sql`. |
+| `feedback` | TEXT | | Human-readable summary generated at submit time; persisted for retrieval. Added by migration `002_assessment_feedback.sql`. |
 | `completed_at` | TEXT | | |
 | `created_at` | TEXT | NOT NULL | |
 
@@ -358,6 +380,8 @@ CREATE TABLE IF NOT EXISTS assessments (
     completed_at      TEXT,
     created_at        TEXT    NOT NULL DEFAULT (datetime('now'))
 );
+-- Migration 001 adds: questions_json TEXT NOT NULL DEFAULT '[]'
+-- Migration 002 adds: feedback TEXT
 ```
 
 ---
