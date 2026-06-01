@@ -479,7 +479,7 @@ Structured lessons that the learner works through at their placed level.
 
 ## Milestone 5 — Polish and Launch Prep
 
-### M5-01: Error Handling and Loading States ✅ COMPLETED 2026-05-31
+### M5-01: Error Handling and Loading States ✅ COMPLETED 2026-05-31 (patched 2026-06-01)
 
 **Description:** Add consistent error boundaries, API error toasts, and skeleton loading states across all pages.
 
@@ -495,6 +495,13 @@ Structured lessons that the learner works through at their placed level.
 
 **Language-pair agnosticism:** All new components are generic UI; no language names anywhere ✅
 
+**Rerun audit 2026-06-01:** All original artefacts pass. Next.js version confirmed as 16.2.1; `unstable_retry` prop name is correct per installed docs. Pages added post-M5-01 (lesson, vocabulary, chat) use inline error states rather than `addToast` — outside original scope but represent incomplete "across all pages" coverage. Tracked below.
+
+**Known gaps (post-M5-01 scope growth):**
+- `learn/[pairId]/lesson/[lessonId]` — completion errors use inline phase state; no toast
+- `learn/[pairId]/vocabulary` — fetch errors use inline block; no toast
+- `learn/[pairId]/chat` — API errors injected as fake assistant messages; no toast
+
 **Dependencies:** Milestones 1–4  
 **Priority:** Medium
 
@@ -506,7 +513,7 @@ Structured lessons that the learner works through at their placed level.
 
 **Scope note:** M2-02/03, M3-02/03/04, M4-04 are not yet built; those pages will be audited when they ship. This audit covers all currently existing app pages.
 
-**Pages audited:** `/auth/login`, `/auth/signup`, `/auth/forgot-password`, `/auth/change-password`, `/dashboard`, `/languages`, `/learn/[pairId]/chat`, `/learn/[pairId]/progress`
+**Pages audited (initial):** `/auth/login`, `/auth/signup`, `/auth/forgot-password`, `/auth/change-password`, `/dashboard`, `/languages`, `/learn/[pairId]/chat`, `/learn/[pairId]/progress`
 
 **Issues found and fixed:**
 
@@ -519,7 +526,15 @@ Structured lessons that the learner works through at their placed level.
    - `p-5 gap-4 w-11 h-11 text-2xl` in a 2-col grid leaves ~65px for the value text; 4+ digit numbers overflowed
    - Fixed: `p-4 sm:p-5`, `gap-3 sm:gap-4`, `w-10 h-10 sm:w-11 sm:h-11`, `text-xl sm:text-2xl`, added `min-w-0 truncate` to text container
 
-**No issues found in:** auth forms, dashboard nav/cards, languages form/pair cards, chat header/input/sessions panel — all already responsive across 375/768/1280px.
+**No issues found in (initial):** auth forms, dashboard nav/cards, languages form/pair cards, chat header/input/sessions panel — all already responsive across 375/768/1280px.
+
+**Rerun audit 2026-06-01:** Extended coverage to all pages deferred from initial run. All original fixes confirmed intact. No regressions found.
+
+**Pages audited (rerun — previously deferred):** `/learn/[pairId]/assessment`, `/learn/[pairId]/lesson/[lessonId]`, `/learn/[pairId]`, `/learn/[pairId]/vocabulary`
+
+**Rerun result: CLEAN PASS on all four new pages.** No fixes required. Two defensive watch notes recorded:
+- `assessment/page.tsx` IntroScreen: language pair header `flex` row has no `flex-wrap`; safe with current 12-language set but would overflow with future language names longer than ~12 characters (governance §4.3 risk).
+- `vocabulary/page.tsx` + `lesson/[lessonId]/page.tsx`: flashcard `text-2xl` word display lacks `overflow-wrap: break-word`; safe for AI-generated vocabulary, theoretical edge case for single-token compound words without break opportunities.
 
 **Dependencies:** Milestones 1–4  
 **Priority:** Medium
@@ -531,7 +546,7 @@ Structured lessons that the learner works through at their placed level.
 **Description:** Add rate limiting to AI-backed endpoints (`/chat`, `/lesson/generate`, `/assessment/score-*`). Use in-memory rate limiter (slowapi) for MVP. Limits: 30 chat messages per user per hour, 10 lesson generations per user per hour.
 
 **Implemented:**
-- `backend/middleware/rate_limit.py` — `Limiter` with per-user JWT key function (`_user_id_key`); `CHAT_LIMIT = "30/hour"`, `LESSON_GENERATE_LIMIT = "10/hour"`, `ASSESSMENT_SCORE_LIMIT = "10/hour"`
+- `backend/middleware/rate_limit.py` — `Limiter` with per-user JWT key function (`_user_id_key`); `CHAT_LIMIT = "30/hour"`, `LESSON_GENERATE_LIMIT = "10/hour"`, `ASSESSMENT_SCORE_LIMIT = "20/hour"` (raised from 10 — see rerun notes)
 - `backend/main.py` — `app.state.limiter` assigned; `RateLimitExceeded` handler registered
 - `backend/api/chat.py` — `POST /chat` decorated with `@limiter.limit(CHAT_LIMIT)`; `request: Request` added
 - `backend/api/lessons.py` — `POST /lesson/generate` decorated with `@limiter.limit(LESSON_GENERATE_LIMIT)`; `request: Request` added
@@ -543,14 +558,34 @@ Structured lessons that the learner works through at their placed level.
 
 **Key decisions (ADR-004):** Per-user keying (JWT `sub` claim); in-memory backend for MVP; key function falls back to client IP; Redis upgrade is a one-line constructor change.
 
+**Rerun audit 2026-06-01:** Three artefacts were stale due to `ASSESSMENT_SCORE_LIMIT` being raised from `"10/hour"` to `"20/hour"` during the M3 milestone audit (Gap 2 fix — shared rate-limit bucket between assessment and lesson scoring flows). Fixed:
+- `backend/tests/test_rate_limit.py` — `test_assessment_score_limit_is_10_per_hour` renamed to `test_assessment_score_limit_is_20_per_hour`; assertion updated to `"20/hour"`. All 12 tests now pass.
+- `docs/decisions/004-rate-limiting.md` — assessment score limits updated to 20/hour; rationale for the change documented inline.
+- `docs/architecture.md` — Rate Limiting section updated to reflect 20/hour with shared-budget note.
+All other artefacts (endpoint decorators, key function, `main.py` wiring, `api_contract.md`) were already correct.
+
 **Dependencies:** M1-06, M3-02  
 **Priority:** Medium
 
 ---
 
-### M5-04: Environment and Secrets Audit
+### M5-04: Environment and Secrets Audit ✅ COMPLETED 2026-06-01
 
 **Description:** Verify all secrets are in environment variables. Remove `shutil.which("ffmpeg")` debug print and other debug logging from production code. Ensure CORS origins are tightly configured.
+
+**Implemented:**
+- `backend/main.py` — startup enforcement for `JWT_SECRET_KEY` and `OPENAI_API_KEY`; server now raises `RuntimeError` on boot if either is absent (per ADR-002 constraint). CORS `allow_methods` tightened from `["*"]` to `["GET", "POST", "DELETE"]`; `allow_headers` tightened from `["*"]` to `["Content-Type", "Authorization"]`.
+- `backend/api/conversation.py` — removed `print(f"Error during transcription: {e}")` debug statement from the active `/conversation/transcribe` handler.
+- `backend/api/reception.py` — removed `print(DB_PATH)` debug statement from module level.
+- `.gitignore` (root) — broadened `.env` pattern to `.env*` to cover `.env.local`, `.env.production`, and similar variants (frontend `.gitignore` already used `.env*`).
+
+**Secrets verification result:**
+- `JWT_SECRET_KEY` — `os.getenv()` in `auth_service.py`; `RuntimeError` if absent (startup + per-call) ✅
+- `OPENAI_API_KEY` — `os.getenv()` in all AI layer modules; `RuntimeError` if absent at startup ✅
+- `ALLOWED_ORIGINS` — `os.getenv()` with safe fallback in `main.py` ✅
+- `DATABASE_PATH` — filesystem path, no secret ✅
+
+**Note:** `shutil.which("ffmpeg")` was not present in the codebase — already resolved before this run. `print()` statements in `scripts/init_db.py`, `scripts/migrate_db.py`, and `database/migrations/__init__.py` are legitimate CLI/startup diagnostic output and were intentionally left.
 
 **Dependencies:** Milestones 1–4  
 **Priority:** High

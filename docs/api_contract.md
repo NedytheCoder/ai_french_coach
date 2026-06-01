@@ -526,8 +526,8 @@ Get the overall learning progress for a language pair.
   "lessons_completed": 14,
   "messages_sent": 78,
   "daily_history": [
-    { "date": "2026-05-30", "xp_earned": 45, "lessons_completed": 2 },
-    { "date": "2026-05-29", "xp_earned": 30, "lessons_completed": 1 }
+    { "date": "2026-05-29", "xp_earned": 30, "lessons_completed": 1 },
+    { "date": "2026-05-30", "xp_earned": 45, "lessons_completed": 2 }
   ],
   "level_progress": {
     "current_level": "A1",

@@ -3,6 +3,11 @@ import os
 
 load_dotenv()
 
+# ADR-002: server must not start without these variables.
+_missing_env = [v for v in ("JWT_SECRET_KEY", "OPENAI_API_KEY") if not os.getenv(v)]
+if _missing_env:
+    raise RuntimeError(f"Required environment variables not set: {', '.join(_missing_env)}")
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
@@ -36,8 +41,8 @@ _allowed_origins = os.getenv(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_allowed_origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["Content-Type", "Authorization"],
     allow_credentials=True,
 )
 

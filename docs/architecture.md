@@ -226,7 +226,7 @@ backend/
 
 All AI-backed endpoints are protected by per-user in-memory rate limiting via `slowapi` (ADR-004). Rate limit state lives in `backend/middleware/rate_limit.py`. The `Limiter` is attached to `app.state` in `main.py` and applied via `@limiter.limit(...)` decorators on individual endpoint handlers.
 
-Limits: 30 chat requests/hour, 10 lesson generation requests/hour, 10 assessment scoring requests/hour.
+Limits: 30 chat requests/hour, 10 lesson generation requests/hour, 20 assessment scoring requests/hour (shared budget covering both the assessment flow and writing/speaking lesson scoring — see ADR-004).
 
 ### AI Layer
 

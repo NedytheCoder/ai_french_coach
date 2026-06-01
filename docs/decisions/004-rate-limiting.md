@@ -30,8 +30,10 @@ We will use `slowapi` (a FastAPI-compatible wrapper around `limits`) for in-memo
 Rate limits:
 - `POST /chat`: 30/hour per user
 - `POST /lesson/generate`: 10/hour per user
-- `POST /assessment/score-writing`: 10/hour per user
-- `POST /assessment/score-speaking`: 10/hour per user
+- `POST /assessment/score-writing`: 20/hour per user
+- `POST /assessment/score-speaking`: 20/hour per user
+
+**Updated 2026-06-01:** Assessment scoring limits raised from 10/hour to 20/hour. `POST /assessment/score-writing` and `POST /assessment/score-speaking` are called by both the placement/progress assessment flow and the writing/speaking lesson renderers. Both call the same endpoints under the same user token, drawing from the same rate-limit bucket. 20/hour provides adequate headroom for users combining assessments and scored lessons within the same hour without changing the cost-protection intent.
 
 Limit configuration lives in `backend/middleware/rate_limit.py`. A 429 response is returned when a limit is exceeded.
 

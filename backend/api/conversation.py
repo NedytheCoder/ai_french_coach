@@ -52,6 +52,5 @@ def transcribe(file: UploadFile = File(...)):
         return transcribe_audio(audio_bytes)
     except HTTPException:
         raise
-    except Exception as e:
-        print(f"Error during transcription: {e}")
+    except Exception:
         raise HTTPException(status_code=500, detail="Transcription failed")

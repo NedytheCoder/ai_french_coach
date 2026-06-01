@@ -92,11 +92,13 @@ function FlashcardSession({
   async function handleAnswer(correct: boolean) {
     if (submitting) return
     setSubmitting(true)
+    let earnedThisCard = 0
     try {
       const result = await vocabularyApi.review(token, item.id, correct)
-      if (result.xp_awarded > 0) {
-        setXpTotal((x) => x + result.xp_awarded)
-        setXpToast(result.xp_awarded)
+      earnedThisCard = result.xp_awarded
+      if (earnedThisCard > 0) {
+        setXpTotal((x) => x + earnedThisCard)
+        setXpToast(earnedThisCard)
         setTimeout(() => setXpToast(null), 2000)
       }
     } catch {
@@ -108,7 +110,7 @@ function FlashcardSession({
       setFace("front")
       setIdx((i) => i + 1)
     } else {
-      onComplete(xpTotal + (correct ? 2 : 0))
+      onComplete(xpTotal + earnedThisCard)
     }
   }
 

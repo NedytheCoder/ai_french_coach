@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 
 from models.vocabulary import ReviewResponse, VocabularyItemOut, VocabularyListResponse
+from services.progress_service import record_activity
 
 _XP_PER_CORRECT_REVIEW = 2
 _INITIAL_INTERVAL_DAYS = 1
@@ -122,5 +123,6 @@ def review_vocabulary(
             "UPDATE user_language_pairs SET total_xp = total_xp + ? WHERE id = ?",
             (xp, row["pair_id"]),
         )
+        record_activity(conn, row["pair_id"], xp)
 
     return ReviewResponse(item_id=item_id, next_review_at=next_review, xp_awarded=xp)

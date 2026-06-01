@@ -122,7 +122,7 @@ def _compute_level_progress(level: str, total_xp: int) -> LevelProgress:
         return LevelProgress(
             current_level=level,
             xp_in_level=xp_in_level,
-            xp_required=_XP_THRESHOLDS["C1"],
+            xp_required=0,
             percent=100,
         )
 

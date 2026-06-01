@@ -14,7 +14,6 @@ router = APIRouter(prefix="/reception", tags=["reception"])
 
 # Database path - adjust based on your project structure
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "app.db")
-print(DB_PATH)
 
 @router.get("/")
 def get_reception():

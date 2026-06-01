@@ -93,8 +93,8 @@ class TestLimitConstants:
     def test_lesson_generate_limit_is_10_per_hour(self):
         assert LESSON_GENERATE_LIMIT == "10/hour"
 
-    def test_assessment_score_limit_is_10_per_hour(self):
-        assert ASSESSMENT_SCORE_LIMIT == "10/hour"
+    def test_assessment_score_limit_is_20_per_hour(self):
+        assert ASSESSMENT_SCORE_LIMIT == "20/hour"
 
 
 class TestLimiterConfiguration:
